@@ -1,7 +1,10 @@
+# -*- coding: utf-8 -*-
+
 from xadmin.sites import AdminSite, site
 
 VERSION = [0,5,0]
 
+ROOT_PATH_NAME = ''
 
 class Settings(object):
     pass
@@ -24,7 +27,7 @@ def autodiscover():
         "fileinput": "fileinput fileUpload form-control",
         "passwordinput": "textinput textInput form-control",
     })
-
+    # 加载内置相关视图
     from xadmin.views import register_builtin_views
     register_builtin_views(site)
 
@@ -43,7 +46,7 @@ def autodiscover():
                     site.register_settings(setting.__name__, setting)
             except Exception:
                 pass
-
+    # 加载插件
     from xadmin.plugins import register_builtin_plugins
     register_builtin_plugins(site)
 
