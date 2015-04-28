@@ -41,7 +41,13 @@ class FakeMethodField(object):
 
 
 class ResultRow(dict):
-    pass
+    def __init__(self):
+        self.cells = []
+        
+    def add_cell(self,name, text):
+        item = ResultItem(name, self)
+        item.text = text
+        self.cells.append(item)
 
 
 class ResultItem(object):
