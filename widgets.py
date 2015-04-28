@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Form Widget classes specific to the Django admin site.
 """
@@ -49,6 +50,41 @@ class AdminTimeWidget(forms.TimeInput):
 
 
 class AdminSelectWidget(forms.Select):
+
+    @property
+    def media(self):
+        return vendor('select.js', 'select.css', 'xadmin.widget.select.js')
+    
+class AjaxSearchWidget(forms.TextInput):
+
+    def __init__(self, data_source, attrs=None, using=None):
+        self.data_source = data_source
+        super(AjaxSearchWidget, self).__init__(attrs)
+
+    def render(self, name, value, attrs=None):
+        if attrs is None:
+            attrs = {}
+        if "class" not in attrs:
+            attrs['class'] = 'select-search'
+        else:
+            attrs['class'] = attrs['class'] + ' select-search'
+        attrs['data-search-url'] = self.data_source
+        attrs['data-placeholder'] = u'输入查找'
+        attrs['data-choices'] = '?'
+        if value:
+            attrs['data-label'] = self.label_for_value(value)
+
+        return super(AjaxSearchWidget, self).render(name, value, attrs)
+
+    def label_for_value(self, value):
+        return 'test label_for_value'
+#        key = self.rel.get_related_field().name
+#        try:
+#            obj = self.rel.to._default_manager.using(
+#                self.db).get(**{key: value})
+#            return '%s' % escape(Truncator(obj).words(14, truncate='...'))
+#        except (ValueError, self.rel.to.DoesNotExist):
+#            return ""
 
     @property
     def media(self):
