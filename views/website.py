@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+'''
+一些站点级视图
+'''
 from django.utils.translation import ugettext as _
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.views.decorators.cache import never_cache
@@ -35,7 +39,7 @@ class UserSettingView(BaseAdminView):
 
 class LoginView(BaseAdminView):
 
-    title = _("Please Login")
+    title = _(u"登陆")
     login_form = None
     login_template = None
 
@@ -58,7 +62,7 @@ class LoginView(BaseAdminView):
             'extra_context': context,
             'current_app': self.admin_site.name,
             'authentication_form': self.login_form or AdminAuthenticationForm,
-            'template_name': self.login_template or 'xadmin/views/login.html',
+            'template_name': self.login_template or 'xadmin/auth/login.html',
         }
         self.update_params(defaults)
         return login(request, **defaults)
