@@ -19,12 +19,9 @@ from xadmin.views.detail import DetailAdminUtil
 
 from base import ModelAdminView, filter_hook, csrf_protect_m
 
-#: xadmin在显示 Form 时，系统默认的 DB Field 对应的 Form Field 的属性。
+#: xadmin在显示 Form 时，系统默认的 DBField 对应的 FormField的属性。
 FORMFIELD_FOR_DBFIELD_DEFAULTS = {
-    models.DateTimeField: {
-        'form_class': forms.SplitDateTimeField,
-        'widget': widgets.AdminSplitDateTime
-    },
+    models.DateTimeField: {'form_class': forms.SplitDateTimeField, 'widget': widgets.AdminSplitDateTime },
     models.DateField: {'widget': widgets.AdminDateWidget},
     models.TimeField: {'widget': widgets.AdminTimeWidget},
     models.TextField: {'widget': widgets.AdminTextareaWidget},
@@ -43,7 +40,7 @@ FORMFIELD_FOR_DBFIELD_DEFAULTS = {
 
 class ReadOnlyField(Field):
     """
-    crispy Field，使用 :class:`~xadmin.views.detail.DetailAdminView` 仅显示该字段的内容，不能编辑。
+    crispy Field，使用在 xadmin.views.detail.DetailAdminView 仅显示该字段的内容，不能编辑。
     """
     template = "xadmin/layout/field_value.html"
 
@@ -63,7 +60,7 @@ class ReadOnlyField(Field):
 
 class ModelFormAdminView(ModelAdminView):
     """
-    用于添加或修改数据的 AdminView，该类是一个基类，提供了数据表单显示及修改等通用功能，被 :class:`CreateAdminView` 及 :class:`UpdateAdminView` 继承
+    用于添加或修改数据的 AdminView，该类是一个基类，提供了数据表单显示及修改等通用功能，被 CreateAdminView 及 UpdateAdminView 继承
 
     **Option 属性**
 
@@ -81,17 +78,10 @@ class ModelFormAdminView(ModelAdminView):
 
         .. autoattribute:: form_layout
     """
-    form = forms.ModelForm     #: 使用 Model 生成 Form 的基本 Form 类，默认为 django.forms.ModelForm
+    form = forms.ModelForm     #: 使Model 生成 Form 的基本 Form 类，默认为 django.forms.ModelForm
     formfield_overrides = {}
     """
-    可以指定某种类型的 DB Field，使用指定的 Form Field 属性，例如::
-
-        class AtricleAdmin(object):
-            formfield_overrides = {
-                models.FileField:{'widget': mywidgets.XFileWidget},
-            }
-
-    这样，显示所有 FileField 字段时，都会使用 ``mywidgets.XFileWidget`` 来显示
+    可以指定某种类型的 DB Field，使用指定的 Form Field 属性
     """
     readonly_fields = ()       #: 只读的字段，这些字段不能被编辑
     style_fields = {}
@@ -114,6 +104,10 @@ class ModelFormAdminView(ModelAdminView):
     change_form_template = None  #: 修改页面的模板
 
     form_layout = None
+    hidde_other_field = False
+    add_redirect_url = None
+    edit_redirect_url = None
+    
     """
     页面 Form 的 Layout 对象，是一个标准的 Crispy Form Layout 对象。使用 Layout 可以方便的定义整个 Form 页面的结构。
     有关 Crispy Form 可以参考其文档 `Crispy Form 文档 <http://django-crispy-forms.readthedocs.org/en/latest/layouts.html>`_
@@ -307,7 +301,7 @@ class ModelFormAdminView(ModelAdminView):
             other_fieldset = Fieldset(_(u'Other Fields'), *[f for f in fields if f not in rendered_fields])
 
             # 将所有没有显示的字段和在一个 Fieldset 里面显示
-            if len(other_fieldset.fields):
+            if len(other_fieldset.fields) and not self.hidde_other_field:
                 if len(container) and isinstance(container[0], Column):
                     # 把其他字段放在第一列显示
                     container[0].fields.append(other_fieldset)
@@ -334,6 +328,7 @@ class ModelFormAdminView(ModelAdminView):
             for field in readonly_fields:
                 # 替换只读字段
                 helper[field].wrap(ReadOnlyField, detail=detail)
+
 
         return helper
 
@@ -599,7 +594,10 @@ class CreateAdminView(ModelFormAdminView):
             if "_redirect" in request.REQUEST:
                 return request.REQUEST["_redirect"]
             elif self.has_view_permission():
-                return self.model_admin_url('changelist')
+                if self.add_redirect_url:
+                    return self.add_redirect_url%self.new_obj._get_pk_val()
+                else:
+                    return self.model_admin_url('changelist')
             else:
                 return self.get_admin_url('index')
 
