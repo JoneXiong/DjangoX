@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import django
 from django.db import models
 from django.db.models.sql.query import LOOKUP_SEP
@@ -42,11 +43,14 @@ except Exception:
 
 
 def xstatic(*tags):
+    u'''
+    根据vendors映射表得到资源的static路径
+    '''
     from vendors import vendors
     node = vendors
 
     fs = []
-    lang = get_language()
+#    lang = get_language()
 
     for tag in tags:
         try:
