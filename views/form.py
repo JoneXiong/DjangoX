@@ -15,6 +15,7 @@ from xadmin import widgets
 from xadmin.layout import FormHelper, Layout, Fieldset, TabHolder, Container, Column, Col, Field
 from xadmin.util import unquote
 from xadmin.views.detail import DetailAdminUtil
+from xadmin.plugins.ajax import JsonErrorDict
 
 from base import CommAdminView, filter_hook, csrf_protect_m
 
@@ -23,7 +24,7 @@ class FormAdminView(CommAdminView):
     title = None
     readonly_fields = ()
 
-    form_template = 'xadmin/views/form.html'
+    template = 'xadmin/views/form.html'
 
     form_layout = None
 
@@ -113,6 +114,12 @@ class FormAdminView(CommAdminView):
                 return HttpResponseRedirect(response)
             else:
                 return response
+        else:
+            if self.request.is_ajax() or self.request.GET.get('_ajax'):
+                result = {}
+                result['result'] = 'error'
+                result['errors'] = JsonErrorDict(self.form_obj.errors, self.form_obj).as_json()
+                return self.render_response(result)
 
         return self.get_response()
 
@@ -154,7 +161,7 @@ class FormAdminView(CommAdminView):
         context.update(self.kwargs or {})
 
         return TemplateResponse(
-            self.request, self.form_template,
+            self.request, self.template,
             context, current_app=self.admin_site.name)
 
     @filter_hook
