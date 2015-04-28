@@ -1,5 +1,5 @@
 {% load url from future %}{% load xadmin_tags %}{% load i18n %}<!DOCTYPE html>
-<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+<html lang="zh_CN">
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
   {% block extrameta %}
@@ -8,13 +8,10 @@
   {% endblock %}
   {% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
   <title>{% block title %}{% endblock %}</title>
-  {% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% block stylesheet_rtl %}{% static "xadmin/css/rtl.css" %}{% endblock %}" />{% endif %}
   {% vendor 'bootstrap.css' %}
-  {% if site_theme %}
-  <link rel="stylesheet" type="text/css" id="site-theme" href="{{site_theme}}" />
-  {% else %}
+
   <link rel="stylesheet" type="text/css" href="{% static "xadmin/css/themes/bootstrap-xadmin.css" %}" />
-  {% endif %}
+
   {% vendor 'font-awesome.css' 'xadmin.main.css' 'xadmin.plugins.css' 'xadmin.responsive.css' %}
   {{ media.css }}
   {% block extrastyle %}{% endblock %}
@@ -24,7 +21,7 @@
     window.__admin_media_prefix__ = "{% filter escapejs %}{% static "xadmin/" %}{% endfilter %}";
     window.__admin_path_prefix__ = "{% filter escapejs %}{{ indexurl }}{% endfilter %}";
   </script>
-  <script type="text/javascript" src="{% url 'xadmin:jsi18n' %}"></script>
+  <script type="text/javascript" src="{% static "xadmin/js/jsi18n.js" %}"></script>
   {% block extrahead %}{% endblock %}
   {% view_block 'extrahead' %}
 </head>
