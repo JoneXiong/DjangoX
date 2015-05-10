@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+import datetime
+
 from django.db import models
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.encoding import smart_unicode
@@ -10,22 +13,47 @@ from django.utils.html import escape,format_html
 from django.utils.text import Truncator
 from django.core.cache import cache, get_cache
 
-from xadmin.views.list import EMPTY_CHANGELIST_VALUE
-import datetime
+from xadmin.defs import EMPTY_CHANGELIST_VALUE
+from xadmin.defs import FILTER_PREFIX, SEARCH_VAR
 
-FILTER_PREFIX = '_p_'
-SEARCH_VAR = '_q_'
+from util import get_model_from_relation, reverse_field_path, get_limit_choices_to_from_path, prepare_lookup_value
 
-from util import (get_model_from_relation,
-    reverse_field_path, get_limit_choices_to_from_path, prepare_lookup_value)
 
+class FieldFilterManager(object):
+    _field_list_filters = []
+    _take_priority_index = 0
+
+    def register(self, list_filter_class, take_priority=False):
+        if take_priority:
+            # 是否优先使用
+            self._field_list_filters.insert(
+                self._take_priority_index, list_filter_class)
+            self._take_priority_index += 1
+        else:
+            self._field_list_filters.append(list_filter_class)
+        return list_filter_class
+
+    def create(self, field, request, params, model, admin_view, field_path):
+        for list_filter_class in self._field_list_filters:
+            if not list_filter_class.test(field, request, params, model, admin_view, field_path):
+                continue
+            print 'use filter: ',field, list_filter_class
+            return list_filter_class(field, request, params, model, admin_view, field_path=field_path)
+
+manager = FieldFilterManager()
 
 class BaseFilter(object):
+    u'''
+    过滤器基类
+    '''
     title = None
     template = 'xadmin/filters/list.html'
 
     @classmethod
     def test(cls, field, request, params, model, admin_view, field_path):
+        u'''
+        用于判断是否应用该过滤器
+        '''
         pass
 
     def __init__(self, request, params, model, admin_view):
@@ -41,9 +69,15 @@ class BaseFilter(object):
                 "a 'title'." % self.__class__.__name__)
 
     def query_string(self, new_params=None, remove=None):
+        u'''
+        得到当前请求的url参数
+        '''
         return self.admin_view.get_query_string(new_params, remove)
 
     def form_params(self):
+        u'''
+        得到当前请求的form表单参数
+        '''
         return self.admin_view.get_form_params(
             remove=map(lambda k: FILTER_PREFIX + k, self.used_params.keys()))
 
@@ -58,7 +92,8 @@ class BaseFilter(object):
         return len(self.used_params) > 0
 
     def do_filte(self, queryset):
-        """
+        u"""
+        执行过滤器查询
         Returns the filtered queryset.
         """
         raise NotImplementedError
@@ -71,44 +106,24 @@ class BaseFilter(object):
         return mark_safe(tpl.render(Context(self.get_context())))
 
 
-class FieldFilterManager(object):
-    _field_list_filters = []
-    _take_priority_index = 0
-
-    def register(self, list_filter_class, take_priority=False):
-        if take_priority:
-            # This is to allow overriding the default filters for certain types
-            # of fields with some custom filters. The first found in the list
-            # is used in priority.
-            self._field_list_filters.insert(
-                self._take_priority_index, list_filter_class)
-            self._take_priority_index += 1
-        else:
-            self._field_list_filters.append(list_filter_class)
-        return list_filter_class
-
-    def create(self, field, request, params, model, admin_view, field_path):
-        for list_filter_class in self._field_list_filters:
-            if not list_filter_class.test(field, request, params, model, admin_view, field_path):
-                continue
-            return list_filter_class(field, request, params,
-                                     model, admin_view, field_path=field_path)
-
-manager = FieldFilterManager()
-
-
 class FieldFilter(BaseFilter):
-
+    u'''
+    字段过滤器基类
+    '''
+    
     lookup_formats = {}
 
     def __init__(self, field, request, params, model, admin_view, field_path):
+        # 多了两个参数
         self.field = field
         self.field_path = field_path
+        
         self.title = getattr(field, 'verbose_name', field_path)
         self.context_params = {}
 
         super(FieldFilter, self).__init__(request, params, model, admin_view)
-
+        
+        # 设置 self.lookup_[key] = value，和 self.context_params、self.used_params
         for name, format in self.lookup_formats.items():
             p = format % field_path
             self.context_params["%s_name" % name] = FILTER_PREFIX + p
@@ -119,24 +134,26 @@ class FieldFilter(BaseFilter):
             else:
                 self.context_params["%s_val" % name] = ''
 
-        map(lambda kv: setattr(
-            self, 'lookup_' + kv[0], kv[1]), self.context_params.items())
+        map(lambda kv: setattr(self, 'lookup_' + kv[0], kv[1]), self.context_params.items())
 
     def get_context(self):
         context = super(FieldFilter, self).get_context()
         context.update(self.context_params)
-        context['remove_url'] = self.query_string(
-            {}, map(lambda k: FILTER_PREFIX + k, self.used_params.keys()))
+        context['remove_url'] = self.query_string( {}, map( lambda k: FILTER_PREFIX + k, self.used_params.keys() ) )
         return context
 
     def has_output(self):
         return True
 
     def do_filte(self, queryset):
+        u'''根据 used_params 做查询'''
         return queryset.filter(**self.used_params)
 
 
 class ListFieldFilter(FieldFilter):
+    u'''
+    列表型字段过滤器基类
+    '''
     template = 'xadmin/filters/list.html'
 
     def get_context(self):
@@ -154,15 +171,12 @@ class BooleanFieldListFilter(ListFieldFilter):
         return isinstance(field, (models.BooleanField, models.NullBooleanField))
 
     def choices(self):
-        for lookup, title in (
-                ('', _('All')),
-                ('1', _('Yes')),
-                ('0', _('No'))):
+        for lookup, title in (  ('', _('All')), ('1', _('Yes')), ('0', _('No'))  ):
             yield {
                 'selected': self.lookup_exact_val == lookup and not self.lookup_isnull_val,
-                'query_string': self.query_string({
+                'query_string': self.query_string( {
                 self.lookup_exact_name: lookup,
-                }, [self.lookup_isnull_name]),
+                }, [self.lookup_isnull_name] ),
                 'display': title,
             }
         if isinstance(self.field, models.NullBooleanField):
@@ -197,14 +211,14 @@ class ChoicesFieldListFilter(ListFieldFilter):
             }
 
 
-@manager.register
+# @manager.register
 class TextFieldListFilter(FieldFilter):
     template = 'xadmin/filters/char.html'
     lookup_formats = {'in': '%s__in','search': '%s__contains'}
 
     @classmethod
     def test(cls, field, request, params, model, admin_view, field_path):
-        return (isinstance(field, models.CharField) and field.max_length > 20) or isinstance(field, models.TextField)
+        return isinstance(field, models.CharField) or isinstance(field, models.TextField)
 
 
 @manager.register
@@ -225,7 +239,7 @@ class NumberFieldListFilter(FieldFilter):
             queryset = queryset.exclude(
                 **{self.field_path: params.pop(ne_key)})
         return queryset.filter(**params)
-
+    
 
 @manager.register
 class DateFieldListFilter(ListFieldFilter):
@@ -419,8 +433,31 @@ class RelatedFieldListFilter(ListFieldFilter):
                 }, [self.lookup_exact_name]),
                 'display': EMPTY_CHANGELIST_VALUE,
             }
+            
+            
+# @manager.register
+class CommonFieldListFilter(FieldFilter):
+    template = 'xadmin/filters/common.html'
+    lookup_formats = {'equal': '%s__exact',
+                      'ne': '%s__ne',
+                      'search': '%s__contains'
+                      }
 
-@manager.register
+    @classmethod
+    def test(cls, field, request, params, model, admin_view, field_path):
+        return True
+
+    def do_filte(self, queryset):
+        params = self.used_params.copy()
+        ne_key = '%s__ne' % self.field_path
+        if ne_key in params:
+            queryset = queryset.exclude(
+                **{self.field_path: params.pop(ne_key)})
+        print 'do filter: ',params
+        return queryset.filter(**params)
+
+
+# @manager.register
 class MultiSelectFieldListFilter(ListFieldFilter):
     """ Delegates the filter to the default filter and ors the results of each
      
@@ -495,7 +532,7 @@ class MultiSelectFieldListFilter(ListFieldFilter):
                 'display': val,
             }
 
-@manager.register
+# @manager.register
 class AllValuesFieldListFilter(ListFieldFilter):
     lookup_formats = {'exact': '%s__exact', 'isnull': '%s__isnull'}
 
