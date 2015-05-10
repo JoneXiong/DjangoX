@@ -411,7 +411,7 @@ def boolean_icon(field_val):
 
 
 def display_for_field(value, field):
-    from xadmin.views.list import EMPTY_CHANGELIST_VALUE
+    from xadmin.defs import EMPTY_CHANGELIST_VALUE
 
     if field.flatchoices:
         return dict(field.flatchoices).get(value, EMPTY_CHANGELIST_VALUE)
