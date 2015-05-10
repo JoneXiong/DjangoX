@@ -57,7 +57,7 @@ from xadmin.sites import site
 from xadmin.views import ModelAdminView, BaseAdminPlugin, ListAdminView
 from xadmin.views.list import COL_LIST_VAR, ORDER_VAR
 from xadmin.views.dashboard import widget_manager, BaseWidget, PartialBaseWidget
-from xadmin.filters import FILTER_PREFIX, SEARCH_VAR
+from xadmin.defs import FILTER_PREFIX, SEARCH_VAR
 from xadmin.plugins.relate import RELATE_PREFIX
 
 from xadmin.models import Bookmark

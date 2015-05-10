@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse, NoReverseMatch
 from django.utils.translation import ugettext as _
 
 from xadmin.sites import site
-from xadmin.filters import SEARCH_VAR
+from xadmin.defs import SEARCH_VAR
 from xadmin.views import BaseAdminPlugin, CommAdminView
 
 

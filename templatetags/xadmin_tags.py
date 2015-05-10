@@ -1,3 +1,4 @@
+#coding:utf-8
 from django.template import Library
 from xadmin.util import static, vendor as util_vendor
 
@@ -6,6 +7,9 @@ register = Library()
 
 @register.simple_tag(takes_context=True)
 def view_block(context, block_name, *args, **kwargs):
+    u'''
+    后台block实现
+    '''
     if 'admin_view' not in context:
         return ""
 

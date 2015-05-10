@@ -39,7 +39,7 @@ from xadmin.util import lookup_field, display_for_field, label_for_field, unquot
 from xadmin.views import BaseAdminPlugin, ModelFormAdminView, ListAdminView
 from xadmin.views.base import csrf_protect_m, filter_hook
 from xadmin.views.edit import ModelFormAdminUtil
-from xadmin.views.list import EMPTY_CHANGELIST_VALUE
+from xadmin.defs import EMPTY_CHANGELIST_VALUE
 from xadmin.layout import FormHelper
 
 
