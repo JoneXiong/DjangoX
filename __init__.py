@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from xadmin.sites import AdminSite, site
+from xadmin.sites import site
 
 VERSION = [0,5,0]
 
 ROOT_PATH_NAME = ''
 
-class Settings(object):
-    pass
+#class Settings(object):
+#    pass
 
 
 def autodiscover():
@@ -21,6 +21,7 @@ def autodiscover():
     from django.utils.importlib import import_module
     from django.utils.module_loading import module_has_submodule
 
+    # 一些动态设置的settings项
     setattr(settings, 'CRISPY_TEMPLATE_PACK', 'bootstrap3')
     setattr(settings, 'CRISPY_CLASS_CONVERTERS', {
         "textinput": "textinput textInput form-control",
@@ -31,25 +32,26 @@ def autodiscover():
     from xadmin.views import register_builtin_views
     register_builtin_views(site)
 
-    # load xadmin settings from XADMIN_CONF module
-    try:
-        xadmin_conf = getattr(settings, 'XADMIN_CONF', 'xadmin_conf.py')
-        conf_mod = import_module(xadmin_conf)
-    except Exception:
-        conf_mod = None
-
-    if conf_mod:
-        for key in dir(conf_mod):
-            setting = getattr(conf_mod, key)
-            try:
-                if issubclass(setting, Settings):
-                    site.register_settings(setting.__name__, setting)
-            except Exception:
-                pass
+#    # load xadmin settings from XADMIN_CONF module
+#    try:
+#        xadmin_conf = getattr(settings, 'XADMIN_CONF', 'xadmin_conf.py')
+#        conf_mod = import_module(xadmin_conf)
+#    except Exception:
+#        conf_mod = None
+#
+#    if conf_mod:
+#        for key in dir(conf_mod):
+#            setting = getattr(conf_mod, key)
+#            try:
+#                if issubclass(setting, Settings):
+#                    site.register_settings(setting.__name__, setting)
+#            except Exception:
+#                pass
     # 加载插件
     from xadmin.plugins import register_builtin_plugins
     register_builtin_plugins(site)
 
+    # 加载各app的 adminx入口
     for app in settings.INSTALLED_APPS:
         mod = import_module(app)
         # Attempt to import the app's admin module.

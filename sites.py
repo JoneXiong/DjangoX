@@ -37,11 +37,9 @@ class MergeAdminMetaclass(type):
 
 class AdminSite(object):
     """
+    全局管理对象
     xadmin最核心的类，管理整个xadmin站点的所有注册内容。
 
-    一般一个管理站点只有一个 ``AdminSite`` 实例，该实例主要完成以下工作:
-
-        * 注册管理所有 xadmin 需要的信息
         * 创建 ``admin view class``
         * 注册 django urls
 
@@ -56,22 +54,23 @@ class AdminSite(object):
         self.name = name
         self.app_name = 'xadmin'
 
-        self._registry = {}  # model_class class -> admin_class class
-        self._registry_avs = {}  # admin_view_class class -> admin_class class
+        self._registry = {}  # model_class class -> admin_class class    模型类全局字典
+        self._registry_avs = {}  # admin_view_class class -> admin_class class    型管理类全局字典
         self._registry_settings = {}  # settings name -> admin_class class
-        self._registry_views = []
+        self._registry_views = []   #他非模型视图集合
+        self._registry_pages = []   #Page模型集合
 
-        #: 保存所有 Model Base Admin View Class
+        #: 保存所有 Model Base Admin View Class    型视图集合
         self._registry_modelviews = []
 
         #: 保存所有系统插件信息， 
-        #    *key*   : 插件绑定的 Admin View 类 
-        #    *value* : 插件 类
+        #    *key*   : 插件绑定的 AdminView 类 
+        #    *value* : 插件类
         self._registry_plugins = {}
 
-        #: 创建好的 admin view 会被缓存起来，同样的， 
-        #    *key*   : 需要创建的 Admin View 的 class name
-        #    *value* : 已经缓存的 Admin View 类
+        #: 创建好的 AdminView 会被缓存起来，同样的， 
+        #    *key*   : 需要创建的 AdminView 的 class name
+        #    *value* : 已经缓存的 AdminView 类
         self._admin_view_cache = {}
 
         self.check_dependencies()
@@ -105,11 +104,11 @@ class AdminSite(object):
 
     def register_modelview(self, path, admin_view_class, name):
         """
-        将 Model Base Admin View 类注册到 AdminSite，
+        注册 ModelAdminView 子类
 
-        :param path: view对应的url路径
-        :param admin_view_class: 注册的 Model Base Admin View 类
-        :param name: view对应的url name, 要包含两个%%s, 分别会替换为 app_label和module_name
+        :param path: url路径
+        :param admin_view_class: 注册的 ModelAdminView 子类
+        :param name:  view对应的url name, 要包含两个%%s, 分别会替换为 app_label和module_name
 
         注册 Model Base Admin View 可以为每一个在xadmin注册的 Model 生成一个 Admin View，并且包含相关的 Model 信息。
         具体内容可以参看 :class:`~xadmin.views.base.ModelAdminView`。 举例::
@@ -130,100 +129,64 @@ class AdminSite(object):
         if issubclass(admin_view_class, BaseAdminView):
             self._registry_modelviews.append((path, admin_view_class, name))
         else:
-            raise ImproperlyConfigured(u'The registered view class %s isn\'t subclass of %s' %
-                                      (admin_view_class.__name__, BaseAdminView.__name__))
+            raise ImproperlyConfigured(u'The registered view class %s isn\'t subclass of %s' %(admin_view_class.__name__, BaseAdminView.__name__))
 
     def register_view(self, path, admin_view_class, name):
         """
-        将 Admin View 类注册到 AdminSite，一般用于创建独立的 admin 页面，例如登陆，介绍页面，帮助页面等。
+        注册 AdminView 类，一般用于创建独立的 admin 页面，例如登陆，介绍页面，帮助页面等。
 
-        :param path: view对应的url路径
-        :param admin_view_class: 注册的 Admin View 类
+        :param path:  url路径
+        :param admin_view_class: 注册的 AdminView 类
         :param name: view对应的url name
-
-        关于 Admin View 具体内容可以参看 :class:`~xadmin.views.base.BaseAdminView`。 举例::
-
-            from xadmin.views import BaseAdminView
-
-            class TestAdminView(BaseAdminView):
-                
-                def get(self, request):
-                    pass
-
-            site.register_view(r'test_view/$', TestModelAdminView, name='for_test')
-
-        注册后，用户可以通过访问 ``/test_view/`` 访问到该view
         """
         self._registry_views.append((path, admin_view_class, name))
+        
+    def register_page(self, page_view_class):
+        name = page_view_class.__name__
+        self._registry_pages.append(page_view_class)
+        self.register_view('^page/%s/$'%name.lower(), page_view_class, name)
 
     def register_plugin(self, plugin_class, admin_view_class):
         """
-        将 Plugin 类注册到 AdminSite，当任何 Admin View 运行时当前 view 绑定的 plugin 会生效。
+        注册 Plugin 类，当任何 AdminView 运行时当前 view 绑定的 plugin 会生效。
 
-        :param plugin_class: view对应的url路径
-        :param admin_view_class: 该 plugin 绑定的 Admin View 类
-
-        关于 Admin Plugin 具体内容可以参看 :class:`~xadmin.views.base.BaseAdminPlugin`。 举例::
-
-            from xadmin.views import BaseAdminPlugin
-
-            class TestAdminPlugin(BaseAdminPlugin):
-                
-                def get_context(self, context):
-                    context['test'] = True
-                    return context
-
-            site.register_plugin(TestAdminPlugin, SomeAdminView)
-
-        注册后，只要运行 SomeAdminView 实例的 get_context 方法，就会调用该 plugin。
+        :param plugin_class: 插件类
+        :param admin_view_class: 该 plugin 绑定的 AdminView 类
         """
         from xadmin.views.base import BaseAdminPlugin
         if issubclass(plugin_class, BaseAdminPlugin):
             self._registry_plugins.setdefault(
                 admin_view_class, []).append(plugin_class)
         else:
-            raise ImproperlyConfigured(u'The registered plugin class %s isn\'t subclass of %s' %
-                                      (plugin_class.__name__, BaseAdminPlugin.__name__))
+            raise ImproperlyConfigured(u'The registered plugin class %s isn\'t subclass of %s' %(plugin_class.__name__, BaseAdminPlugin.__name__))
 
-    def register_settings(self, name, admin_class):
-        self._registry_settings[name.lower()] = admin_class
+#    def register_settings(self, name, admin_class):
+#        self._registry_settings[name.lower()] = admin_class
 
     def register(self, model_or_iterable, admin_class=object, **options):
         """
-        注册需要管理的 Model， 或是注册某 AdminView 的 OptionClass
+        注册需要管理的 Model， 或是为某 AdminView 添加 OptionClass
 
-        :param model_or_iterable: 传入 model 或是指定的 ModelOptionClass
-        :param admin_class: 当 model_or_iterable 为 Model 时，该参数为 ModelAdmin；model_or_iterable 为 AdminView 时 ，该参数为 OptionClass
-
-        关于 Admin Plugin 具体内容可以参看 :class:`~xadmin.views.base.BaseAdminPlugin`。 举例::
-
-            from models import SomeModel
-
-            class SomeModelAdmin(object):
-                pass
-
-            site.register(SomeModel, SomeModelAdmin)
-
+        :param model_or_iterable: 传入 model 或 BaseAdminView子类
+        :param admin_class: 
+                        model_or_iterable 为 Model 时，该参数为 ModelAdmin；
+                        model_or_iterable 为 BaseAdminView 时 ，该参数为 OptionClass
         """
         from xadmin.views.base import BaseAdminView
         if isinstance(model_or_iterable, ModelBase) or issubclass(model_or_iterable, BaseAdminView):
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
-            if isinstance(model, ModelBase):
+            if isinstance(model, ModelBase):    #当为模型Model时
                 if model._meta.abstract:
-                    raise ImproperlyConfigured('The model %s is abstract, so it '
-                                               'cannot be registered with admin.' % model.__name__)
+                    raise ImproperlyConfigured('The model %s is abstract, so it cannot be registered with admin.' % model.__name__)
 
                 if model in self._registry:
-                    raise AlreadyRegistered(
-                        'The model %s is already registered' % model.__name__)
+                    raise AlreadyRegistered('The model %s is already registered' % model.__name__)
 
                 # If we got **options then dynamically construct a subclass of
                 # admin_class with those **options.
                 if options:
-                    # For reasons I don't quite understand, without a __module__
-                    # the created class appears to "live" in the wrong place,
-                    # which causes issues later on.
+                    # For reasons I don't quite understand, without a __module__  the created class appears to "live" in the wrong place, which causes issues later on.
                     options['__module__'] = __name__
 
                 admin_class = type(str("%s%sAdmin" % (model._meta.app_label, model._meta.module_name)), (admin_class,), options or {})
@@ -231,15 +194,17 @@ class AdminSite(object):
                 admin_class.order = self.model_admins_order
                 self.model_admins_order += 1
                 self._registry[model] = admin_class
-            else:
+            else:   # 当为BaseAdminView子类时
                 if model in self._registry_avs:
                     raise AlreadyRegistered('The admin_view_class %s is already registered' % model.__name__)
                 if options:
                     options['__module__'] = __name__
-                    admin_class = type(str(
-                        "%sAdmin" % model.__name__), (admin_class,), options)
+                    admin_class = type(str("%sAdmin" % model.__name__), (admin_class,), options)
 
                 self._registry_avs[model] = admin_class
+
+    def get_grup_registrys(self, grup_name):
+        return [ (e.model, e) for e in self._registry.values() if e.model._meta.app_label==grup_name]
 
     def unregister(self, model_or_iterable):
         """
@@ -288,10 +253,10 @@ class AdminSite(object):
 
     def admin_view(self, view, cacheable=False):
         """
-        为当前 ``AdminSite`` 的所有 View 提供的 Decorator。主要是功能是使用 :meth:`AdminSite.has_permission` 
+        为所有 View 提供装饰。主要是功能是使用 :meth:`AdminSite.has_permission` 
         方法来判断当前用户是否有权限访问该 ``AdminSite``， 如果没有，转到登陆页面
 
-        通常情况下会在 :meth:`AdminSite.get_urls` 方法中使用该方法
+        在AdminSite.get_urls 方法中使用该方法
 
         :param cacheable: 默认情况下，所有的 AdminView 会通过 ``never_cache`` 标记成不做缓存，如果确实需要缓存，可以设置 cacheable=True
         """
@@ -313,21 +278,21 @@ class AdminSite(object):
         return dict([(name, getattr(option_class, name)) for name in dir(option_class)
                     if name[0] != '_' and not callable(getattr(option_class, name)) and hasattr(plugin_class, name)])
 
-    def _get_settings_class(self, admin_view_class):
-        name = admin_view_class.__name__.lower()
-
-        if name in self._registry_settings:
-            return self._registry_settings[name]
-        elif name.endswith('admin') and name[0:-5] in self._registry_settings:
-            return self._registry_settings[name[0:-5]]
-        elif name.endswith('adminview') and name[0:-9] in self._registry_settings:
-            return self._registry_settings[name[0:-9]]
-
-        return None
+#    def _get_settings_class(self, admin_view_class):
+#        name = admin_view_class.__name__.lower()
+#
+#        if name in self._registry_settings:
+#            return self._registry_settings[name]
+#        elif name.endswith('admin') and name[0:-5] in self._registry_settings:
+#            return self._registry_settings[name[0:-5]]
+#        elif name.endswith('adminview') and name[0:-9] in self._registry_settings:
+#            return self._registry_settings[name[0:-9]]
+#
+#        return None
 
     def _create_plugin(self, option_classes):
         """
-        返回创建插件类的方法，用于创建新的、与 OptionClass 合并过的插件类。
+        创建插件类，用于创建新的、与 OptionClass 合并过的插件类。
         """
         # 创建新插件类的方法
         def merge_class(plugin_class):
@@ -351,23 +316,26 @@ class AdminSite(object):
 
     def get_plugins(self, admin_view_class, *option_classes):
         """
-        xadmin中 **核心** 方法，用于获取 AdminViewClass 的 plugins。
+        核心方法，用于获取 AdminViewClass 的 plugins。
 
-        获取 plugins 首先根据该 AdminViewClass 及其所有的集成类在已经注册的插件中找到相应的插件类。然后再使用第二个参数的 OptionClass 拼成插件类。
+        获取 plugins 首先根据该 AdminViewClass 及其所有的继承类在已经注册的插件中找到相应的插件类。然后再使用第二个参数的 OptionClass 拼成插件类。
         """
         from xadmin.views import BaseAdminView
         plugins = []
         opts = [oc for oc in option_classes if oc]
         for klass in admin_view_class.mro():
-            # 列出 AdminViewClass 所有的集成类
+            # 列出 AdminViewClass 所有的继承类
             if klass == BaseAdminView or issubclass(klass, BaseAdminView):
                 merge_opts = []
+                
                 reg_class = self._registry_avs.get(klass)
                 if reg_class:
                     merge_opts.append(reg_class)
-                settings_class = self._get_settings_class(klass)
-                if settings_class:
-                    merge_opts.append(settings_class)
+                    
+#                settings_class = self._get_settings_class(klass)
+#                if settings_class:
+#                    merge_opts.append(settings_class)
+                    
                 merge_opts.extend(opts)
                 ps = self._registry_plugins.get(klass, [])
                 # 如果有需要merge的 OptionClass 则使用 AdminSite._create_plugin 方法创建插件类，并且放入插件列表
@@ -377,7 +345,7 @@ class AdminSite(object):
 
     def get_view_class(self, view_class, option_class=None, **opts):
         """
-        xadmin中 **最核心** 的方法，用于创建 xadmin 特有的 AdminViewClass。
+        最核心的方法，用于创建 AdminViewClass。
 
         创建 AdminView 和核心思想为动态生成 mix 的类，主要步骤有两步:
 
@@ -391,19 +359,18 @@ class AdminSite(object):
             reg_class = self._registry_avs.get(klass)
             if reg_class:
                 merges.append(reg_class)
-            settings_class = self._get_settings_class(klass)
-            if settings_class:
-                merges.append(settings_class)
+#            settings_class = self._get_settings_class(klass)
+#            if settings_class:
+#                merges.append(settings_class)
             merges.append(klass)
+            
         new_class_name = ''.join([c.__name__ for c in merges])
 
         if new_class_name not in self._admin_view_cache:
             # 如果缓存中没有该类，则创建这个类。首先取得该 view_class 的 plugins
             plugins = self.get_plugins(view_class, option_class)
             # 合成新类，同时吧 plugins 及 admin_site 作为类属性传入
-            self._admin_view_cache[new_class_name] = MergeAdminMetaclass(
-                new_class_name, tuple(merges),
-                dict({'plugin_classes': plugins, 'admin_site': self}, **opts))
+            self._admin_view_cache[new_class_name] = MergeAdminMetaclass(new_class_name, tuple(merges),  dict({'plugin_classes': plugins, 'admin_site': self}, **opts))
 
         return self._admin_view_cache[new_class_name]
 
