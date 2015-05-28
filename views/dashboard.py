@@ -75,7 +75,7 @@ class UserWidgetAdmin(object):
     list_filter = ['user', 'widget_type', 'page_id']
     list_display_links = ('widget_type',)
     user_fields = ['user']
-    hidden_menu = True
+    #hidden_menu = True
 
     wizard_form_list = (
         (_(u"Widget Type"), ('page_id', 'widget_type')),
@@ -487,6 +487,8 @@ class Dashboard(CommAdminView):
     widgets = []
     title = _(u"Dashboard")
     icon = None
+    app_label = None
+    base_template = 'xadmin/base_site_noleft.html'
 
     def get_page_id(self):
         return self.request.path
@@ -660,3 +662,16 @@ class ModelDashboard(Dashboard, ModelAdminView):
     def get(self, request, *args, **kwargs):
         self.widgets = self.get_widgets()
         return self.template_response(self.get_template_list('views/model_dashboard.html'), self.get_context())
+
+
+class AppDashboard(Dashboard):
+    title = _(u"%s Dashboard")
+    icon = "fa fa-dashboard"
+    base_template = 'xadmin/base_site.html'
+
+    def get_page_id(self):
+        return 'app:%s' % self.app_label
+    
+    def get_title(self):
+        mod = self.admin_site.app_dict[self.app_label]
+        return self.title % force_unicode(getattr(mod, 'verbose_name', self.app_label))
