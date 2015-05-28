@@ -1000,7 +1000,7 @@ msgstr "要删除所选的%(verbose_name)s '%(escaped_object)s' 将要求删除�
 #: templates/xadmin/views/model_delete_confirm.html:27
 #, python-format
 msgid "Are you sure you want to delete the %(verbose_name)s \"%(escaped_object)s\"? All of the following related items will be deleted:"
-msgstr "请确认要删除选中的%(verbose_name)s \"%(escaped_object)s\"吗？以下所有对象和余它们相关的条目将都会被删除："
+msgstr "请确认要删除选中的%(verbose_name)s \"%(escaped_object)s\"吗？以下所有对象和与它们相关的条目将都会被删除："
 
 #: templates/xadmin/views/model_delete_confirm.html:34
 #: templates/xadmin/views/model_delete_selected_confirm.html:49
@@ -1029,7 +1029,7 @@ msgstr "要删除所选的 %(objects_name)s, 将要求删除以下受保护的�
 #: templates/xadmin/views/model_delete_selected_confirm.html:34
 #, python-format
 msgid "Are you sure you want to delete the selected %(objects_name)s? All of the following objects and their related items will be deleted:"
-msgstr "请确认要删除选中的 %(objects_name)s 吗？以下所有对象和余它们相关的条目将都会被删除："
+msgstr "请确认要删除选中的 %(objects_name)s 吗？以下所有对象和与它们相关的条目将都会被删除："
 
 #: templates/xadmin/views/model_history.html:26
 msgid "Diff"

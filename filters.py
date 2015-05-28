@@ -211,7 +211,7 @@ class ChoicesFieldListFilter(ListFieldFilter):
             }
 
 
-# @manager.register
+@manager.register
 class TextFieldListFilter(FieldFilter):
     template = 'xadmin/filters/char.html'
     lookup_formats = {'in': '%s__in','search': '%s__contains'}
