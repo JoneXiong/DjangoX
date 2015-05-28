@@ -1,10 +1,16 @@
 # coding=utf-8
 import sys
 from functools import update_wrapper
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.base import ModelBase
 from django.views.decorators.cache import never_cache
+from django.utils.text import capfirst
+from django.utils.datastructures import SortedDict
+from django.core.urlresolvers import reverse
+from util import sortkeypicker
+import defs
 
 #设置系统的编码为utf-8
 reload(sys)
@@ -13,14 +19,14 @@ sys.setdefaultencoding("utf-8")
 
 class AlreadyRegistered(Exception):
     """
-    如果一个 model 已经在 :class:`AdminSite` 注册过，当尝试再次注册时会抛出这个异常。
+    如果一个 model 已经在 AdminSite 注册过，当尝试再次注册时会抛出这个异常。
     """
     pass
 
 
 class NotRegistered(Exception):
     """
-    当一个model并未在 :class:`AdminSite` 注册，当调用 :meth:`AdminSite.unregister` 想要取消该model的注册就会抛出该异常。
+    当一个model并未在 AdminSite 注册，当调用 AdminSite.unregister 想要取消该model的注册就会抛出该异常。
     """
     pass
 
@@ -50,6 +56,16 @@ class AdminSite(object):
         * 注册的 ``model admin view class``
         * 注册的各种插件
     """
+    
+    site_title = None         # 网站的标题
+    site_footer = None         # 网站的下角标文字
+    menu_style = 'default'    # 网站左侧菜单风格
+    app_dict = SortedDict()   # app模块全局字典
+    sys_menu = {}                   # 网站菜单全局字典
+    sys_menu_loaded = False  # 菜单是否加载过
+    apps_icons = {'xadmin': 'fa fa-circle-o'}
+
+    
     def __init__(self, name='xadmin'):
         self.name = name
         self.app_name = 'xadmin'
@@ -111,18 +127,6 @@ class AdminSite(object):
         :param name:  view对应的url name, 要包含两个%%s, 分别会替换为 app_label和module_name
 
         注册 Model Base Admin View 可以为每一个在xadmin注册的 Model 生成一个 Admin View，并且包含相关的 Model 信息。
-        具体内容可以参看 :class:`~xadmin.views.base.ModelAdminView`。 举例::
-
-            from xadmin.views import ModelAdminView
-
-            class TestModelAdminView(ModelAdminView):
-                
-                def get(self, request, obj_id):
-                    pass
-
-            site.register_modelview(r'^(.+)/test/$', TestModelAdminView, name='%s_%s_test')
-
-        注册后，用户可以通过访问 ``/%(app_label)s/%(module_name)s/123/test`` 访问到该view
         """
         # 内部引用，避免循环引用
         from xadmin.views.base import BaseAdminView
@@ -145,6 +149,12 @@ class AdminSite(object):
         name = page_view_class.__name__
         self._registry_pages.append(page_view_class)
         self.register_view('^page/%s/$'%name.lower(), page_view_class, name)
+        
+    def register_appindex(self, app_index_class):
+        app_label = app_index_class.app_label
+        name = '%s_%s'%(app_label,app_index_class.__name__)
+        self.app_dict[app_label].index_url_name = name
+        self.register_view('^index/%s/$'%app_label, app_index_class, name)
 
     def register_plugin(self, plugin_class, admin_view_class):
         """
@@ -189,7 +199,7 @@ class AdminSite(object):
                     # For reasons I don't quite understand, without a __module__  the created class appears to "live" in the wrong place, which causes issues later on.
                     options['__module__'] = __name__
 
-                admin_class = type(str("%s%sAdmin" % (model._meta.app_label, model._meta.module_name)), (admin_class,), options or {})
+                admin_class = type(str("%s__%s__Admin" % (model._meta.app_label, model._meta.module_name)), (admin_class,), options or {})
                 admin_class.model = model
                 admin_class.order = self.model_admins_order
                 self.model_admins_order += 1
@@ -251,17 +261,16 @@ class AdminSite(object):
             raise ImproperlyConfigured("Put 'django.contrib.auth.context_processors.auth' "
                                        "in your TEMPLATE_CONTEXT_PROCESSORS setting in order to use the admin application.")
 
-    def admin_view(self, view, cacheable=False):
+    def site_view_decor(self, view, cacheable=False):
         """
-        为所有 View 提供装饰。主要是功能是使用 :meth:`AdminSite.has_permission` 
-        方法来判断当前用户是否有权限访问该 ``AdminSite``， 如果没有，转到登陆页面
-
-        在AdminSite.get_urls 方法中使用该方法
+        为所有 View 提供公共装饰，访问权限验证
+        在Site.get_urls 方法中使用该方法
 
         :param cacheable: 默认情况下，所有的 AdminView 会通过 ``never_cache`` 标记成不做缓存，如果确实需要缓存，可以设置 cacheable=True
         """
         def inner(request, *args, **kwargs):
             if not self.has_permission(request) and getattr(view, 'need_site_permission', True):
+                # 没有权限则跳转到登录页
                 return self.create_admin_view(self.login_view)(request, *args, **kwargs)
             return view(request, *args, **kwargs)
 
@@ -309,7 +318,7 @@ class AdminSite(object):
                 if attrs:
                     # 合并新的插件类
                     plugin_class = MergeAdminMetaclass(
-                        '%s%s' % (''.join([oc.__name__ for oc in option_classes]), plugin_class.__name__),
+                        '%s%s' % ('__'.join([oc.__name__ for oc in option_classes]), plugin_class.__name__),
                         tuple(bases), attrs)
             return plugin_class
         return merge_class
@@ -364,7 +373,7 @@ class AdminSite(object):
 #                merges.append(settings_class)
             merges.append(klass)
             
-        new_class_name = ''.join([c.__name__ for c in merges])
+        new_class_name = '__'.join([c.__name__ for c in merges])
 
         if new_class_name not in self._admin_view_cache:
             # 如果缓存中没有该类，则创建这个类。首先取得该 view_class 的 plugins
@@ -376,7 +385,8 @@ class AdminSite(object):
 
     def create_admin_view(self, admin_view_class):
         """
-        使用 :meth:`~AdminSite.get_view_class` 创建 AdminView 类，并且返回 view 方法，可以用于 get_urls 方法中
+        返回 Django View处理方法
+        使用 get_view_class 创建 AdminView 类，并且返回 view 方法，用于 get_urls 方法中
 
         :param admin_view_class: AdminView 类
         """
@@ -384,7 +394,7 @@ class AdminSite(object):
 
     def create_model_admin_view(self, admin_view_class, model, option_class):
         """
-        使用 :meth:`~AdminSite.get_view_class` 创建 ModelAdminView 类，并且返回 view 方法，可以用于 get_urls 方法中
+        使用 get_view_class 创建 ModelAdminView 类，并且返回 view 方法，用于 get_urls 方法中
 
         :param admin_view_class: AdminView 类，该类应该为 :class:`~xadmin.views.base.ModelAdminView` 的子类
         :param model: Model 类，目前该参数暂无作用
@@ -402,8 +412,11 @@ class AdminSite(object):
 
         #: 该方法主要用来使用 AdminSite.admin_view 封装 view
         def wrap(view, cacheable=False):
+            '''
+            url请求处理的起点，默认不做view缓存
+            '''
             def wrapper(*args, **kwargs):
-                return self.admin_view(view, cacheable)(*args, **kwargs)
+                return self.site_view_decor(view, cacheable)(*args, **kwargs)
             return update_wrapper(wrapper, view)
 
         # 添加 i18n_javascript view， 用于js的国际化
@@ -412,26 +425,31 @@ class AdminSite(object):
                                                       cacheable=True), name='jsi18n')
                                )
 
-        # 添加注册的 AdminViewClass
+        # 添加注册的所有 AdminViewClass
         urlpatterns += patterns('',
                                 *[url(
                                   path, wrap(self.create_admin_view(clz_or_func)) if type(clz_or_func) == type and issubclass(clz_or_func, BaseAdminView) else include(clz_or_func(self)),
                                   name=name) for path, clz_or_func, name in self._registry_views]
                                 )
 
-        # 添加 ModelAdminViewClass
+        # 循环所有已注册的 Model, 逐一添加其ModelAdminViewClass
         for model, admin_class in self._registry.iteritems():
-            # 需要将所有已经注册的 Model 逐一注册 ModelAdminViewClass
-            view_urls = [url(
-                path, wrap(
-                    self.create_model_admin_view(clz, model, admin_class)),
-                name=name % (model._meta.app_label, model._meta.module_name))
-                for path, clz, name in self._registry_modelviews]
+            view_urls = []
+            app_label = model._meta.app_label
+            module_name = model._meta.module_name
+            for path, clz, name in self._registry_modelviews:
+                view_attr_name = name.replace('%s_%s','view')
+                name = name % (app_label, module_name)
+                if hasattr(admin_class, view_attr_name):
+                    view_class = getattr(admin_class, view_attr_name)
+                    clz = view_class or clz
+                m_view = wrap( self.create_model_admin_view(clz, model, admin_class) )
+                view_urls.append( url(path, m_view, name=name) )
             urlpatterns += patterns('',
-                                    url(
-                                    r'^%s/%s/' % (
-                                        model._meta.app_label, model._meta.module_name),
-                                    include(patterns('', *view_urls)))
+                                        url(
+                                            r'^%s/%s/' % (app_label, module_name),
+                                            include(patterns('', *view_urls))
+                                        )
                                     )
 
         return urlpatterns
@@ -459,6 +477,125 @@ class AdminSite(object):
         else:
             from django.views.i18n import null_javascript_catalog as javascript_catalog
         return javascript_catalog(request, packages=['django.conf', 'xadmin'])
+    
+    def get_model_url(self, model, name, *args, **kwargs):
+        """
+        路径工具函数
+        通过 model, name 取得 url，会自动拼成 urlname，并会加上 AdminSite.app_name 的 url namespace
+        """
+        return reverse(
+            '%s:%s_%s_%s' % (self.app_name, model._meta.app_label,
+                             model._meta.module_name, name),
+            args=args, kwargs=kwargs, current_app=self.name)
 
-# :class:`AdminSite` 的单例，通常情况下可以直接使用这个 site，作为全站统一实例
+    def url_for(self, name, *args, **kwargs):
+        return reverse( '%s:%s'%(self.name, name) ,current_app=self.name)
+        
+    def get_model_perm(self, model, name):
+        return '%s.%s_%s' % (model._meta.app_label, name, model._meta.module_name)
+    
+    def get_sys_menu(self):
+        for model, model_admin in self._registry.items():
+            if getattr(model_admin, 'hidden_menu', False):
+                continue
+            if hasattr(model_admin, 'menu_group'):
+                m_menu_group = model_admin.menu_group or '_default_group'
+            else:
+                m_menu_group = '_default_group'
+            icon = getattr(model_admin,'model_icon', defs.DEFAULT_MODEL_ICON)
+            
+            app_label = getattr(model_admin, 'app_label', model._meta.app_label)  #model_admin.app_label
+            model_dict = {
+                'title': unicode(capfirst(model._meta.verbose_name_plural)),
+                'url': self.get_model_url(model, "changelist"),
+                'icon': icon,
+                'perm': self.get_model_perm(model, 'view'),
+                'order': model_admin.order,
+            }
+            m_menu = self.sys_menu[app_label]
+            if m_menu_group in m_menu.keys():
+                m_menu[m_menu_group]['menus'].append(model_dict)
+            else:
+                m_menu['_default_group']['menus'].append(model_dict)
+        
+        for page in self._registry_pages:
+            if getattr(page, 'hidden_menu', False):
+                continue
+            if hasattr(page, 'menu_group'):
+                m_menu_group = page.menu_group or '_default_group'
+            else:
+                m_menu_group = '_default_group'
+            app_label = page.app_label
+            model_dict = {
+                'title': page.verbose_name,
+                'url': page.get_page_url(),
+                'icon': page.icon_class,
+                'perm': 'auth.'+ (page.perm or page.__name__),
+                'order': page.order,
+            }
+            m_menu = self.sys_menu[app_label]
+            if m_menu_group in m_menu.keys():
+                m_menu[m_menu_group]['menus'].append(model_dict)
+            else:
+                m_menu['_default_group']['menus'].append(model_dict)
+                
+        for app_menu in self.sys_menu.values():
+            for menu in app_menu.values():
+                menu['menus'].sort(key=sortkeypicker(['order', 'title']))
+        self.sys_menu_loaded = True
+    
+    def get_app_menu(self, app_label):
+        if not self.sys_menu_loaded:self.get_sys_menu()
+        m_menu = self.sys_menu[app_label]
+        m_app = self.app_dict[app_label]
+        ret = []
+        if hasattr(m_app,'menus'):
+            m_menus = m_app.menus
+            for e in m_menus:
+                ret.append(m_menu[e[0]])
+        if len(m_menu['_default_group'])>0:
+                ret.append(m_menu['_default_group'])
+        return ret
+    
+    def get_site_menu(self, select_app):
+        if not self.sys_menu_loaded:self.get_sys_menu()
+        ret = [{
+                    'app_lavel': '',
+                    'title': u'面板',
+                    'url': self.url_for('index'),
+                    'icon': '',
+                    'selected': not select_app
+                }]
+        for app_label,mod in self.app_dict.iteritems():
+            if hasattr(mod,'verbose_name'):
+                m_first_url = None
+                if hasattr(mod,'index_url_name'):
+                    m_first_url  = self.url_for(mod.index_url_name)
+                else:
+                    app_menu = self.sys_menu[app_label]
+                    if hasattr(mod,'menus'):
+                        m_groups = mod.menus
+                        for e in m_groups:
+                            m_menus = app_menu[e[0]]['menus']
+                            if len(m_menus)>0:
+                                m_first_url = m_menus[0]['url']
+                                break
+                    if not m_first_url:
+                        d_menus = app_menu['_default_group']['menus']
+                        if len(d_menus)>0:
+                            m_first_url = d_menus[0]['url']
+                        else:
+                            m_first_url = '#'
+
+                ret.append({
+                            'app_lavel': app_label,
+                            'title': getattr(mod,'verbose_name', unicode(capfirst(app_label))  ),
+                            'url': m_first_url,
+                            'icon': '',
+                            'selected': app_label==select_app
+                            })
+        return ret
+        
+
+# AdminSite 的单例, 全站统一实例
 site = AdminSite()

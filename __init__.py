@@ -5,9 +5,11 @@ from xadmin.sites import site
 VERSION = [0,5,0]
 
 ROOT_PATH_NAME = ''
+verbose_name = u'系统'
 
-#class Settings(object):
-#    pass
+menus = (
+         ('auth_group', u'权限',  'auth_icon'),
+         )
 
 
 def autodiscover():
@@ -21,7 +23,7 @@ def autodiscover():
     from django.utils.importlib import import_module
     from django.utils.module_loading import module_has_submodule
 
-    # 一些动态设置的settings项
+    # 为 crispy_form 动态设置的settings项
     setattr(settings, 'CRISPY_TEMPLATE_PACK', 'bootstrap3')
     setattr(settings, 'CRISPY_CLASS_CONVERTERS', {
         "textinput": "textinput textInput form-control",
@@ -32,29 +34,25 @@ def autodiscover():
     from xadmin.views import register_builtin_views
     register_builtin_views(site)
 
-#    # load xadmin settings from XADMIN_CONF module
-#    try:
-#        xadmin_conf = getattr(settings, 'XADMIN_CONF', 'xadmin_conf.py')
-#        conf_mod = import_module(xadmin_conf)
-#    except Exception:
-#        conf_mod = None
-#
-#    if conf_mod:
-#        for key in dir(conf_mod):
-#            setting = getattr(conf_mod, key)
-#            try:
-#                if issubclass(setting, Settings):
-#                    site.register_settings(setting.__name__, setting)
-#            except Exception:
-#                pass
     # 加载插件
     from xadmin.plugins import register_builtin_plugins
     register_builtin_plugins(site)
 
-    # 加载各app的 adminx入口
+    # 加载各app的 adminx
     for app in settings.INSTALLED_APPS:
         mod = import_module(app)
-        # Attempt to import the app's admin module.
+        
+        app_label = app.split('.')[-1]
+        site.app_dict[app_label] = mod
+        
+        # app级菜单初始化
+        site.sys_menu[app_label] = {'_default_group':{'title': u'其他', 'icon': 'group_configure', 'menus': []}  }
+        if hasattr(mod,'menus'):
+            m_menus = mod.menus
+            for e in m_menus:
+                site.sys_menu[app][e[0]] = {'title': e[1], 'icon': e[2], 'menus': []}
+        
+        # 导入 adminx 模块
         try:
             before_import_registry = site.copy_registry()
             import_module('%s.adminx' % app)
