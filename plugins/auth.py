@@ -43,8 +43,10 @@ class PermissionModelMultipleChoiceField(ModelMultipleChoiceField):
 class GroupAdmin(object):
     search_fields = ('name',)
     ordering = ('name',)
-    style_fields = {'permissions': 'm2m_transfer'}
+    style_fields = {'permissions': 'm2m_raw'}
     model_icon = 'fa fa-group'
+    app_label = 'xadmin'
+    menu_group = 'auth_group'
 
     def get_field_attrs(self, db_field, **kwargs):
         attrs = super(GroupAdmin, self).get_field_attrs(db_field, **kwargs)
@@ -54,14 +56,17 @@ class GroupAdmin(object):
 
 
 class UserAdmin(object):
+    verbose_name = u'用户'
     change_user_password_template = None
     list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
     list_filter = ('is_staff', 'is_superuser', 'is_active')
     search_fields = ('username', 'first_name', 'last_name', 'email')
     ordering = ('username',)
-    style_fields = {'user_permissions': 'm2m_transfer'}
+    style_fields = {'user_permissions': 'm2m_raw'}
     model_icon = 'fa fa-user'
     relfield_style = 'fk-ajax'
+    app_label = 'xadmin'
+    menu_group = 'auth_group'
 
     def get_field_attrs(self, db_field, **kwargs):
         attrs = super(UserAdmin, self).get_field_attrs(db_field, **kwargs)
@@ -113,6 +118,9 @@ class PermissionAdmin(object):
 
     model_icon = 'fa fa-lock'
     list_display = ('show_name', )
+    list_filter = ('name', 'codename', 'content_type')
+    app_label = 'xadmin'
+    menu_group = 'auth_group'
 
 site.register(Group, GroupAdmin)
 site.register(User, UserAdmin)
