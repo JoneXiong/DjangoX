@@ -1,5 +1,5 @@
 # coding=utf-8
-from django.http import HttpResponse
+
 from django.template.response import SimpleTemplateResponse
 from django.template.response import TemplateResponse
 from django.http import HttpResponseRedirect
@@ -22,9 +22,10 @@ class PageView(CommAdminView):
     template = 'xadmin/views/page.html'
     
     app_label = 'xadmin'
-    menu_grup = '_default_grup'
+    menu_group = '_default_group'
     icon_class = 'fa fa-plus'
-    menu_index = 0  #order
+    #menu_index = 0
+    order = 0
     
     hidden_menu = False
     perm = None#'comm_page_code'
