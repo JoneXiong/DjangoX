@@ -10,6 +10,15 @@
     <div class="navbar-header">
       <a class="navbar-brand" href="#">{% block branding %}{{ site_title }}{% endblock %}</a>
     </div>
+   <div>
+      <ul class="nav navbar-nav">
+	      {% for sitem in site_menu %}
+	      <li{% if sitem.selected %} class="active"{% endif %}>
+	        <a href="{{ sitem.url }}">{% if sitem.icon %}<i class="fa-fw {{sitem.icon}}"></i>{% endif %} {{ sitem.title }}</a>
+	      </li>
+	      {% endfor %}
+      </ul>
+   </div>
     <div class="navbar-collapse collapse">
       <ul class="nav navbar-nav navbar-right">
         {% view_block 'top_navmenu' %}
@@ -34,7 +43,7 @@
         {% if nav_menu %}
           {% include menu_template %}
         {% else %}
-          <p>{% trans "You don't have permission to edit anything." %}</p>
+          <p></p>
         {% endif %}
       {% endblock %}
       {% view_block 'left_navbar' %}
