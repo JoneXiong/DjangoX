@@ -3,9 +3,6 @@
 
 {% block navbar_md %}
   <ul class="well nav nav-pills nav-stacked nav-sitemenu hide-sm">
-    <li>
-      <a href="{% url 'xadmin:index' %}"><i class="fa-fw fa fa-home"></i> {% trans 'Home' %}</a>
-    </li>
     {% for item in nav_menu %}
       <li class="{% if item.menus %}nav-header{% endif %} {% if item.selected %} active{% endif %}">
         {% if item.url %}<a href="{{ item.url }}" class="section">{% endif %}
