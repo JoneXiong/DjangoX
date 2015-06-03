@@ -506,7 +506,7 @@ class AdminSite(object):
             
             app_label = getattr(model_admin, 'app_label', model._meta.app_label)  #model_admin.app_label
             model_dict = {
-                'title': unicode(capfirst(model._meta.verbose_name_plural)),
+                'title': getattr(model_admin, 'verbose_name', '') or  unicode(capfirst(model._meta.verbose_name_plural)),
                 'url': self.get_model_url(model, "changelist"),
                 'icon': icon,
                 'perm': self.get_model_perm(model, 'view'),
