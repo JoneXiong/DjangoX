@@ -1,0 +1,61 @@
+{% load url from future %}{% load xadmin_tags %}{% load i18n %}<!DOCTYPE html>
+<html lang="zh_CN">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
+  {% block extrameta %}
+  <meta name="description" content="">
+  <meta name="author" content="">
+  {% endblock %}
+  {% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
+  <title>{% block title %}{% endblock %}</title>
+  {% vendor 'bootstrap.css' %}
+
+  <link rel="stylesheet" type="text/css" href="{% static "xadmin/css/themes/bootstrap-xadmin.css" %}" />
+
+  {% vendor 'font-awesome.css' 'xadmin.main.css' 'xadmin.plugins.css' 'xadmin.responsive.css' %}
+  {{ media.css }}
+  {% block extrastyle %}{% endblock %}
+  {% vendor 'jquery.js' %}
+  {% url 'xadmin:index' as indexurl %}
+  <script type="text/javascript">
+    window.__admin_media_prefix__ = "{% filter escapejs %}{% static "xadmin/" %}{% endfilter %}";
+    window.__admin_path_prefix__ = "{% filter escapejs %}{{ indexurl }}{% endfilter %}";
+  </script>
+  <script type="text/javascript" src="{% static "xadmin/js/jsi18n.js" %}"></script>
+  {% block extrahead %}{% endblock %}
+  {% view_block 'extrahead' %}
+</head>
+<body class="{% block bodyclass %}{% endblock %}">
+	
+      {% block content-nav %}
+      <div class="navbar content-navbar navbar-default navbar-xs" data-toggle="breakpoint"
+        data-class-xs="navbar content-navbar navbar-inverse navbar-xs"
+        data-class-sm="navbar content-navbar navbar-default navbar-xs">
+        <div class="navbar-header">
+          {% view_block 'nav_toggles' %}
+          {% block nav_toggles %}
+          {% include "xadmin/includes/toggle_back.html" %}
+          {% endblock %}
+
+          <a class="navbar-brand" data-toggle="collapse" data-target="#top-nav .navbar-collapse">
+            {% block nav_title %}{% endblock %}
+          </a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            {% view_block 'nav_menu' %}
+          </ul>
+          {% view_block 'nav_form' %}
+          {% block nav_form %}{% endblock %}
+
+        </div>
+      </div>
+      {% endblock %}
+	
+  {% block content %}{% endblock %}
+  {% vendor 'jquery-ui-sortable.js' 'bootstrap.js' 'xadmin.main.js' 'xadmin.responsive.js' %}
+  {{ media.js }}
+  {% block extrabody %}{% endblock %}
+  {% view_block 'extrabody' %}
+</body>
+</html>
