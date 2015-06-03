@@ -28,6 +28,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic import View
 from xadmin.util import static, json, vendor, sortkeypicker
+from .. import defs
 
 #: 通用的csrf_protect_m装饰器，给其他模块的 AdminView 使用
 csrf_protect_m = method_decorator(csrf_protect)
@@ -152,13 +153,15 @@ class JSONEncoder(DjangoJSONEncoder):
                 return smart_unicode(o)
 
 
-class BaseAdminObject(object):
+class BaseCommon(object):
     """
-    提供给 :class:`BaseAdminView` 和 :class:`BaseAdminPlugin` 的通用基类，主要是提供了一些常用的通用方法
+    通用方法、工具函数集合类
+    提供给BaseAdminView 和 BaseAdminPlugin 的通用基类，主要是提供了一些常用的通用方法
     """
     def get_view(self, view_class, option_class=None, *args, **kwargs):
         """
-        获取 AdminViewClass 的实例。实际上就是调用 :meth:`~xadmin.sites.AdminSite.get_view_class` 方法
+        获取经过合并后的实际的view类
+        获取 AdminViewClass 的实例。实际上就是调用 xadmin.sites.AdminSite.get_view_class 方法
 
         :param view_class: AdminViewClass 的类
         :param option_class: 希望与 AdminViewClass 合并的 OptionClass
@@ -168,7 +171,8 @@ class BaseAdminObject(object):
 
     def get_model_view(self, view_class, model, *args, **kwargs):
         """
-        获取 ModelAdminViewClass 的实例。首先通过 :class:`~xadmin.sites.AdminSite` 取得 model 对应的 OptionClass，然后调用 :meth:`get_view` 方法
+        操作对象的获取
+        获取 ModelAdminViewClass 的实例。首先通过 :xadmin.sites.AdminSite 取得 model 对应的 OptionClass，然后调用 get_view 方法
 
         :param view_class: ModelAdminViewClass 的类
         :param model: 绑定的 Model 类
@@ -177,13 +181,15 @@ class BaseAdminObject(object):
 
     def get_admin_url(self, name, *args, **kwargs):
         """
-        便捷方法，方便的通过 name 取得 url，会加上 AdminSite.app_name 的 url namespace
+        路径工具函数
+        通过 name 取得 url，会加上 AdminSite.app_name 的 url namespace
         """
         return reverse('%s:%s' % (self.admin_site.app_name, name), args=args, kwargs=kwargs)
 
     def get_model_url(self, model, name, *args, **kwargs):
         """
-        便捷方法，方便的通过 model, name 取得 url，会自动拼成 urlname，并会加上 AdminSite.app_name 的 url namespace
+        路径工具函数
+        通过 model, name 取得 url，会自动拼成 urlname，并会加上 AdminSite.app_name 的 url namespace
         """
         return reverse(
             '%s:%s_%s_%s' % (self.admin_site.app_name, model._meta.app_label,
@@ -192,6 +198,7 @@ class BaseAdminObject(object):
 
     def get_model_perm(self, model, name):
         """
+        权限相关
         获取 Model 的某种权限标签，标签的格式为::
 
             >>> view.get_model_perm(User, 'view')
@@ -201,6 +208,7 @@ class BaseAdminObject(object):
 
     def has_model_perm(self, model, name, user=None):
         """
+        权限判断
         判断当前用户是否有某个 Model 的 某种权限，例如:
 
             >>> view.has_model_perm(User, 'view')
@@ -211,6 +219,7 @@ class BaseAdminObject(object):
 
     def get_query_string(self, new_params=None, remove=None):
         """
+        URL 参数控制
         在当前的query_string基础上生成新的query_string
 
         :param new_params: 要新加的参数，该参数为 dict 
@@ -235,6 +244,7 @@ class BaseAdminObject(object):
 
     def get_form_params(self, new_params=None, remove=None):
         """
+        Form 参数控制
         将当前 request 的参数，新加或是删除后，生成 hidden input。用于放入 HTML 的 Form 中。
 
         :param new_params: 要新加的参数，该参数为 dict 
@@ -260,6 +270,7 @@ class BaseAdminObject(object):
 
     def render_response(self, content, response_type='json'):
         """
+        请求返回API
         便捷方法，方便生成 HttpResponse，如果 response_type 为 ``json`` 会自动转为 json 格式后输出
         """
         if response_type == 'json':
@@ -268,23 +279,37 @@ class BaseAdminObject(object):
                 json.dumps(content, cls=JSONEncoder, ensure_ascii=False))
             return response
         return HttpResponse(content)
+    
+    def render_json(self, content):
+        response = HttpResponse(mimetype="application/json; charset=UTF-8")
+        response.write(
+            json.dumps(content, cls=JSONEncoder, ensure_ascii=False))
+        return response
+    
+    def render_text(self, content):
+        return HttpResponse(content)
 
     def template_response(self, template, context):
         """
+        请求返回API
         便捷方法，方便生成 TemplateResponse
         """
         return TemplateResponse(self.request, template, context, current_app=self.admin_site.name)
 
     def message_user(self, message, level='info'):
         """
-        Send a message to the user. The default implementation
+        debug error info success warning
         posts a message using the django.contrib.messages backend.
         """
         if hasattr(messages, level) and callable(getattr(messages, level)):
             getattr(messages, level)(self.request, message)
+    
+    def msg(self, message, level='info'):
+        self.message_user(message, level)
 
     def static(self, path):
         """
+        路径工具函数
         :meth:`xadmin.util.static` 的快捷方法，返回静态文件的 url。
         """
         return static(path)
@@ -293,9 +318,9 @@ class BaseAdminObject(object):
         return vendor(*tags)
 
 
-class BaseAdminPlugin(BaseAdminObject):
+class BaseAdminPlugin(BaseCommon):
     """
-    所有 Plugin 的基类。继承于 :class:`BaseAdminObject` 。插件的注册和使用可以参看 :meth:`xadmin.sites.AdminSite.register_plugin` ，
+    所有 Plugin 的基类。继承于 :class:`BaseCommon` 。插件的注册和使用可以参看 :meth:`xadmin.sites.AdminSite.register_plugin` ，
     插件的原理可以参看 :func:`filter_hook` :
 
     .. autofunction:: xadmin.views.base.filter_hook
@@ -319,38 +344,19 @@ class BaseAdminPlugin(BaseAdminObject):
         当返回值为 ``False`` 时，所属的 AdminView 实例不会加载该插件
         """
         pass
+BasePlugin = BaseAdminPlugin
 
 
-class BaseAdminView(BaseAdminObject, View):
+class BaseAdminView(BaseCommon, View):
     """
-    所有 AdminView 的基类。继承于 :class:`BaseAdminObject` 和 :class:`django.views.generic.View`
+    所有 View 的基类。继承于 :BaseCommon 和 django.views.generic.View
 
-    该类是 xadmin 中 **最核心** 的类，所有的 AdminView 都需要继承此类。xadmin 与 Django Admin最大的区别就在于 xadmin 
-    每次请求会产生一个 AdminView 的实例，也就是基于 Class 的 view 方式。该方式在 Django 1.3 被实现，可以参看 Django 的官方文档
-    `Class-based generic views <https://docs.djangoproject.com/en/1.4/topics/class-based-views/>`_
+    xadmin 每次请求会产生一个 ViewClass 的实例，也就是基于 Class 的 view 方式。该方式在 Django 1.3 被实现，可以参看 Django 的官方文档
 
-    使用 Class 的方式实现的好处显而易见。首先，每一次请求都会产生一个新的实例，这样 request 这种变量就可以保存在实例中，基类的扩展，或
-    是复写父类方法时再也不用带着 request 到处跑了，当然，除了 request 还有很多可以基于实例存储的变量。
+    使用 Class 的方式实现的好处显而易见: 每一次请求都会产生一个新的实例，request 这种变量就可以保存在实例中，复写父类方法时再也不用带着 request 到处跑了，
+    当然，除了 request 还有很多可以基于实例存储的变量。
 
-    其次，基于实例的方式非常方便的实现了插件功能，而且还能实现插件的动态加载，因为每个 AdminView 实例可以根据自身实例的属性情况来判断加载
-    哪些插件，具体信息也可以参看 :class:`BaseAdminPlugin` 的描述。
-
-    实现一个自己的 AdminView 类很简单，举例如下::
-
-        from xadmin.sites import site
-        from xadmin.views import BaseAdminView
-
-        class MyAdminView(BaseAdminView):
-
-            def get(self, request, *args, **kwargs):
-                pass
-
-        site.register_view(r'^me_test/$', MyAdminView, name='my_test')
-
-    而后您就可以在 ``me_test/`` 访问到该view了。当然xadmin同事提供了一些通用的 AdminView，分别为
-
-        * :class:`CommAdminView` : xadmin通用界面的基础View，提供了xadmin通用界面需要的一些数据(菜单等)
-        * :class:`ModelAdminView` : 核心类之一，提供了基于 Model 的 AdminView。
+    其次，基于实例的方式非常方便的实现了插件功能，而且还能实现插件的动态加载，因为每个 View 实例可以根据自身实例的属性情况来判断加载哪些插件
     """
 
     base_template = 'xadmin/base.html'
@@ -366,17 +372,17 @@ class BaseAdminView(BaseAdminObject, View):
 
         self.args = args
         self.kwargs = kwargs
-        self.init_plugin(*args, **kwargs)
-        self.init_request(*args, **kwargs)
+        self.init_plugin(*args, **kwargs)   #实例化时执行
+        self.init_request(*args, **kwargs)  #实例化时执行
 
     @classonlymethod
     def as_view(cls):
         """
-        复写了 :meth:`View.as_view` 方法，主要是将 :meth:`View.dispatch` 的也写到了本方法中，并且去掉了一些初始化操作，
+        复写了 django View 的as_view 方法，主要是将 :meth:`View.dispatch` 的也写到了本方法中，并且去掉了一些初始化操作，
         因为这些初始化操作在 AdminView 的初始化方法中已经完成了，可以参看 :meth:`BaseAdminView.init_request`
         """
         def view(request, *args, **kwargs):
-            self = cls(request, *args, **kwargs)
+            self = cls(request, *args, **kwargs)    #真正示例化的地方
 
             if hasattr(self, 'get') and not hasattr(self, 'head'):
                 self.head = self.get
@@ -435,97 +441,58 @@ class BaseAdminView(BaseAdminObject, View):
         取得页面所需的 Media 对象，用于生成 css 和 js 文件
         """
         return forms.Media()
+BaseView = BaseAdminView
 
 
 class CommAdminView(BaseAdminView):
     """
-    基于 :class:`BaseAdminView` 提供的通用 AdminView。主要是完成了一些 xadmin 页面通用内容的处理。主要有:
-
+    通用 AdminView 主要有:
         * 网站标题
-        * 全局的 Model 图标
         * 网站菜单
  
-    **View属性**:
- 
-        .. autoattribute:: site_title
-        .. autoattribute:: site_footer
-        .. autoattribute:: global_models_icon
-        .. autoattribute:: base_template
-        .. autoattribute:: default_model_icon
+    属性
+        base_template
+        default_model_icon
     """
 
     base_template = 'xadmin/base_site.html'    #: View模板继承的基础模板
-    menu_template = 'xadmin/includes/sitemenu_default.html'
+    #menu_template = 'xadmin/includes/sitemenu_default.html' # 用于菜单include的模板
 
-    site_title = None         #: 网站的标题
-    site_footer = None         #: 网站的下角标文字
-    #: 全局的 Model 图标::
-    #:
-    #:     globe_models_icon = {User: 'user-icon'}
-    global_models_icon = {}
-    default_model_icon = None
-    apps_label_title = {}
-    apps_icons = {}
+    #site_title = None
+    #site_footer = None
+
+    #default_model_icon = 'fa fa-circle-o'
+    #apps_icons = {'xadmin': 'fa fa-circle-o'}
 
     def get_site_menu(self):
-        """``FAQ:如何定制系统菜单``\n
+        """不建议使用
         用于给子类复写的方法，开发者可以在子类或 OptionClass 中复写该方法，返回自己定义的网站菜单。菜单的格式为::
 
             ({
-                "title": "菜单标题", "perm": "权限标示", 
-                "icon": "图标的 css class", "url": "菜单url", 
+                "title": "菜单标题", 
+                "perm": "权限标示", 
+                "icon": "图标的 css class", 
+                "url": "菜单url", 
                 "menus": [...]    # 子菜单项
             })
-
-        菜单项的 ``perm`` 和 ``url`` 如果是基于 Model 的，可以使用 xadmin 提供的便利方法 
-        :meth:`BaseAdminObject.get_model_perm` 和 :meth:`BaseAdminObject.get_model_url`。举例说明创建菜单::
-
-            class AdminSettings(object):
-
-                def get_site_menu(self):
-                    return (
-                        {'title': '内容管理', 'perm': self.get_model_perm(Article, 'change'), 'menus':(
-                            {'title': '游戏资料', 'icon': 'info-sign', 'url': self.get_model_url(Article, 'changelist') + '?_rel_categories__id__exact=2'},
-                            {'title': '网站文章', 'icon': 'file', 'url': self.get_model_url(Article, 'changelist') + '?_rel_categories__id__exact=1'},
-                        )},
-                        {'title': '分类管理', 'perm': self.get_model_perm(Category, 'change'), 'menus':(
-                            {'title': '主要分类', 'url': self.get_model_url(Category, 'changelist') + '?_p_parent__isnull=True'},
-                            {'title': '游戏资料', 'url': self.get_model_url(Category, 'changelist') + '?_rel_parent__id__exact=2'},
-                        )},
-                    )
-
-            site.register(CommAdminView, AdminSettings)
-
         """
         return None
 
-    @filter_hook
+    #@filter_hook
     def get_nav_menu(self):
         """
-        返回网站菜单，如果 :meth:`get_site_menu` 返回的结果不是 None ，那么将把其返回结果作为菜单的第一部分，而后会补全没有出现的 Model 列表页菜单项，
-        如果 :meth:`get_site_menu` 返回为 None， 那么将自动根据 App 和 Model 生成两级的菜单。
-
+        返回网站菜单，get_site_menu 将把其返回结果作为菜单的第一部分
+        自动根据 App 和 Model 生成两级的菜单,置于其后
         :rtype: 格式见 :meth:`get_site_menu` 返回格式
         """
         site_menu = list(self.get_site_menu() or [])
-        had_urls = []
-
-        # 选出所有已经存在的菜单项的 URL，后期自动生成菜单时会排除这些项。
-        def get_url(menu, had_urls):
-            if 'url' in menu:
-                had_urls.append(menu['url'])
-            if 'menus' in menu:
-                for m in menu['menus']:
-                    get_url(m, had_urls)
-        get_url({'menus': site_menu}, had_urls)
 
         nav_menu = SortedDict()    #使用有序 dict，保证每次生成的菜单顺序固定
-
-        for model, model_admin in self.admin_site._registry.items():
+        
+        for model, model_admin in self.admin_site._registry.items(): #self.admin_site.get_grup_registrys(self.app_label):    # 
             if getattr(model_admin, 'hidden_menu', False):
                 continue
             app_label = model._meta.app_label
-            app_icon = None
             model_dict = {
                 'title': unicode(capfirst(model._meta.verbose_name_plural)),
                 'url': self.get_model_url(model, "changelist"),
@@ -533,64 +500,69 @@ class CommAdminView(BaseAdminView):
                 'perm': self.get_model_perm(model, 'view'),
                 'order': model_admin.order,
             }
-            if model_dict['url'] in had_urls:
-                # 过如该url已经在之前的菜单项中存在，就跳过该项
-                continue
 
             app_key = "app:%s" % app_label
             if app_key in nav_menu:
                 nav_menu[app_key]['menus'].append(model_dict)
             else:
-                # Find app title
+                # 得到app_title 
                 app_title = unicode(app_label.title())
-                if app_label.lower() in self.apps_label_title:
-                    app_title = self.apps_label_title[app_label.lower()]
-                else:
-                    mods = model.__module__.split('.')
-                    if len(mods) > 1:
-                        mod = '.'.join(mods[0:-1])
-                        if mod in sys.modules:
-                            mod = sys.modules[mod]
-                            if 'verbose_name' in dir(mod):
-                                app_title = getattr(mod, 'verbose_name')
-                            elif 'app_title' in dir(mod):
-                                app_title = getattr(mod, 'app_title')
-                #find app icon
-                if app_label.lower() in self.apps_icons:
-                    app_icon = self.apps_icons[app_label.lower()]
+                mods = model.__module__.split('.')
+                if len(mods) > 1:
+                    mod = '.'.join(mods[0:-1])
+                    if mod in sys.modules:
+                        mod = sys.modules[mod]
+                        if 'verbose_name' in dir(mod):
+                            app_title = getattr(mod, 'verbose_name')
 
                 nav_menu[app_key] = {
                     'title': app_title,
                     'menus': [model_dict],
                 }
-
-            app_menu = nav_menu[app_key]
-            if app_icon:
-                app_menu['first_icon'] = app_icon
-            elif ('first_icon' not in app_menu or
-                    app_menu['first_icon'] == self.default_model_icon) and model_dict.get('icon'):
-                app_menu['first_icon'] = model_dict['icon']
-
-            if 'first_url' not in app_menu and model_dict.get('url'):
-                app_menu['first_url'] = model_dict['url']
-
+              # first_icon  first_url 目前无用
+#            app_menu = nav_menu[app_key]
+#            if app_icon:
+#                app_menu['first_icon'] = app_icon
+#            elif ('first_icon' not in app_menu or
+#                    app_menu['first_icon'] == self.default_model_icon) and model_dict.get('icon'):
+#                app_menu['first_icon'] = model_dict['icon']
+#
+#            if 'first_url' not in app_menu and model_dict.get('url'):
+#                app_menu['first_url'] = model_dict['url']
+        for page in self.admin_site._registry_pages:
+            if getattr(page, 'hidden_menu', False):
+                continue
+            app_label = page.app_label
+            model_dict = {
+                'title': page.verbose_name,
+                'url': page.get_page_url(),
+                'icon': page.icon_class,
+                'perm': 'auth.'+ (page.perm or page.__name__),
+                'order': page.order,
+            }
+            app_key = "app:%s" % app_label
+            if app_key in nav_menu:
+                nav_menu[app_key]['menus'].append(model_dict)
+            else:
+                app_title = unicode(app_label.title())
+                nav_menu[app_key] = {
+                    'title': app_title,
+                    'menus': [model_dict],
+                }
+        # model排序
         for menu in nav_menu.values():
             menu['menus'].sort(key=sortkeypicker(['order', 'title']))
-
+        # app排序
         nav_menu = nav_menu.values()
         nav_menu.sort(key=lambda x: x['title'])
 
         site_menu.extend(nav_menu)
-
         return site_menu
 
     @filter_hook
     def get_context(self):
         """
         **Context Params** :
-
-            ``site_title`` : 使用 :attr:`site_title` 属性，默认为 "Django Xadmin"
-
             ``nav_menu`` : 权限过滤后的系统菜单项，如果在非 DEBUG 模式，该项会缓存在 SESSION 中
         """
         context = super(CommAdminView, self).get_context()
@@ -599,7 +571,10 @@ class CommAdminView(BaseAdminView):
         if not settings.DEBUG and 'nav_menu' in self.request.session:
             nav_menu = json.loads(self.request.session['nav_menu'])
         else:
-            menus = copy.copy(self.get_nav_menu())
+            if hasattr(self, 'app_label') and self.app_label:
+                menus = copy.deepcopy(self.admin_site.get_app_menu(self.app_label)) #copy.copy(self.get_nav_menu())
+            else:
+                menus = []
 
             def check_menu_permission(item):
                 need_perm = item.pop('perm', None)
@@ -647,13 +622,15 @@ class CommAdminView(BaseAdminView):
                 menu['selected'] = True
             return selected
         for menu in nav_menu:
-            check_selected(menu, self.request.path)
-
+            if check_selected(menu, self.request.path):break
+        
+        m_site = self.admin_site
         context.update({
-            'menu_template': self.menu_template,
+            'menu_template': defs.BUILDIN_STYLES.get(m_site.menu_style, defs.BUILDIN_STYLES['default']), 
             'nav_menu': nav_menu,
-            'site_title': self.site_title or _(u'Django Xadmin'),
-            'site_footer': self.site_footer or _(u'my-company.inc 2013'),
+            'site_menu': hasattr(self, 'app_label') and m_site.get_site_menu(self.app_label) or [],
+            'site_title': m_site.site_title or defs.DEFAULT_SITE_TITLE,
+            'site_footer': m_site.site_footer or defs.DEFAULT_SITE_FOOTER,
             'breadcrumbs': self.get_breadcrumb()
         })
 
@@ -683,11 +660,12 @@ class CommAdminView(BaseAdminView):
         或者在 Model 的 OptionClass 中设置 :attr:`model_icon` 属性。
         """
         # 首先从全局图标中获取
-        icon = self.global_models_icon.get(model)
-        if icon is None and model in self.admin_site._registry:
+#        icon = self.global_models_icon.get(model)
+        icon = None
+        if model in self.admin_site._registry:
             # 如果 Model 的 OptionClass 中有 model_icon 属性，则使用该属性
             icon = getattr(self.admin_site._registry[model],
-                           'model_icon', self.default_model_icon)
+                           'model_icon', defs.DEFAULT_MODEL_ICON)
         return icon
 
     @filter_hook
@@ -696,6 +674,8 @@ class CommAdminView(BaseAdminView):
             'url': self.get_admin_url('index'),
             'title': _('Home')
             }]
+SiteView = CommAdminView
+
 
 class ModelAdminView(CommAdminView):
     """
@@ -744,12 +724,13 @@ class ModelAdminView(CommAdminView):
     ordering = None  #: (dict) 获取 Model 的 queryset 时默认的排序规则
     model = None     #: 绑定的 Model 类，在注册 Model 时，该项会自动附在 OptionClass 中，见方法 :meth:`AdminSite.register`
     remove_permissions = []
+    app_label = None
 
     def __init__(self, request, *args, **kwargs):
         #: 即 Model._meta
         self.opts = self.model._meta
         #: 即 Model._meta.app_label
-        self.app_label = self.model._meta.app_label
+        self.app_label = self.app_label or self.model._meta.app_label
         #: 即 Model._meta.module_name
         self.module_name = self.model._meta.module_name
         #: 即 (self.app_label, self.module_name)
@@ -814,7 +795,7 @@ class ModelAdminView(CommAdminView):
 
     def model_admin_url(self, name, *args, **kwargs):
         """
-        等同于 :meth:`BaseAdminObject.get_admin_url` ，只是无需填写 model 参数， 使用本身的 :attr:`ModelAdminView.model` 属性。
+        等同于 :meth:`BaseCommon.get_admin_url` ，只是无需填写 model 参数， 使用本身的 :attr:`ModelAdminView.model` 属性。
         """
         return reverse(
             "%s:%s_%s_%s" % (self.admin_site.app_name, self.opts.app_label,
@@ -890,3 +871,9 @@ class ModelAdminView(CommAdminView):
         """
         return ('delete' not in self.remove_permissions) and self.user.has_perm('%s.delete_%s' % self.model_info)
 
+    def has_permission(self, perm_code):
+        raw_code = perm_code[:]
+        if perm_code in ('view', 'add', 'change', 'delete'):
+            perm_code = '%s.%s_%s' %(self.app_label, perm_code ,self.module_name)
+        return (raw_code not in self.remove_permissions) and self.user.has_perm(perm_code)
+ModelView = ModelAdminView
