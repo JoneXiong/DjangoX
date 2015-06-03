@@ -170,6 +170,9 @@ class FormAdminView(CommAdminView):
 
         msg = _('The %s was changed successfully.') % self.title
         self.message_user(msg, 'success')
+        
+        if "_continue" in request.REQUEST:
+            return self.get_response()
 
         if "_redirect" in request.REQUEST:
             return request.REQUEST["_redirect"]
