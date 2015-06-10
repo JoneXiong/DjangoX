@@ -201,8 +201,9 @@ class AdminSite(object):
 
                 admin_class = type(str("%s__%s__Admin" % (model._meta.app_label, model._meta.module_name)), (admin_class,), options or {})
                 admin_class.model = model
-                admin_class.order = self.model_admins_order
-                self.model_admins_order += 1
+                if not hasattr(admin_class, "order"):
+                    admin_class.order = self.model_admins_order
+                    self.model_admins_order += 1
                 self._registry[model] = admin_class
             else:   # 当为BaseAdminView子类时
                 if model in self._registry_avs:
@@ -378,7 +379,7 @@ class AdminSite(object):
         if new_class_name not in self._admin_view_cache:
             # 如果缓存中没有该类，则创建这个类。首先取得该 view_class 的 plugins
             plugins = self.get_plugins(view_class, option_class)
-            # 合成新类，同时吧 plugins 及 admin_site 作为类属性传入
+            # 合成新类，同时把 plugins 及 admin_site 作为类属性传入
             self._admin_view_cache[new_class_name] = MergeAdminMetaclass(new_class_name, tuple(merges),  dict({'plugin_classes': plugins, 'admin_site': self}, **opts))
 
         return self._admin_view_cache[new_class_name]
@@ -541,7 +542,7 @@ class AdminSite(object):
                 
         for app_menu in self.sys_menu.values():
             for menu in app_menu.values():
-                menu['menus'].sort(key=sortkeypicker(['order', 'title']))
+                menu['menus'].sort(key=sortkeypicker(['order']))
         self.sys_menu_loaded = True
     
     def get_app_menu(self, app_label):

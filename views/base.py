@@ -568,7 +568,7 @@ class CommAdminView(BaseAdminView):
         context = super(CommAdminView, self).get_context()
 
         # DEBUG模式会首先尝试从SESSION中取得缓存的菜单项
-        if not settings.DEBUG and 'nav_menu' in self.request.session:
+        if 0 and not settings.DEBUG and 'nav_menu' in self.request.session:
             nav_menu = json.loads(self.request.session['nav_menu'])
         else:
             if hasattr(self, 'app_label') and self.app_label:
@@ -589,18 +589,18 @@ class CommAdminView(BaseAdminView):
 
             def filter_item(item):
                 if 'menus' in item:
-                    before_filter_length = len(item['menus'])
+                    #before_filter_length = len(item['menus'])
                     item['menus'] = [filter_item(
                         i) for i in item['menus'] if check_menu_permission(i)]
                     after_filter_length = len(item['menus'])
-                    if after_filter_length == 0 and before_filter_length > 0:
+                    if after_filter_length == 0:
                         return None
                 return item
 
             nav_menu = [filter_item(item) for item in menus if check_menu_permission(item)]
             nav_menu = filter(lambda x:x, nav_menu)
 
-            if not settings.DEBUG:
+            if 0 and not settings.DEBUG:
                 self.request.session['nav_menu'] = json.dumps(nav_menu)
                 self.request.session.modified = True
 
@@ -734,7 +734,7 @@ class ModelAdminView(CommAdminView):
         #: 即 Model._meta.module_name
         self.module_name = self.model._meta.module_name
         #: 即 (self.app_label, self.module_name)
-        self.model_info = (self.app_label, self.module_name)
+        self.model_info = (self.model._meta.app_label, self.module_name)
 
         super(ModelAdminView, self).__init__(request, *args, **kwargs)
 

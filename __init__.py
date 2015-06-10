@@ -50,7 +50,7 @@ def autodiscover():
         if hasattr(mod,'menus'):
             m_menus = mod.menus
             for e in m_menus:
-                site.sys_menu[app][e[0]] = {'title': e[1], 'icon': e[2], 'menus': []}
+                site.sys_menu[app_label][e[0]] = {'title': e[1], 'icon': e[2], 'menus': []}
         
         # 导入 adminx 模块
         try:
