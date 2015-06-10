@@ -312,7 +312,7 @@ class ModelBaseWidget(BaseWidget):
     app_label = None
     module_name = None
     model_perm = 'change'
-    model = ModelChoiceField(label=_(u'Target Model'), widget=exwidgets.AdminSelectWidget)
+    model = ModelChoiceField(label=_(u'Target Model'), widget=exwidgets.SelectWidget)
 
     def __init__(self, dashboard, data):
         self.dashboard = dashboard

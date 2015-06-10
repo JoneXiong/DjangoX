@@ -12,6 +12,7 @@ from django.utils.encoding import force_unicode
 from django.utils.html import escape
 from django.template import loader
 from django.utils.translation import ugettext as _
+
 from xadmin import widgets
 from xadmin.layout import FormHelper, Layout, Fieldset, TabHolder, Container, Column, Col, Field
 from xadmin.util import unquote
@@ -19,11 +20,11 @@ from xadmin.views.detail import DetailAdminUtil
 
 from base import ModelAdminView, filter_hook, csrf_protect_m
 
-#: xadmin在显示 Form 时，系统默认的 DBField 对应的 FormField的属性。
+#在显示 Form 时，系统默认的 DBField 对应的 FormField的属性。
 FORMFIELD_FOR_DBFIELD_DEFAULTS = {
-    models.DateTimeField: {'form_class': forms.SplitDateTimeField, 'widget': widgets.AdminSplitDateTime },
-    models.DateField: {'widget': widgets.AdminDateWidget},
-    models.TimeField: {'widget': widgets.AdminTimeWidget},
+    models.DateTimeField: {'form_class': forms.SplitDateTimeField, 'widget': widgets.SplitDateTime },
+    models.DateField: {'widget': widgets.DateWidget},
+    models.TimeField: {'widget': widgets.TimeWidget},
     models.TextField: {'widget': widgets.AdminTextareaWidget},
     models.URLField: {'widget': widgets.AdminURLFieldWidget},
     models.IntegerField: {'widget': widgets.AdminIntegerFieldWidget},
@@ -32,8 +33,8 @@ FORMFIELD_FOR_DBFIELD_DEFAULTS = {
     models.IPAddressField: {'widget': widgets.AdminTextInputWidget},
     models.ImageField: {'widget': widgets.AdminFileWidget},
     models.FileField: {'widget': widgets.AdminFileWidget},
-    models.ForeignKey: {'widget': widgets.AdminSelectWidget},
-    models.OneToOneField: {'widget': widgets.AdminSelectWidget},
+    models.ForeignKey: {'widget': widgets.SelectWidget},
+    models.OneToOneField: {'widget': widgets.SelectWidget},
     models.ManyToManyField: {'widget': widgets.AdminSelectMultiple},
 }
 
@@ -60,7 +61,7 @@ class ReadOnlyField(Field):
 
 class ModelFormAdminView(ModelAdminView):
     """
-    用于添加或修改数据的 AdminView，该类是一个基类，提供了数据表单显示及修改等通用功能，被 CreateAdminView 及 UpdateAdminView 继承
+    用于添加或修改的 AdminView，该类是一个基类，被 CreateAdminView 及 UpdateAdminView 继承
 
     **Option 属性**
 
@@ -78,12 +79,9 @@ class ModelFormAdminView(ModelAdminView):
 
         .. autoattribute:: form_layout
     """
-    form = forms.ModelForm     #: 使Model 生成 Form 的基本 Form 类，默认为 django.forms.ModelForm
-    formfield_overrides = {}
-    """
-    可以指定某种类型的 DB Field，使用指定的 Form Field 属性
-    """
-    readonly_fields = ()       #: 只读的字段，这些字段不能被编辑
+    form = forms.ModelForm     #由 Model 生成 Form 的基类，默认为 django.forms.ModelForm
+    
+    formfield_overrides = {}    # 可以指定某种类型的 DB Field，使用指定的FormField的属性
     style_fields = {}
     """
     指定 Field 的 Style， Style一般用来实现同一种类型的字段的不同效果，例如同样是 radio button，有普通及``inline``两种 Style。
@@ -94,8 +92,10 @@ class ModelFormAdminView(ModelAdminView):
 
     ``rich-textarea`` 可能是某插件提供的 Style，这样显示 ``content`` 字段时就会使用该插件的效果了
     """
-    exclude = None
     relfield_style = None      #: 当 Model 是其他 Model 的 ref model 时，其他 Model 在显示本 Model 的字段时使用的 Field Style
+    
+    exclude = None
+    readonly_fields = ()       #: 只读的字段，这些字段不能被编辑
 
     save_as = False            #: 是否显示 ``另存为`` 按钮
     save_on_top = False        #: 是否在页面上面显示按钮组
@@ -140,7 +140,6 @@ class ModelFormAdminView(ModelAdminView):
 
     def __init__(self, request, *args, **kwargs):
         overrides = FORMFIELD_FOR_DBFIELD_DEFAULTS.copy()
-        # 将 :attr:`formfield_overrides` 替换系统默认值
         overrides.update(self.formfield_overrides)
         self.formfield_overrides = overrides
         super(ModelFormAdminView, self).__init__(request, *args, **kwargs)
@@ -148,9 +147,7 @@ class ModelFormAdminView(ModelAdminView):
     @filter_hook
     def formfield_for_dbfield(self, db_field, **kwargs):
         """
-        生成表单时的回调方法，返回 Form Field。
-
-        :param db_field: Model 的 DB Field
+        生成表单时的回调方法，返回 FormField。
         """
         # 如果使用了非自动生成的 intermediary model 则不显示该字段
         if isinstance(db_field, models.ManyToManyField) and not db_field.rel.through._meta.auto_created:
@@ -162,55 +159,46 @@ class ModelFormAdminView(ModelAdminView):
     @filter_hook
     def get_field_style(self, db_field, style, **kwargs):
         """
-        根据 Field Style 返回 Form Field 属性。扩展插件可以过滤该方法，提供各种不同的 Style
-
-        :param db_field: Model 的 DB Field
-
-        :param style: 配置的 Field Style，该值来自于属性 :attr:`style_fields`
+        根据 FieldStyle 返回 FormField 属性。扩展插件可以过滤该方法，提供各种不同的 Style
         """
         if style in ('radio', 'radio-inline') and (db_field.choices or isinstance(db_field, models.ForeignKey)):
             # fk 字段生成 radio 表单控件
-            attrs = {'widget': widgets.AdminRadioSelect(
-                attrs={'inline': style == 'radio-inline'})}
+            attrs = {'widget': widgets.AdminRadioSelect(attrs={'inline': style == 'radio-inline'}) }
             if db_field.choices:
-                attrs['choices'] = db_field.get_choices(
-                    include_blank=db_field.blank,
-                    blank_choice=[('', _('Null'))]
-                )
+                attrs['choices'] = db_field.get_choices(include_blank=db_field.blank, blank_choice=[('', _('Null'))])
             return attrs
 
         if style in ('checkbox', 'checkbox-inline') and isinstance(db_field, models.ManyToManyField):
-            return {'widget': widgets.AdminCheckboxSelect(attrs={'inline': style == 'checkbox-inline'}),
-                    'help_text': None}
+            return {'widget': widgets.AdminCheckboxSelect(attrs={'inline': style == 'checkbox-inline'}),'help_text': None}
+        if type(style)==dict:return style
 
     @filter_hook
     def get_field_attrs(self, db_field, **kwargs):
         """
-        根据 DB Field 返回 Form Field 的属性，dict类型。
-
-        :param db_field: Model 的 DB Field
+        根据DBField 返回 FormField 的属性，dict类型。
         """
+#         m_key = 'get_%s_attrs'%db_field.name
+#         if hasattr(self, m_key):
+#             return getattr(self, m_key)()
+        
         if db_field.name in self.style_fields:
             # 如果设置了 Field Style，则返回 Style 的属性
-            attrs = self.get_field_style(
-                db_field, self.style_fields[db_field.name], **kwargs)
+            attrs = self.get_field_style(db_field, self.style_fields[db_field.name], **kwargs)
             if attrs:
                 return attrs
 
         if hasattr(db_field, "rel") and db_field.rel:
             related_modeladmin = self.admin_site._registry.get(db_field.rel.to)
-            # 如果字段是关联字段，并且关联字段的 ModelAdmin 设置了 :attr:`relfield_style` 属性，则使用该值作为 Field Style
+            # 如果字段是关联字段，并且关联字段的 ModelAdmin 设置了 `relfield_style` 属性，则使用该值作为 FieldStyle
             if related_modeladmin and hasattr(related_modeladmin, 'relfield_style'):
-                attrs = self.get_field_style(
-                    db_field, related_modeladmin.relfield_style, **kwargs)
+                attrs = self.get_field_style(db_field, related_modeladmin.relfield_style, **kwargs)
                 if attrs:
                     return attrs
 
         if db_field.choices:
-            return {'widget': widgets.AdminSelectWidget}
+            return {'widget': widgets.SelectWidget}
 
-        for klass in db_field.__class__.mro():
-            # 根据 DB Field 的类，获取 Field 属性
+        for klass in db_field.__class__.mro():  #循环类及基类
             if klass in self.formfield_overrides:
                 return self.formfield_overrides[klass].copy()
 

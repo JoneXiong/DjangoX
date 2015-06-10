@@ -13,7 +13,7 @@ from django.utils.translation import ugettext as _
 from util import vendor
 
 
-class AdminDateWidget(forms.DateInput):
+class DateWidget(forms.DateInput):
 
     @property
     def media(self):
@@ -23,15 +23,15 @@ class AdminDateWidget(forms.DateInput):
         final_attrs = {'class': 'date-field', 'size': '10'}
         if attrs is not None:
             final_attrs.update(attrs)
-        super(AdminDateWidget, self).__init__(attrs=final_attrs, format=format)
+        super(DateWidget, self).__init__(attrs=final_attrs, format=format)
 
     def render(self, name, value, attrs=None):
-        input_html = super(AdminDateWidget, self).render(name, value, attrs)
+        input_html = super(DateWidget, self).render(name, value, attrs)
         return mark_safe('<div class="input-group date bootstrap-datepicker"><span class="input-group-addon"><i class="fa fa-calendar"></i></span>%s'
                          '<span class="input-group-btn"><button class="btn btn-default" type="button">%s</button></span></div>' % (input_html, _(u'Today')))
+AdminDateWidget = DateWidget
 
-
-class AdminTimeWidget(forms.TimeInput):
+class TimeWidget(forms.TimeInput):
 
     @property
     def media(self):
@@ -41,15 +41,27 @@ class AdminTimeWidget(forms.TimeInput):
         final_attrs = {'class': 'time-field', 'size': '8'}
         if attrs is not None:
             final_attrs.update(attrs)
-        super(AdminTimeWidget, self).__init__(attrs=final_attrs, format=format)
+        super(TimeWidget, self).__init__(attrs=final_attrs, format=format)
 
     def render(self, name, value, attrs=None):
-        input_html = super(AdminTimeWidget, self).render(name, value, attrs)
+        input_html = super(TimeWidget, self).render(name, value, attrs)
         return mark_safe('<div class="input-group time bootstrap-timepicker"><span class="input-group-addon"><i class="fa fa-clock-o">'
                          '</i></span>%s<span class="input-group-btn"><button class="btn btn-default" type="button">%s</button></span></div>' % (input_html, _(u'Now')))
+AdminTimeWidget  = TimeWidget
 
+class SelectWidget(forms.Select):
 
-class AdminSelectWidget(forms.Select):
+    @property
+    def media(self):
+        return vendor('select.js', 'select.css', 'xadmin.widget.select.js')
+AdminSelectWidget = SelectWidget
+    
+class SelectModelWidget(forms.Select):
+    
+    def __init__(self, model, key, value, attrs=None, choices=()):
+        super(SelectModelWidget, self).__init__(attrs)
+        self.model = model
+        self.choices = list( model.objects.values_list(key,value) )
 
     @property
     def media(self):
@@ -91,12 +103,12 @@ class AjaxSearchWidget(forms.TextInput):
         return vendor('select.js', 'select.css', 'xadmin.widget.select.js')
 
 
-class AdminSplitDateTime(forms.SplitDateTimeWidget):
+class SplitDateTime(forms.SplitDateTimeWidget):
     """
     A SplitDateTime Widget that has some admin-specific styling.
     """
     def __init__(self, attrs=None):
-        widgets = [AdminDateWidget, AdminTimeWidget]
+        widgets = [DateWidget, TimeWidget]
         # Note that we're calling MultiWidget, not SplitDateTimeWidget, because
         # we want to define widgets.
         forms.MultiWidget.__init__(self, widgets, attrs)
@@ -104,7 +116,7 @@ class AdminSplitDateTime(forms.SplitDateTimeWidget):
     def format_output(self, rendered_widgets):
         return mark_safe(u'<div class="datetime clearfix">%s%s</div>' %
                         (rendered_widgets[0], rendered_widgets[1]))
-
+AdminSplitDateTime = SplitDateTime
 
 class AdminRadioInput(RadioInput):
 
@@ -227,3 +239,5 @@ class AdminCommaSeparatedIntegerFieldWidget(forms.TextInput):
             final_attrs.update(attrs)
         super(AdminCommaSeparatedIntegerFieldWidget,
               self).__init__(attrs=final_attrs)
+
+from widgets_rel import *

@@ -19,3 +19,6 @@ BUILDIN_STYLES = {
     'default': 'xadmin/includes/sitemenu_default.html',
     'accordion': 'xadmin/includes/sitemenu_accordion.html',
 }
+
+TO_FIELD_VAR = 't'
+SHOW_FIELD_VAR = 's'
