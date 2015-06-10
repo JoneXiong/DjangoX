@@ -9,9 +9,11 @@
   {% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
   <title>{% block title %}{% endblock %}</title>
   {% vendor 'bootstrap.css' %}
-
+  {% if site_theme %}
+  <link rel="stylesheet" type="text/css" id="site-theme" href="{{site_theme}}" />
+  {% else %}
   <link rel="stylesheet" type="text/css" href="{% static "xadmin/css/themes/bootstrap-xadmin.css" %}" />
-
+  {% endif %}
   {% vendor 'font-awesome.css' 'xadmin.main.css' 'xadmin.plugins.css' 'xadmin.responsive.css' %}
   {{ media.css }}
   {% block extrastyle %}{% endblock %}

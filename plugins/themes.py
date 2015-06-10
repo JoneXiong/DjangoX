@@ -65,7 +65,7 @@ class ThemePlugin(BaseAdminPlugin):
                     ex_themes.extend([
                         {'name': t['name'], 'description': t['description'],
                             'css': t['cssMin'], 'thumbnail': t['thumbnail']}
-                        for t in watch_themes])
+                        for t in watch_themes if t['name'] not in ('Cosmo','Cyborg', 'Darkly') ])
                 except Exception:
                     pass
 
