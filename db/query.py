@@ -79,6 +79,12 @@ class QuerySet(object):
         if not hasattr(self.data, '__len__'):
             self.data = list(self.data)
         return len(self.data)
+    
+    def get_slice(self, start, end):
+        if self.data:
+            return self.data[start:end]
+        else:
+            return []
 
 Collection = QuerySet
 
