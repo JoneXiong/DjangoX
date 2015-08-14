@@ -22,3 +22,5 @@ BUILDIN_STYLES = {
 
 TO_FIELD_VAR = 't'
 SHOW_FIELD_VAR = 's'
+
+ACTION_CHECKBOX_NAME = '_selected_action'
