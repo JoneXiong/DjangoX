@@ -1,57 +1,7 @@
 # coding=utf-8
 """
-Action
-======
-
-功能
-----
-
-Action 插件在数据列表页面提供了数据选择功能, 选择后的数据可以经过 Action 做特殊的处理. 默认提供的 Action 为批量删除功能.
-
-截图
-----
-
-.. image:: /images/plugins/action.png
-
-使用
-----
-
+在数据列表页面提供了数据选择功能, 选择后的数据可以经过 Action 做特殊的处理. 默认提供的 Action 为批量删除功能.
 开发者可以设置 Model OptionClass 的 actions 属性, 该属性是一个列表, 包含您想启用的 Action 的类. 系统已经默认内置了删除数据的 Action,
-当然您可以自己制作 Action 来实现特定的功能, 制作 Action 的实例如下.
-
-    * 首先要创建一个 Action 类, 该类需要继承 BaseActionView. BaseActionView 是 :class:`~xadmin.views.ModelAdminView` 的子类::
-    
-        from xadmin.plugins.actions import BaseActionView
-
-        class MyAction(BaseActionView):
-
-            # 这里需要填写三个属性
-            action_name = "my_action"    #: 相当于这个 Action 的唯一标示, 尽量用比较针对性的名字
-            description = _(u'Test selected %(verbose_name_plural)s') #: 描述, 出现在 Action 菜单中, 可以使用 ``%(verbose_name_plural)s`` 代替 Model 的名字.
-
-            model_perm = 'change'    #: 该 Action 所需权限
-
-            # 而后实现 do_action 方法
-            def do_action(self, queryset):
-                # queryset 是包含了已经选择的数据的 queryset
-                for obj in queryset:
-                    # obj 的操作
-                    ...
-                # 返回 HttpResponse
-                return HttpResponse(...)
-
-    * 然后在 Model 的 OptionClass 中使用这个 Action::
-
-        class MyModelAdmin(object):
-
-            actions = [MyAction, ]
-
-    * 这样就完成了自己的 Action
-
-API
----
-.. autoclass:: ActionPlugin
-
 """
 from django import forms
 from django.core.exceptions import PermissionDenied
@@ -67,13 +17,14 @@ from django.utils.text import capfirst
 from xadmin.sites import site
 from xadmin.util import model_format_dict, get_deleted_objects, model_ngettext
 from xadmin.views import BaseAdminPlugin, ListAdminView
-from xadmin.views.base import filter_hook, ModelAdminView
+from xadmin.views.base import filter_hook
+from xadmin.views.page import GridPage
+from xadmin.defs import ACTION_CHECKBOX_NAME
+from xadmin.views.action import BaseActionView
 
-
-ACTION_CHECKBOX_NAME = '_selected_action'
 checkbox = forms.CheckboxInput({'class': 'action-select'}, lambda value: False)
 
-
+#  定义一个显示列 用于展示选择框
 def action_checkbox(obj):
     return checkbox.render(ACTION_CHECKBOX_NAME, force_unicode(obj.pk))
 action_checkbox.short_description = mark_safe(
@@ -83,30 +34,10 @@ action_checkbox.allow_export = False
 action_checkbox.is_column = False
 
 
-class BaseActionView(ModelAdminView):
-    action_name = None
-    description = None
-    icon = 'fa fa-tasks'
-
-    model_perm = 'change'
-
-    @classmethod
-    def has_perm(cls, list_view):
-        return list_view.get_model_perms()[cls.model_perm]
-
-    def init_action(self, list_view):
-        self.list_view = list_view
-        self.admin_site = list_view.admin_site
-
-    @filter_hook
-    def do_action(self, queryset):
-        pass
-
-
 class DeleteSelectedAction(BaseActionView):
 
     action_name = "delete_selected"
-    description = _(u'Delete selected %(verbose_name_plural)s')
+    verbose_name = _(u'Delete selected %(verbose_name_plural)s')
 
     delete_confirmation_template = None
     delete_selected_confirmation_template = None
@@ -116,6 +47,7 @@ class DeleteSelectedAction(BaseActionView):
 
     @filter_hook
     def delete_models(self, queryset):
+        u'''orm删除对象'''
         n = queryset.count()
         if n:
             queryset.delete()
@@ -125,7 +57,7 @@ class DeleteSelectedAction(BaseActionView):
 
     @filter_hook
     def do_action(self, queryset):
-        # Check that the user has delete permission for the actual model
+        # 检查是否有删除权限
         if not self.has_delete_permission():
             raise PermissionDenied
 
@@ -144,7 +76,7 @@ class DeleteSelectedAction(BaseActionView):
             self.delete_models(queryset)
             # Return None to display the change list page again.
             return None
-
+        # GET请求 删除确认页面
         if len(queryset) == 1:
             objects_name = force_unicode(self.opts.verbose_name)
         else:
@@ -168,7 +100,6 @@ class DeleteSelectedAction(BaseActionView):
             'action_checkbox_name': ACTION_CHECKBOX_NAME,
         })
 
-        # Display the confirmation page
         return TemplateResponse(self.request, self.delete_selected_confirmation_template or
                                 self.get_template_list('views/model_delete_selected_confirm.html'), context, current_app=self.admin_site.name)
 
@@ -257,10 +188,13 @@ class ActionPlugin(BaseAdminPlugin):
             return ac(self.admin_view, self.request, queryset)
 
     def get_actions(self):
+        u'''获取所有action'''
         if self.actions is None:
             return SortedDict()
-
-        actions = [self.get_action(action) for action in self.global_actions]
+        if self.model:
+            actions = [self.get_action(action) for action in self.global_actions]
+        else:
+            actions = []
 
         for klass in self.admin_view.__class__.mro()[::-1]:
             class_actions = getattr(klass, 'actions', [])
@@ -283,19 +217,28 @@ class ActionPlugin(BaseAdminPlugin):
     def get_action_choices(self):
         """
         Return a list of choices for use in a form object.  Each choice is a
-        tuple (name, description).
+        tuple (name, verbose_name, icon).
         """
         choices = []
-        for ac, name, description, icon in self.actions.itervalues():
-            choice = (name, description % model_format_dict(self.opts), icon)
+        for ac, name, verbose_name, icon in self.actions.itervalues():
+
+#            class dg():
+#                verbose_name = 'dg'
+#                verbose_name_plural = 'dg_plural'
+#            choice = (name, description % model_format_dict(dg), icon)
+            if self.opts:
+                choice = (name, verbose_name % model_format_dict(self.opts), icon)
+            else:
+                choice = (name, verbose_name, icon)
             choices.append(choice)
         return choices
 
     def get_action(self, action):
+        u'''获取指定action的信息列表'''
         if isinstance(action, type) and issubclass(action, BaseActionView):
             if not action.has_perm(self.admin_view):
                 return None
-            return action, getattr(action, 'action_name'), getattr(action, 'description'), getattr(action, 'icon')
+            return action, getattr(action, 'action_name') or 'act_%s'%action.__name__, getattr(action, 'verbose_name') or getattr(action, 'description'), getattr(action, 'icon')
 
         elif callable(action):
             func = action
@@ -327,14 +270,15 @@ class ActionPlugin(BaseAdminPlugin):
 
     # Media
     def get_media(self, media):
-        if self.actions and self.admin_view.result_count:
+        if self.actions and self.admin_view.result_count and not self.admin_view.pop:
             media = media + self.vendor('xadmin.plugin.actions.js', 'xadmin.plugins.css')
         return media
 
     # Block Views
     def block_results_bottom(self, context, nodes):
-        if self.actions and self.admin_view.result_count:
+        if self.actions and self.admin_view.result_count and not self.admin_view.pop:
             nodes.append(loader.render_to_string('xadmin/blocks/model_list.results_bottom.actions.html', context_instance=context))
 
 
 site.register_plugin(ActionPlugin, ListAdminView)
+# site.register_plugin(ActionPlugin, GridPage)
