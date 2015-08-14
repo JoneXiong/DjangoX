@@ -9,10 +9,11 @@ from django.utils.encoding import force_unicode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _, ugettext_lazy
 from xadmin.layout import FormHelper, Layout, Fieldset, Container, Col
-from xadmin.plugins.actions import BaseActionView, ACTION_CHECKBOX_NAME
+from xadmin.views.action import BaseActionView
 from xadmin.util import model_ngettext, vendor
 from xadmin.views.base import filter_hook
 from xadmin.views.edit import ModelFormAdminView
+from xadmin.defs import ACTION_CHECKBOX_NAME
 
 BATCH_CHECKBOX_NAME = '_batch_change_fields'
 

@@ -230,7 +230,7 @@ class FilterPlugin(BaseAdminPlugin):
                     context_instance=context))
 
 site.register_plugin(FilterPlugin, ListAdminView)
-#site.register_plugin(FilterPlugin, GridPage)
+site.register_plugin(FilterPlugin, GridPage)
 
 
 
