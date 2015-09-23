@@ -133,7 +133,7 @@ class ListAdminView(ModelAdminView):
 
     object_list_template = None    #: 显示数据的模板
     pop = False
-    search_sphinx_ins = None
+    search_sphinx_ins = None 
 
     def init_request(self, *args, **kwargs):
         """
@@ -250,7 +250,25 @@ class ListAdminView(ModelAdminView):
         取得 Model 的 queryset, 该 queryset 已经进行排序和过滤过. 其他插件可以在这里修改 queryset
         """
         # 首先取得基本的 queryset
-        queryset = self.queryset()
+        if self.search_sphinx_ins:
+            query = self.request.GET.get(SEARCH_VAR, '')
+            if query:
+                query_set = self.search_sphinx_ins.query(query)
+                query_set.set_options(mode='SPH_MATCH_EXTENDED2')
+                query_set.set_options(rankmode='SPH_SORT_RELEVANCE')
+                query_set.order_by('-@weight', '-@id')
+                query_set._maxmatches = 500
+                query_set._limit = 500
+                
+                sph_results = query_set._get_sphinx_results()
+                result_ids = [r['id'] for r in sph_results['matches'][:500]]
+                if query.isdigit():
+                    result_ids.append(int(query))
+                queryset = self.queryset().filter(id__in=result_ids)
+            else:
+                queryset = self.queryset()
+        else:
+            queryset = self.queryset()
 
         if not queryset.query.select_related:
             if self.list_select_related:
