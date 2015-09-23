@@ -21,7 +21,7 @@
     window.__admin_media_prefix__ = "{% filter escapejs %}{% static "xadmin/" %}{% endfilter %}";
     window.__admin_path_prefix__ = "{% filter escapejs %}{{ indexurl }}{% endfilter %}";
   </script>
-  <script type="text/javascript" src="{% static "xadmin/js/jsi18n.js" %}"></script>
+  <script type="text/javascript" src="{% url 'xadmin:jsi18n' %}"></script>
   {% block extrahead %}{% endblock %}
   {% view_block 'extrahead' %}
 </head>
@@ -47,7 +47,10 @@
           </ul>
           {% view_block 'nav_form' %}
           {% block nav_form %}{% endblock %}
-
+          <div class="navbar-btn navbar-right hide-xs">
+            {% view_block 'nav_btns' %}
+            {% block nav_btns %}{% endblock %}
+          </div>
         </div>
       </div>
       {% endblock %}

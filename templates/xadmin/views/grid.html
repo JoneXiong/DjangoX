@@ -115,13 +115,17 @@
     <tbody>
     {% for row in results %}
       <tr class="grid-item">
+      	{% if check_box %}
 		<td class="action-checkbox">
-            <input class="action-select" name="_selected_action" type="checkbox" value="row.cells[0].label">
+            <input class="action-select" name="_selected_action" type="checkbox" value="{{ row.cells.0.label }}">
         </td>
+        {% endif %}
       	{% for o in row.cells %}
+      	{% ifnotequal o.field_name '_data' %}
         <td>
             {{ o.label }}
         </td>
+        {% endifnotequal  %}
         {% endfor %}
 	  </tr>
       {% view_block 'result_row' row %}
