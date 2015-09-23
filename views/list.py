@@ -6,12 +6,15 @@ from django.http import HttpResponseRedirect
 from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_unicode, smart_unicode
-from django.utils.html import escape, conditional_escape
+from django.utils.html import escape, conditional_escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
+from django.utils.text import Truncator
 
 from xadmin.util import lookup_field, display_for_field, label_for_field, boolean_icon
+from xadmin.defs import EMPTY_CHANGELIST_VALUE
+from xadmin.defs import FILTER_PREFIX, SEARCH_VAR
 
 from base import ModelAdminView, filter_hook, inclusion_tag, csrf_protect_m
 
@@ -24,9 +27,6 @@ COL_LIST_VAR = '_cols'
 ERROR_FLAG = 'e'
 
 DOT = '.'
-
-# 数据表格中的值为空时显示的值
-EMPTY_CHANGELIST_VALUE = _('Null')
 
 
 class FakeMethodField(object):
@@ -132,6 +132,8 @@ class ListAdminView(ModelAdminView):
     ordering = None                #: 默认的数据排序
 
     object_list_template = None    #: 显示数据的模板
+    pop = False
+    search_sphinx_ins = None
 
     def init_request(self, *args, **kwargs):
         """
@@ -158,6 +160,9 @@ class ListAdminView(ModelAdminView):
         self.show_all = ALL_VAR in request.GET
         self.to_field = request.GET.get(TO_FIELD_VAR)
         self.params = dict(request.GET.items())
+        if 'pop' in self.request.GET:
+            self.pop = True
+            self.base_template = 'xadmin/base_pure.html'
 
         # 删除已经获取的参数, 因为后面可能要用 params 或过滤数据
         if PAGE_VAR in self.params:
@@ -406,6 +411,9 @@ class ListAdminView(ModelAdminView):
 
             ``results`` : 显示列表的内容信息, 是 :class:`ResultItem` 列表
         """
+        if hasattr(self, 'verbose_name'):
+            self.opts.verbose_name = self.verbose_name
+            self.opts.verbose_name_plural = self.verbose_name
         self.title = _('%s List') % force_unicode(self.opts.verbose_name)
 
         # 获取所有可供显示的列的信息
@@ -644,7 +652,17 @@ class ListAdminView(ModelAdminView):
                                      % (item_res_uri, edit_url, _(u'Details of %s') % str(obj)))
             else:
                 url = self.url_for_result(obj)
-                item.wraps.append(u'<a href="%s">%%s</a>' % url)
+                if self.pop:
+                    if 's' in self.request.GET:
+                        show = getattr(obj, self.request.GET.get('s'))
+                        if callable(show):show = show()
+                    else:
+                        show = escape(Truncator(obj).words(14, truncate='...'))
+                    show = show.replace('%','%%').replace("\'","\\\'")
+                    pop = format_html(' class="for_multi_select" show="{0}" sid="{1}" ', show, getattr(obj, self.request.GET.get('t')) )
+                else:
+                    pop = ''
+                item.wraps.append(u'<a href="%s" %s>%%s</a>' % (url, pop))
 
         return item
 
