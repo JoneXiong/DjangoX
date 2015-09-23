@@ -59,7 +59,7 @@ class AdminSite(object):
     
     site_title = None         # 网站的标题
     site_footer = None         # 网站的下角标文字
-    menu_style = 'default'    # 网站左侧菜单风格
+    menu_style = 'accordion'    # 网站左侧菜单风格
     app_dict = SortedDict()   # app模块全局字典
     sys_menu = {}                   # 网站菜单全局字典
     sys_menu_loaded = False  # 菜单是否加载过
@@ -331,10 +331,11 @@ class AdminSite(object):
         获取 plugins 首先根据该 AdminViewClass 及其所有的继承类在已经注册的插件中找到相应的插件类。然后再使用第二个参数的 OptionClass 拼成插件类。
         """
         from xadmin.views import BaseAdminView
+        from xadmin.views.page import GridPage
         plugins = []
         opts = [oc for oc in option_classes if oc]
         for klass in admin_view_class.mro():
-            # 列出 AdminViewClass 所有的继承类
+            # 列出 AdminViewClass 所有的继承类，包括本身类
             if klass == BaseAdminView or issubclass(klass, BaseAdminView):
                 merge_opts = []
                 
@@ -345,6 +346,8 @@ class AdminSite(object):
 #                settings_class = self._get_settings_class(klass)
 #                if settings_class:
 #                    merge_opts.append(settings_class)
+                if issubclass(klass, GridPage):
+                    merge_opts.append(admin_view_class)
                     
                 merge_opts.extend(opts)
                 ps = self._registry_plugins.get(klass, [])
@@ -530,7 +533,7 @@ class AdminSite(object):
             model_dict = {
                 'title': page.verbose_name,
                 'url': page.get_page_url(),
-                'icon': page.icon_class,
+                'icon': page.icon,
                 'perm': 'auth.'+ (page.perm or page.__name__),
                 'order': page.order,
             }
