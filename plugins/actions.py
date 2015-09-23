@@ -132,11 +132,12 @@ class ActionPlugin(BaseAdminPlugin):
             av = self.admin_view
             selection_note_all = ungettext('%(total_count)s selected',
                                            'All %(total_count)s selected', av.result_count)
-
+            m_action_choices = self.get_action_choices()
             new_context = {
                 'selection_note': _('0 of %(cnt)s selected') % {'cnt': len(av.result_list)},
                 'selection_note_all': selection_note_all % {'total_count': av.result_count},
-                'action_choices': self.get_action_choices(),
+                'action_choices': m_action_choices[:5],
+                'action_choices_more': len(m_action_choices)>5 and m_action_choices[5:] or [],
                 'actions_selection_counter': self.actions_selection_counter,
             }
             context.update(new_context)
