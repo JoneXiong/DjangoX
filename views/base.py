@@ -332,6 +332,9 @@ class BaseAdminPlugin(BaseCommon):
         if hasattr(admin_view, 'model'):
             self.model = admin_view.model
             self.opts = admin_view.model._meta
+        else:
+            self.model = None
+            self.opts = None
 
     def init_request(self, *args, **kwargs):
         """
@@ -368,7 +371,7 @@ class BaseAdminView(BaseCommon, View):
         self.user = request.user
 
         self.base_plugins = [p(self) for p in getattr(self,
-                                                      "plugin_classes", [])]
+                                                      "plugin_classes", [])]    #Plugin真正实例化的地方
 
         self.args = args
         self.kwargs = kwargs
@@ -536,7 +539,7 @@ class CommAdminView(BaseAdminView):
             model_dict = {
                 'title': page.verbose_name,
                 'url': page.get_page_url(),
-                'icon': page.icon_class,
+                'icon': page.icon,
                 'perm': 'auth.'+ (page.perm or page.__name__),
                 'order': page.order,
             }
