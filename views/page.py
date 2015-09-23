@@ -1,5 +1,7 @@
 # coding=utf-8
 
+import json
+
 from django.template.response import SimpleTemplateResponse
 from django.template.response import TemplateResponse
 from django.http import HttpResponseRedirect
@@ -8,6 +10,7 @@ from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.utils.safestring import mark_safe
 from django.core.urlresolvers import reverse
 from django.utils.html import escape, conditional_escape
+from django.template import loader
 
 import xadmin
 from base import BaseAdminView, CommAdminView, filter_hook, inclusion_tag, csrf_protect_m
@@ -23,7 +26,7 @@ class PageView(CommAdminView):
     
     app_label = 'xadmin'
     menu_group = '_default_group'
-    icon_class = 'fa fa-plus'
+    icon = 'fa fa-plus'
     #menu_index = 0
     order = 0
     
@@ -63,17 +66,21 @@ class FormPage(FormAdminView,PageView):
     def render_btn(cls, _redirect=None):
         m_root = xadmin.ROOT_PATH_NAME and '/'+xadmin.ROOT_PATH_NAME or ''
         if _redirect:
-            return '<a href="%s/page/%s/?_redirect=%s" class="btn btn-primary"><i class="%s"></i> %s</a>'%( m_root, cls.__name__.lower(), _redirect, cls.icon_class, cls.verbose_name )
+            return '<a href="%s/page/%s/?_redirect=%s" class="btn btn-primary"><i class="%s"></i> %s</a>'%( m_root, cls.__name__.lower(), _redirect, cls.icon, cls.verbose_name )
         else:
-            return '<a href="%s/page/%s/" class="btn btn-primary"><i class="%s"></i> %s</a>'%( m_root, cls.__name__.lower(), cls.icon_class, cls.verbose_name )
+            return '<a href="%s/page/%s/" class="btn btn-primary"><i class="%s"></i> %s</a>'%( m_root, cls.__name__.lower(), cls.icon, cls.verbose_name )
 
 class GridPage(PageView):
     template = 'xadmin/views/grid.html'
-    icon_class = 'fa fa-circle-o'
+    icon = 'fa fa-circle-o'
     
     list_filter = ()
+    search_fields = ()
     
     list_display_links_details = False
+    check_box = False
+    form_actions = ()
+    val_list = ()
     
     list_per_page = 30             #: 每页显示数据的条数
     list_max_show_all = 200        #: 每页最大显示数据的条数
@@ -88,6 +95,9 @@ class GridPage(PageView):
     
     head = []
     col_ctrl = True
+    
+    pop = False
+    search_sphinx_ins = True
     
 #    brand_icon
 #    brand_name
@@ -134,12 +144,15 @@ class GridPage(PageView):
     def get_context(self):
         context = super(GridPage, self).get_context()
         context.update({
-                        'brand_icon': self.icon_class,
+                        'cl': self,
+                        'brand_icon': self.icon,
                         'model_fields': self.model_fields(),
                         'result_headers': self.result_headers(),
                         'results': self.results() or [],
                         'nav_buttons': mark_safe(''.join(self.get_nav_btns()) ),
-                        'col_ctrl': self.col_ctrl
+                        'col_ctrl': self.col_ctrl,
+                        'bottom_buttons': mark_safe(''.join(self.get_bottom_btns()) ),
+                        'check_box': self.check_box
                         })
         return context
     
@@ -176,6 +189,8 @@ class GridPage(PageView):
         media = super(GridPage, self).get_media() + self.vendor('xadmin.page.list.js', 'xadmin.page.form.js')
         if self.list_display_links_details:
             media += self.vendor('xadmin.plugin.details.js', 'xadmin.form.css')
+        if self.check_box:
+            media += self.vendor('xadmin.plugin.actions.js', 'xadmin.plugins.css')
         return media
     
     @filter_hook
@@ -203,10 +218,11 @@ class GridPage(PageView):
             m_rh = ResultHeader(field_name, row)
             m_rh.text = text
             row.cells.append(m_rh)
-        check_box_rh = ResultHeader('action_checkbox', row)
-        check_box_rh.text = '<input type="checkbox" id="action-toggle">'
-        check_box_rh.classes.append("action-checkbox-column")
-        row.cells.insert(0,check_box_rh)
+        if self.check_box:
+            check_box_rh = ResultHeader('action_checkbox', row)
+            check_box_rh.text = '<input type="checkbox" id="action-toggle">'
+            check_box_rh.classes.append("action-checkbox-column")
+            row.cells.insert(0,check_box_rh)
         return row
     
     @filter_hook
@@ -221,23 +237,8 @@ class GridPage(PageView):
     
     @filter_hook
     def get_list_queryset(self):
-#        row = ResultRow()
-#        row.add_cell('id', 1)
-#        row.add_cell('tag', 2)
-#        row.add_cell('alias', 3)
-#        row.add_cell('vtalk_c', 4)
-#        rows = [row,row,row,row,row]
-        
-        data = [
-                {'id':1, 'tag':2, 'alias':3, 'vtalk_c':4},
-                {'id':2, 'tag':2, 'alias':3, 'vtalk_c':4},
-                {'id':3, 'tag':2, 'alias':3, 'vtalk_c':4},
-                {'id':4, 'tag':2, 'alias':3, 'vtalk_c':4},
-                {'id':5, 'tag':2, 'alias':3, 'vtalk_c':4},
-                ]
         from xadmin.db.query import Collection
-        return Collection(data)
-        #return rows
+        return Collection([])
     
     @filter_hook
     def results(self):
@@ -247,6 +248,10 @@ class GridPage(PageView):
         results = []
         for data in self.result_list:
             row = ResultRow()
+            m_data = {}
+            for e in self.val_list:
+                m_data[e] = data[e]
+            row.add_cell('_data', json.dumps(m_data))
             for key in self.list_display:
                 if key!='action_checkbox':
                     row.add_cell(key, data[key])
@@ -273,7 +278,7 @@ class GridPage(PageView):
         self.multi_page = self.result_count > self.list_per_page
         
         if (self.show_all and self.can_show_all) or not self.multi_page:
-            self.result_list = self.list_queryset
+            self.result_list = self.list_queryset.get_slice(0, self.result_count)
         else:
             try:
                 self.result_list = self.paginator.page(
@@ -355,6 +360,29 @@ class GridPage(PageView):
             'ALL_VAR': 'all',
             '1': 1,
         }
+        
+    # Block Views
+    def block_results_bottom(self, context, nodes):
+        if self.check_box and self.result_count and not self.pop:
+            nodes.append(loader.render_to_string('xadmin/blocks/grid.results_bottom.actions.html', context_instance=context))
+            
+    def get_bottom_btns(self):
+        return [ ac.render_bottom_btn(self.get_url()) for ac in self.form_actions ]
     
 class FormAction(FormPage):
-    pass
+    
+    template = 'xadmin/views/form_action.html'
+    hidden_menu = True
+    
+    def get_id_list(self):
+            ids = self.request.GET.get('ids')
+            m_list = ids.split('||')
+            return [ json.loads(e) for e in m_list]
+    
+    @classmethod  
+    def render_bottom_btn(cls, _redirect=None):
+        m_root = xadmin.ROOT_PATH_NAME and '/'+xadmin.ROOT_PATH_NAME or ''
+        if _redirect:
+            return '<a href="%s/page/%s/?_redirect=%s" class="btn btn-success" onclick="return $.do_form_action(this);"><i class="%s"></i> %s</a>&nbsp;'%( m_root, cls.__name__.lower(), _redirect, cls.icon, cls.verbose_name )
+        else:
+            return '<a href="%s/page/%s/" class="btn btn-success" onclick="return $.do_form_action(this);"><i class="%s"></i> %s</a>&nbsp;'%( m_root, cls.__name__.lower(), cls.icon, cls.verbose_name )
