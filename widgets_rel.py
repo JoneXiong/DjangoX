@@ -104,9 +104,15 @@ class RawIdWidget(forms.TextInput):
                 attrs['class'] = 'vForeignKeyRawIdAdminField' # The JavaScript code looks for this hook.
 
             if value:
+                if attrs['class'] == 'vManyToManyRawIdAdminField':
+                    self.label_format = '<span style="display: inline-block; width:300px"><textarea class="textarea-field admintextareawidget form-control" id="id_%s_show"  readonly="readonly" rows="10">%s</textarea></span>'
                 extra.append( self.label_for_value(value, name=name) )
             else:
-                extra.append('<span style="display: inline-block; width:300px"><input type="text" id="id_%s_show" class="form-control" value="" readonly="readonly" /></span>'%name)
+                if attrs['class'] == 'vManyToManyRawIdAdminField':
+                    input_html = '<textarea class="textarea-field admintextareawidget form-control" id="id_%s_show" readonly="readonly" rows="10"></textarea>'%name
+                else:
+                    input_html = '<input type="text" id="id_%s_show" class="form-control" value="" readonly="readonly" />'%name
+                extra.append('<span style="display: inline-block; width:300px">%s</span>'%input_html)
             
             extra.append('&nbsp;&nbsp;<a class="related-lookup" id="remove_id_%s" href="javascript://" onclick="return removeRelatedObject(this);" >x</a>&nbsp;&nbsp;'%name)
             extra.append('<a href="%s%s" class="related-lookup" id="lookup_id_%s" onclick="return showRelatedObjectLookupPopup(this);"> '
@@ -168,10 +174,8 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
         if attrs is None:
             attrs = {}
         attrs['class'] = 'vManyToManyRawIdAdminField'
-        if value:
+        if type(value) in (list,tuple):
             value = ','.join([force_text(v) for v in value])
-        else:
-            value = ''
         return super(ManyToManyRawIdWidget, self).render(name, value, attrs)
 
     def label_for_value(self, value, name=None):
@@ -180,7 +184,7 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
         key = self.rel.get_related_field().name
         objs = self.rel.to._default_manager.using(self.db).filter(**{key+'__in': m_value})
         tar_list = [escape(Truncator(obj).words(14, truncate='...')) for obj in objs]
-        return self.label_format %(name, ','.join(tar_list) )
+        return self.label_format %(name, '\n'.join(tar_list) )
 
     def value_from_datadict(self, data, files, name):
         value = data.get(name)
@@ -244,10 +248,8 @@ class ManyToManyPopupWidget(ForeignKeyPopupWidget):
         if attrs is None:
             attrs = {}
         attrs['class'] = 'vManyToManyRawIdAdminField'
-        if value:
+        if type(value) in (list,tuple):
             value = ','.join([force_text(v) for v in value])
-        else:
-            value = ''
         return super(ManyToManyPopupWidget, self).render(name, value, attrs)
     
     def label_for_value(self, value, name=None):
@@ -263,7 +265,7 @@ class ManyToManyPopupWidget(ForeignKeyPopupWidget):
                 tar_list.append(escape(Truncator(show_val).words(14, truncate='...')))
         else:
             tar_list = [escape(Truncator(obj).words(14, truncate='...')) for obj in objs]
-        return self.label_format %(name, ','.join(tar_list) )
+        return self.label_format %(name, '\n'.join(tar_list) )
 
     def value_from_datadict(self, data, files, name):
         value = data.get(name)

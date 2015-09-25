@@ -55,14 +55,22 @@ function dismissRelatedLookupPopup(win, chosenId, desc) {
     var elem = document.getElementById(name);
     var show = document.getElementById(name+'_show');
     if (elem.className.indexOf('vManyToManyRawIdAdminField') != -1 && elem.value) {
-        elem.value += ',' + chosenId;
-        show.value += ',' + desc;
+    	if ( elem.value.split(",").indexOf(''+chosenId)<0 ){
+	        elem.value += ',' + chosenId;
+	        show.value += '\n' + desc;
+    	}
     } else {
         document.getElementById(name).value = chosenId;
         show.value = desc;
     }
     $(elem).change();
-    win.close();
+    //win.close();
+}
+
+function can_multi_select_check(win){
+	var name = windowname_to_id(win.name);
+	var elem = document.getElementById(name);
+	return elem.className.indexOf('vManyToManyRawIdAdminField') > -1;
 }
 
 function showAddAnotherPopup(triggeringLink) {
