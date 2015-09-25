@@ -62,7 +62,10 @@ class UserAdmin(object):
     list_filter = ('is_staff', 'is_superuser', 'is_active')
     search_fields = ('username', 'first_name', 'last_name', 'email')
     ordering = ('username',)
-    style_fields = {'user_permissions': 'm2m_raw'}
+    style_fields = {
+                    'groups': 'm2m_transfer',
+                    'user_permissions': 'm2m_raw' 
+    }
     model_icon = 'fa fa-user'
     relfield_style = 'fk-ajax'
     app_label = 'xadmin'
