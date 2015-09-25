@@ -14,7 +14,7 @@ from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
 from xadmin.layout import Field, render_field
 from xadmin.plugins.inline import Inline
-from xadmin.plugins.actions import BaseActionView
+from xadmin.views.action import BaseActionView
 from xadmin.plugins.inline import InlineModelAdmin
 from xadmin.sites import site
 from xadmin.util import unquote, quote, model_format_dict

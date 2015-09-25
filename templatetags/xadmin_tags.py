@@ -39,3 +39,19 @@ static = register.simple_tag(static)
 @register.simple_tag(takes_context=True)
 def vendor(context, *tags):
     return util_vendor(*tags).render()
+
+@register.filter
+def get_item(container, key):
+    if isinstance(container, dict):
+        try:
+            value = container.get(key)
+        except (KeyError, TypeError):
+            value = settings.TEMPLATE_STRING_IF_INVALID
+    elif isinstance(container, (list, tuple)):
+        try:
+            value = container[key]
+        except (IndexError, TypeError):
+            value = settings.TEMPLATE_STRING_IF_INVALID
+    else:
+        value = settings.TEMPLATE_STRING_IF_INVALID
+    return value
