@@ -489,6 +489,7 @@ class Dashboard(CommAdminView):
     icon = None
     app_label = None
     base_template = 'xadmin/base_site_noleft.html'
+    template = 'xadmin/views/dashboard.html'
 
     def get_page_id(self):
         return self.request.path
@@ -587,7 +588,7 @@ class Dashboard(CommAdminView):
     @never_cache
     def get(self, request, *args, **kwargs):
         self.widgets = self.get_widgets()
-        return self.template_response('xadmin/views/dashboard.html', self.get_context())
+        return self.template_response(self.template, self.get_context())
 
     @csrf_protect_m
     def post(self, request, *args, **kwargs):
