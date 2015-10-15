@@ -531,10 +531,10 @@ class Dashboard(CommAdminView):
                     widget.delete()
                     continue
             portal.append(portal_col)
-
-        UserSettings(
-            user=self.user, key="dashboard:%s:pos" % self.get_page_id(),
-            value='|'.join([','.join([str(w.id) for w in col]) for col in portal])).save()
+        if self.widget_customiz:
+            UserSettings(
+                user=self.user, key="dashboard:%s:pos" % self.get_page_id(),
+                value='|'.join([','.join([str(w.id) for w in col]) for col in portal])).save()
 
         return portal
 
