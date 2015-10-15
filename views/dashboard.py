@@ -676,3 +676,36 @@ class AppDashboard(Dashboard):
     def get_title(self):
         mod = self.admin_site.app_dict[self.app_label]
         return self.title % force_unicode(getattr(mod, 'verbose_name', self.app_label))
+    
+    @filter_hook
+    def get_context(self):
+        context = super(Dashboard, self).get_context()
+        nav_menu = context['nav_menu']
+        widgets = [
+            [ ],
+            [ ]
+        ]
+        flag=False
+        for item in nav_menu:
+            widget = {"type": "qbutton", "title": item['title'], "btns": [] }
+            for sitem in item['menus']:
+                widget['btns'].append( {'title': sitem['title'], 'url': sitem['url'], 'icon': sitem['icon'] } )
+            widgets[int(flag)].append(widget)
+            flag = not flag
+        self.widgets = widgets
+        self.widgets = self.get_widgets()
+        new_context = {
+            'title': self.get_title(),
+            'icon': self.icon,
+            'portal_key': self.get_portal_key(),
+            'columns': [('col-sm-%d' % int(12 / len(self.widgets)), ws) for ws in self.widgets],
+            'has_add_widget_permission': self.has_model_perm(UserWidget, 'add') and self.widget_customiz,
+            'add_widget_url': self.get_admin_url('%s_%s_add' % (UserWidget._meta.app_label, UserWidget._meta.module_name)) +
+            "?user=%s&page_id=%s&_redirect=%s" % (self.user.id, self.get_page_id(), urlquote(self.request.get_full_path()))
+        }
+        context.update(new_context)
+        return context
+
+    @never_cache
+    def get(self, request, *args, **kwargs):
+        return self.template_response(self.template, self.get_context())
