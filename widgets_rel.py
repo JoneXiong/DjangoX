@@ -223,7 +223,9 @@ class ForeignKeyPopupWidget(RawIdWidget):
             m_param = self.admin_view.fk_url_param
             if name in m_param.keys():
                 params.update(m_param[name])
-        params.update({defs.TO_FIELD_VAR: self.t_name, defs.SHOW_FIELD_VAR: self.s_name})
+        params[defs.TO_FIELD_VAR] = self.t_name
+        if self.s_name:
+            params[defs.SHOW_FIELD_VAR] = self.s_name
         return params
 
     def label_for_value(self, value, name=None):
