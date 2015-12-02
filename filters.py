@@ -161,6 +161,55 @@ class ListFieldFilter(FieldFilter):
         context['choices'] = list(self.choices())
         return context
 
+class ChoicesBaseFilter(BaseFilter):
+    
+    title = None
+    parameter_name = None
+
+    def __init__(self, request, params, model, admin_view):
+        super(ChoicesBaseFilter, self).__init__(request, params, model, admin_view)
+        if self.parameter_name is None:
+            raise ImproperlyConfigured(
+                "The list filter '%s' does not specify "
+                "a 'parameter_name'." % self.__class__.__name__)
+        lookup_choices = self.lookups(request, admin_view)
+        if lookup_choices is None:
+            lookup_choices = ()
+        self.lookup_choices = list(lookup_choices)
+        if self.parameter_name in params:
+            value = params.pop(self.parameter_name)
+            self.used_params[self.parameter_name] = value
+        
+       
+    def lookups(self, request, admin_view):
+        raise NotImplementedError
+        
+    def choices(self):
+        yield {
+            'selected': self.value() is None,
+            'query_string': self.query_string({}, ['_p_'+self.parameter_name]),
+            'display': _('All'),
+        }
+        for lookup, title in self.lookup_choices:
+            yield {
+                'selected': self.value() == lookup,
+                'query_string': self.query_string({'_p_'+self.parameter_name: lookup,}, []),
+                'display': title,
+            }
+    
+    def get_context(self):
+        context = super(ChoicesBaseFilter, self).get_context()
+        context['choices'] = list(self.choices())
+        return context
+    
+    def has_output(self):
+        return len(self.lookup_choices) > 0
+
+    def value(self):
+        return self.used_params.get(self.parameter_name, None)
+    
+    def do_filte(self, queryset):
+        raise NotImplementedError
 
 @manager.register
 class BooleanFieldListFilter(ListFieldFilter):
