@@ -210,6 +210,52 @@ class ChoicesBaseFilter(BaseFilter):
     
     def do_filte(self, queryset):
         raise NotImplementedError
+    
+class TextBaseFilter(BaseFilter):
+    
+    title = None
+    parameter_name = None
+    template = 'xadmin/filters/char.html'
+    lookup_formats = {'in': '%s__in','search': '%s__contains'}
+
+    def __init__(self, request, params, model, admin_view):
+        super(TextBaseFilter, self).__init__(request, params, model, admin_view)
+        if self.parameter_name is None:
+            raise ImproperlyConfigured(
+                "The list filter '%s' does not specify "
+                "a 'parameter_name'." % self.__class__.__name__)
+
+        # 设置 self.lookup_[key] = value，和 self.context_params、self.used_params
+        self.context_params = {}
+        for name, format in self.lookup_formats.items():
+            p = format % self.parameter_name
+            self.context_params["%s_name" % name] = FILTER_PREFIX + p
+            if p in params:
+                value = prepare_lookup_value(p, params.pop(p))
+                self.used_params[p] = value
+                self.context_params["%s_val" % name] = value
+            else:
+                self.context_params["%s_val" % name] = ''
+
+        map(lambda kv: setattr(self, 'lookup_' + kv[0], kv[1]), self.context_params.items())
+    
+    def has_output(self):
+        return True
+    
+    def get_context(self):
+        context = super(TextBaseFilter, self).get_context()
+        context.update(self.context_params)
+        context['remove_url'] = self.query_string( {}, map( lambda k: FILTER_PREFIX + k, self.used_params.keys() ) )
+        return context
+
+    def value(self):
+        _param_name = self.lookup_formats['search'] % self.parameter_name
+        return self.used_params.get(_param_name, None)
+    
+    def do_filte(self, queryset):
+        raise NotImplementedError
+    
+    
 
 @manager.register
 class BooleanFieldListFilter(ListFieldFilter):
