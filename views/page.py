@@ -32,6 +32,7 @@ class PageView(CommAdminView):
     
     hidden_menu = False
     perm = None#'comm_page_code'
+    pop = False
     
     def init_request(self, *args, **kwargs):
         #if not self.perm:
@@ -39,6 +40,9 @@ class PageView(CommAdminView):
         if self.perm:
             if not self.user.has_perm('auth.'+self.perm):
                 raise PermissionDenied
+        if '_pop' in self.request.GET:
+            self.pop = True
+            self.base_template = 'xadmin/base_pure.html'
     
     def get(self, request, *args, **kwargs):
         return TemplateResponse(self.request,self.template, self.get_context())
@@ -60,7 +64,10 @@ class PageView(CommAdminView):
         return '%s/page/%s/'%(m_root, cls.__name__.lower())
     
 class FormPage(FormAdminView,PageView):
-    pass
+    
+    @filter_hook
+    def get_redirect_url(self):
+        return self.get_response()
 
     @classmethod  
     def render_btn(cls, _redirect=None):
@@ -254,7 +261,10 @@ class GridPage(PageView):
             row.add_cell('_data', json.dumps(m_data))
             for key in self.list_display:
                 if key!='action_checkbox':
-                    row.add_cell(key, data[key])
+                    if data.has_key(key):
+                        row.add_cell(key, data[key])
+                    else:
+                        row.add_cell(key, getattr(self, key)(data) )
             results.append(row)
         return results
         #return self.result_list
