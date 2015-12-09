@@ -11,6 +11,9 @@ from django.utils.encoding import force_unicode
 from django.utils.html import escape
 from django.template import loader
 from django.utils.translation import ugettext as _
+from django.utils.safestring import mark_safe
+from django.http import HttpResponse
+
 from xadmin import widgets
 from xadmin.layout import FormHelper, Layout, Fieldset, TabHolder, Container, Column, Col, Field
 from xadmin.util import unquote
@@ -27,10 +30,14 @@ class FormAdminView(CommAdminView):
     template = 'xadmin/views/form.html'
 
     form_layout = None
+    pop = False
 
     def init_request(self, *args, **kwargs):
         # comm method for both get and post
         self.prepare_form()
+        if '_pop' in self.request.GET:
+            self.pop = True
+            self.base_template = 'xadmin/base_pure.html'
 
     @filter_hook
     def prepare_form(self):
@@ -173,9 +180,20 @@ class FormAdminView(CommAdminView):
         
         if "_continue" in request.REQUEST:
             return self.get_response()
-
-        if "_redirect" in request.REQUEST:
+        elif "_redirect" in request.REQUEST:
             return request.REQUEST["_redirect"]
+        elif '_pop' in request.REQUEST:
+            js_str='''<!DOCTYPE html>
+<html lang="zh_CN">
+<head>
+            <script type="text/javascript">
+                window.opener.location.reload();
+                window.close();
+            </script>
+</head><body></body>
+</html>
+            '''
+            return HttpResponse(mark_safe(js_str))
         else:
             return self.get_redirect_url()
 
