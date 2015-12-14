@@ -37,6 +37,8 @@ from django.utils.html import escape
 from django.utils.translation import ugettext as _
 from django.utils.xmlutils import SimplerXMLGenerator
 from django.db.models import BooleanField, NullBooleanField
+
+import xadmin
 from xadmin.sites import site
 from xadmin.views import BaseAdminPlugin, ListAdminView
 from xadmin.util import json
@@ -255,7 +257,7 @@ class ExportPlugin(BaseAdminPlugin):
     # View Methods
     def get_result_list(self, __):
         if self.request.GET.get('all', 'off') == 'on':
-            self.admin_view.list_per_page = sys.maxint
+            self.admin_view.list_per_page = xadmin.EXPORT_MAX#sys.maxint
         return __()
 
     def result_header(self, item, field_name, row):

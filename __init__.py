@@ -5,6 +5,8 @@ from xadmin.sites import site
 VERSION = [0,5,0]
 
 ROOT_PATH_NAME = ''
+EXPORT_MAX = 100000
+
 verbose_name = u'系统'
 
 menus = (
