@@ -59,7 +59,7 @@ except:
 
 class ExportMenuPlugin(BaseAdminPlugin):
 
-    list_export = ('xlsx', 'xls', 'csv', 'xml', 'json')
+    list_export = [ ]#('xlsx', 'xls', 'csv', 'xml', 'json')
     export_names = {'xlsx': 'Excel 2007', 'xls': 'Excel', 'csv': 'CSV',
                     'xml': 'XML', 'json': 'JSON'}
 
