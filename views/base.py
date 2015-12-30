@@ -877,6 +877,6 @@ class ModelAdminView(CommAdminView):
     def has_permission(self, perm_code):
         raw_code = perm_code[:]
         if perm_code in ('view', 'add', 'change', 'delete'):
-            perm_code = '%s.%s_%s' %(self.app_label, perm_code ,self.module_name)
+            perm_code = '%s.%s_%s' %(self.model._meta.app_label, perm_code ,self.module_name)
         return (raw_code not in self.remove_permissions) and self.user.has_perm(perm_code)
 ModelView = ModelAdminView
