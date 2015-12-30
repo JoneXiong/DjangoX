@@ -316,6 +316,24 @@ class BaseCommon(object):
 
     def vendor(self, *tags):
         return vendor(*tags)
+    
+    def log_change(self, obj, message):
+        """
+        Log that an object has been successfully changed.
+
+        The default implementation creates an admin LogEntry object.
+        """
+        from django.contrib.admin.models import LogEntry, CHANGE
+        from django.contrib.contenttypes.models import ContentType
+        from django.utils.encoding import force_text
+        LogEntry.objects.log_action(
+            user_id         = self.request.user.pk,
+            content_type_id = ContentType.objects.get_for_model(obj).pk,
+            object_id       = obj.pk,
+            object_repr     = force_text(obj),
+            action_flag     = CHANGE,
+            change_message  = message
+        )
 
 
 class BaseAdminPlugin(BaseCommon):
