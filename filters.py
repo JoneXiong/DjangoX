@@ -46,8 +46,9 @@ class BaseFilter(object):
     u'''
     过滤器基类
     '''
-    title = None
-    template = 'xadmin/filters/list.html'
+    title = None    # 过滤器显示名
+    template = 'xadmin/filters/list.html'   # 过滤器使用的模板
+    parameter_name = None # 过滤器名    主key
 
     @classmethod
     def test(cls, field, request, params, model, admin_view, field_path):
@@ -57,12 +58,15 @@ class BaseFilter(object):
         pass
 
     def __init__(self, request, params, model, admin_view):
-        self.used_params = {}
-        self.request = request
-        self.params = params
-        self.model = model
-        self.admin_view = admin_view
-
+        u'''
+        一些成员的初始化
+        '''
+        self.used_params = {}   # 当前请求使用了的参数数据 eg: {'tee_date__gte': 'xxx'} {'slug__contains'='d9c98cb5'}
+        self.request = request  # 当前请求对象
+        self.params = params  # 当前请求的所有参数数据
+        self.model = model     # 表模型，当宿主为 GridPage 时 model 为空
+        self.admin_view = admin_view    # 当前页面主体对象
+        # 确保子类设置了 title 成员
         if self.title is None:
             raise ImproperlyConfigured(
                 "The filter '%s' does not specify "
@@ -70,31 +74,33 @@ class BaseFilter(object):
 
     def query_string(self, new_params=None, remove=None):
         u'''
-        得到当前请求的url参数
+        根据参数生成？ url  eg：?_p_guarantee_date__gte=2016-01-05&_p_guarantee_date__lt=2016-01-14
         '''
         return self.admin_view.get_query_string(new_params, remove)
 
     def form_params(self):
         u'''
-        得到当前请求的form表单参数
+        生成 url 参数信息的 hidden input
         '''
         return self.admin_view.get_form_params(
             remove=map(lambda k: FILTER_PREFIX + k, self.used_params.keys()))
 
     def has_output(self):
-        """
-        Returns True if some choices would be output for this filter.
-        """
+        u'''
+        过滤器是否有choices选项    必须重载
+        '''
         raise NotImplementedError
 
     @property
     def is_used(self):
+        u'''
+        是否使用了此过滤器
+        '''
         return len(self.used_params) > 0
 
     def do_filte(self, queryset):
         u"""
-        执行过滤器查询
-        Returns the filtered queryset.
+        执行过滤器查询 需返回queryset   必须重载
         """
         raise NotImplementedError
 
@@ -105,16 +111,42 @@ class BaseFilter(object):
         tpl = get_template(self.template)
         return mark_safe(tpl.render(Context(self.get_context())))
 
+class InputFilter(BaseFilter):
+    
+    lookup_formats = {} # 过滤器涉及的子类型和url参数之间映射字典
+    
+    def __init__(self, request, params, model, admin_view):
+        super(InputFilter, self).__init__(request, params, model, admin_view)
+        # 确保子类设置了 lookup_formats 成员
+        if self.title is None:
+            raise ImproperlyConfigured(
+                "The filter '%s' does not specify "
+                "a 'lookup_formats'." % self.__class__.__name__)
+            
+        # 设置 self.lookup_[key] = value，和 self.context_params、self.used_params
+        self.context_params = {}
+        for name, format in self.lookup_formats.items():
+            p = format % self.parameter_name
+            self.context_params["%s_name" % name] = FILTER_PREFIX + p
+            if p in params:
+                value = prepare_lookup_value(p, params.pop(p))
+                self.used_params[p] = value
+                self.context_params["%s_val" % name] = value
+            else:
+                self.context_params["%s_val" % name] = ''
+
+        map(lambda kv: setattr(self, 'lookup_' + kv[0], kv[1]), self.context_params.items())
+        
+    def has_output(self):
+        return True
 
 class FieldFilter(BaseFilter):
     u'''
-    字段过滤器基类
+    模型字段过滤器基类
     '''
     
-    lookup_formats = {}
-
     def __init__(self, field, request, params, model, admin_view, field_path):
-        # 多了两个参数
+        # 多了首尾两个参数    字段类 和 字段名
         self.field = field
         self.field_path = field_path
         
@@ -255,6 +287,108 @@ class TextBaseFilter(BaseFilter):
     def do_filte(self, queryset):
         raise NotImplementedError
     
+    
+class NumberBaseFilter(BaseFilter):
+    
+    title = None
+    template = 'xadmin/filters/number.html'
+    lookup_formats = {'equal': '%s__exact', 'lt': '%s__lt', 'gt': '%s__gt',
+                      'ne': '%s__ne', 'lte': '%s__lte', 'gte': '%s__gte',
+                      }
+    
+    def __init__(self, request, params, model, admin_view):
+        super(NumberBaseFilter, self).__init__(request, params, model, admin_view)
+        if self.parameter_name is None:
+            raise ImproperlyConfigured(
+                "The list filter '%s' does not specify "
+                "a 'parameter_name'." % self.__class__.__name__)
+
+        # 设置 self.lookup_[key] = value，和 self.context_params、self.used_params
+        self.context_params = {}
+        for name, format in self.lookup_formats.items():
+            p = format % self.parameter_name
+            self.context_params["%s_name" % name] = FILTER_PREFIX + p
+            if p in params:
+                value = prepare_lookup_value(p, params.pop(p))
+                self.used_params[p] = value
+                self.context_params["%s_val" % name] = value
+            else:
+                self.context_params["%s_val" % name] = ''
+
+        map(lambda kv: setattr(self, 'lookup_' + kv[0], kv[1]), self.context_params.items())
+        
+    def has_output(self):
+        return True
+    
+    def get_context(self):
+        context = super(NumberBaseFilter, self).get_context()
+        context.update(self.context_params)
+        context['remove_url'] = self.query_string( {}, map( lambda k: FILTER_PREFIX + k, self.used_params.keys() ) )
+        return context
+
+    def do_filte(self, queryset):
+        raise NotImplementedError
+        params = self.used_params.copy()
+        ne_key = '%s__ne' % self.field_path
+        if ne_key in params:
+            queryset = queryset.exclude(
+                **{self.field_path: params.pop(ne_key)})
+        return queryset.filter(**params)
+    
+class DateBaseFilter(ListFieldFilter):
+    template = 'xadmin/filters/date.html'
+    lookup_formats = {'since': '%s__gte', 'until': '%s__lt'}
+
+    def __init__(self, request, params, model, admin_view):
+        super(NumberBaseFilter, self).__init__(request, params, model, admin_view)
+        
+        for name, format in self.lookup_formats.items():
+            p = format % self.parameter_name
+            self.context_params["%s_name" % name] = FILTER_PREFIX + p
+            if p in params:
+                value = prepare_lookup_value(p, params.pop(p))
+                self.used_params[p] = value
+                self.context_params["%s_val" % name] = value
+            else:
+                self.context_params["%s_val" % name] = ''
+
+        map(lambda kv: setattr(self, 'lookup_' + kv[0], kv[1]), self.context_params.items())
+        
+        self.field_generic = '%s__' % self.parameter_name
+        self.date_params = dict([(FILTER_PREFIX + k, v) for k, v in params.items()
+                                 if k.startswith(self.field_generic)])
+
+        now = timezone.now()
+        if now.tzinfo is not None:
+            current_tz = timezone.get_current_timezone()
+            now = now.astimezone(current_tz)
+            if hasattr(current_tz, 'normalize'):
+                now = current_tz.normalize(now)
+
+        today = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        tomorrow = today + datetime.timedelta(days=1)
+
+        self.links = (
+            (_('全部'), {}),
+            (_('Today'), {
+                self.lookup_since_name: str(today),
+                self.lookup_until_name: str(tomorrow),
+            }),
+        )
+        
+    def get_context(self):
+        context = super(DateBaseFilter, self).get_context()
+        context['choices'] = list(self.choices())
+        return context
+
+    def choices(self):
+        for title, param_dict in self.links:
+            yield {
+                'selected': self.date_params == param_dict,
+                'query_string': self.query_string(
+                param_dict, [FILTER_PREFIX + self.field_generic]),
+                'display': title,
+            }
     
 
 @manager.register
