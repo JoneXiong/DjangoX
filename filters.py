@@ -118,13 +118,13 @@ class InputFilter(BaseFilter):
     def __init__(self, request, params, model, admin_view):
         super(InputFilter, self).__init__(request, params, model, admin_view)
         # 确保子类设置了 lookup_formats 成员
-        if self.title is None:
+        if self.lookup_formats is None:
             raise ImproperlyConfigured(
                 "The filter '%s' does not specify "
                 "a 'lookup_formats'." % self.__class__.__name__)
             
         # 设置 self.lookup_[key] = value，和 self.context_params、self.used_params
-        self.context_params = {}
+        self.context_params = {}    #传给模板的context变量
         for name, format in self.lookup_formats.items():
             p = format % self.parameter_name
             self.context_params["%s_name" % name] = FILTER_PREFIX + p
@@ -139,6 +139,16 @@ class InputFilter(BaseFilter):
         
     def has_output(self):
         return True
+    
+    def get_context(self):
+        context = super(TextBaseFilter, self).get_context()
+        context.update(self.context_params)
+        context['remove_url'] = self.query_string( {}, map( lambda k: FILTER_PREFIX + k, self.used_params.keys() ) )
+        return context
+    
+    def get_value(self, name):
+        _param_name = self.lookup_formats[name] % self.parameter_name
+        return self.used_params.get(_param_name, None)
 
 class FieldFilter(BaseFilter):
     u'''
@@ -149,33 +159,12 @@ class FieldFilter(BaseFilter):
         # 多了首尾两个参数    字段类 和 字段名
         self.field = field
         self.field_path = field_path
+        self.parameter_name = field_path
         
         self.title = getattr(field, 'verbose_name', field_path)
         self.context_params = {}
 
         super(FieldFilter, self).__init__(request, params, model, admin_view)
-        
-        # 设置 self.lookup_[key] = value，和 self.context_params、self.used_params
-        for name, format in self.lookup_formats.items():
-            p = format % field_path
-            self.context_params["%s_name" % name] = FILTER_PREFIX + p
-            if p in params:
-                value = prepare_lookup_value(p, params.pop(p))
-                self.used_params[p] = value
-                self.context_params["%s_val" % name] = value
-            else:
-                self.context_params["%s_val" % name] = ''
-
-        map(lambda kv: setattr(self, 'lookup_' + kv[0], kv[1]), self.context_params.items())
-
-    def get_context(self):
-        context = super(FieldFilter, self).get_context()
-        context.update(self.context_params)
-        context['remove_url'] = self.query_string( {}, map( lambda k: FILTER_PREFIX + k, self.used_params.keys() ) )
-        return context
-
-    def has_output(self):
-        return True
 
     def do_filte(self, queryset):
         u'''根据 used_params 做查询'''
@@ -194,16 +183,10 @@ class ListFieldFilter(FieldFilter):
         return context
 
 class ChoicesBaseFilter(BaseFilter):
-    
-    title = None
-    parameter_name = None
 
     def __init__(self, request, params, model, admin_view):
         super(ChoicesBaseFilter, self).__init__(request, params, model, admin_view)
-        if self.parameter_name is None:
-            raise ImproperlyConfigured(
-                "The list filter '%s' does not specify "
-                "a 'parameter_name'." % self.__class__.__name__)
+
         lookup_choices = self.lookups(request, admin_view)
         if lookup_choices is None:
             lookup_choices = ()
@@ -214,6 +197,7 @@ class ChoicesBaseFilter(BaseFilter):
         
        
     def lookups(self, request, admin_view):
+        u'''配置选项 eg [ ('1', '上个月'), ('2', '下个月') ]'''
         raise NotImplementedError
         
     def choices(self):
@@ -239,121 +223,35 @@ class ChoicesBaseFilter(BaseFilter):
 
     def value(self):
         return self.used_params.get(self.parameter_name, None)
+
     
-    def do_filte(self, queryset):
-        raise NotImplementedError
+class TextBaseFilter(InputFilter):
     
-class TextBaseFilter(BaseFilter):
-    
-    title = None
-    parameter_name = None
     template = 'xadmin/filters/char.html'
     lookup_formats = {'in': '%s__in','search': '%s__contains'}
 
-    def __init__(self, request, params, model, admin_view):
-        super(TextBaseFilter, self).__init__(request, params, model, admin_view)
-        if self.parameter_name is None:
-            raise ImproperlyConfigured(
-                "The list filter '%s' does not specify "
-                "a 'parameter_name'." % self.__class__.__name__)
-
-        # 设置 self.lookup_[key] = value，和 self.context_params、self.used_params
-        self.context_params = {}
-        for name, format in self.lookup_formats.items():
-            p = format % self.parameter_name
-            self.context_params["%s_name" % name] = FILTER_PREFIX + p
-            if p in params:
-                value = prepare_lookup_value(p, params.pop(p))
-                self.used_params[p] = value
-                self.context_params["%s_val" % name] = value
-            else:
-                self.context_params["%s_val" % name] = ''
-
-        map(lambda kv: setattr(self, 'lookup_' + kv[0], kv[1]), self.context_params.items())
-    
-    def has_output(self):
-        return True
-    
-    def get_context(self):
-        context = super(TextBaseFilter, self).get_context()
-        context.update(self.context_params)
-        context['remove_url'] = self.query_string( {}, map( lambda k: FILTER_PREFIX + k, self.used_params.keys() ) )
-        return context
-
     def value(self):
-        _param_name = self.lookup_formats['search'] % self.parameter_name
-        return self.used_params.get(_param_name, None)
-    
-    def do_filte(self, queryset):
-        raise NotImplementedError
+        u'''获取Text的值'''
+        return self.get_value('search')
     
     
 class NumberBaseFilter(BaseFilter):
     
-    title = None
     template = 'xadmin/filters/number.html'
     lookup_formats = {'equal': '%s__exact', 'lt': '%s__lt', 'gt': '%s__gt',
                       'ne': '%s__ne', 'lte': '%s__lte', 'gte': '%s__gte',
                       }
-    
-    def __init__(self, request, params, model, admin_view):
-        super(NumberBaseFilter, self).__init__(request, params, model, admin_view)
-        if self.parameter_name is None:
-            raise ImproperlyConfigured(
-                "The list filter '%s' does not specify "
-                "a 'parameter_name'." % self.__class__.__name__)
 
-        # 设置 self.lookup_[key] = value，和 self.context_params、self.used_params
-        self.context_params = {}
-        for name, format in self.lookup_formats.items():
-            p = format % self.parameter_name
-            self.context_params["%s_name" % name] = FILTER_PREFIX + p
-            if p in params:
-                value = prepare_lookup_value(p, params.pop(p))
-                self.used_params[p] = value
-                self.context_params["%s_val" % name] = value
-            else:
-                self.context_params["%s_val" % name] = ''
-
-        map(lambda kv: setattr(self, 'lookup_' + kv[0], kv[1]), self.context_params.items())
-        
-    def has_output(self):
-        return True
     
-    def get_context(self):
-        context = super(NumberBaseFilter, self).get_context()
-        context.update(self.context_params)
-        context['remove_url'] = self.query_string( {}, map( lambda k: FILTER_PREFIX + k, self.used_params.keys() ) )
-        return context
-
-    def do_filte(self, queryset):
-        raise NotImplementedError
-        params = self.used_params.copy()
-        ne_key = '%s__ne' % self.field_path
-        if ne_key in params:
-            queryset = queryset.exclude(
-                **{self.field_path: params.pop(ne_key)})
-        return queryset.filter(**params)
+class DateBaseFilter(ChoicesBaseFilter, InputFilter):
     
-class DateBaseFilter(ListFieldFilter):
-    template = 'xadmin/filters/date.html'
+    template = 'xadmin/filters/date_base.html'
     lookup_formats = {'since': '%s__gte', 'until': '%s__lt'}
 
     def __init__(self, request, params, model, admin_view):
-        super(NumberBaseFilter, self).__init__(request, params, model, admin_view)
+        super(DateBaseFilter, self).__init__(request, params, model, admin_view)
         
-        for name, format in self.lookup_formats.items():
-            p = format % self.parameter_name
-            self.context_params["%s_name" % name] = FILTER_PREFIX + p
-            if p in params:
-                value = prepare_lookup_value(p, params.pop(p))
-                self.used_params[p] = value
-                self.context_params["%s_val" % name] = value
-            else:
-                self.context_params["%s_val" % name] = ''
-
-        map(lambda kv: setattr(self, 'lookup_' + kv[0], kv[1]), self.context_params.items())
-        
+        # date_params 包含 FILTER_PREFIX 的 used_params
         self.field_generic = '%s__' % self.parameter_name
         self.date_params = dict([(FILTER_PREFIX + k, v) for k, v in params.items()
                                  if k.startswith(self.field_generic)])
@@ -375,11 +273,6 @@ class DateBaseFilter(ListFieldFilter):
                 self.lookup_until_name: str(tomorrow),
             }),
         )
-        
-    def get_context(self):
-        context = super(DateBaseFilter, self).get_context()
-        context['choices'] = list(self.choices())
-        return context
 
     def choices(self):
         for title, param_dict in self.links:
