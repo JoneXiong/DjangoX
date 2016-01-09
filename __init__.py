@@ -15,11 +15,6 @@ menus = (
 
 
 def autodiscover():
-    """
-    Auto-discover INSTALLED_APPS admin.py modules and fail silently when
-    not present. This forces an import on them to register any admin bits they
-    may want.
-    """
 
     from django.conf import settings
     from django.utils.importlib import import_module
@@ -42,8 +37,8 @@ def autodiscover():
 
     # 加载各app的 adminx
     for app in settings.INSTALLED_APPS:
+        # 加载app
         mod = import_module(app)
-        
         app_label = app.split('.')[-1]
         site.app_dict[app_label] = mod
         
@@ -65,8 +60,5 @@ def autodiscover():
             # (see #8245).
             site.restore_registry(before_import_registry)
 
-            # Decide whether to bubble up this error. If the app just
-            # doesn't have an admin module, we can ignore the error
-            # attempting to import it, otherwise we want it to bubble up.
             if module_has_submodule(mod, 'adminx'):
                 raise
