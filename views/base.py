@@ -7,20 +7,16 @@ from functools import update_wrapper
 
 
 from django import forms
-from django.utils.encoding import force_unicode
 from django.conf import settings
 from django.contrib import messages
-from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.template import Context, Template
 from django.template.response import TemplateResponse
-from django.utils.datastructures import SortedDict
 from django.utils.decorators import method_decorator, classonlymethod
 from django.utils.http import urlencode
 from django.utils.itercompat import is_iterable
 from django.utils.safestring import mark_safe
-from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic import View
@@ -298,7 +294,7 @@ class BaseAdminView(BaseCommon, View):
         因为这些初始化操作在 AdminView 的初始化方法中已经完成了，可以参看 :meth:`BaseAdminView.init_request`
         """
         def view(request, *args, **kwargs):
-            self = cls(request, *args, **kwargs)    #真正示例化的地方
+            self = cls(request, *args, **kwargs)    #真正实例化的地方
 
             if hasattr(self, 'get') and not hasattr(self, 'head'):
                 self.head = self.get
@@ -477,203 +473,3 @@ class CommAdminView(BaseAdminView):
 SiteView = CommAdminView
 
 
-class ModelAdminView(CommAdminView):
-    """
-    基于 Model 的 AdminView，该类的子类，在 AdminSite 生成 urls 时，会为每一个注册的 Model 生成一个 url 映射。
-    ModelAdminView 注册时使用 :meth:`xadmin.sites.AdminSite.register_modelview` 方法注册，具体使用实例可以参见该方法的说明，或参考实例::
-
-        from xadmin.views import ModelAdminView
-
-        class TestModelAdminView(ModelAdminView):
-            
-            def get(self, request, obj_id):
-                pass
-
-        site.register_modelview(r'^(.+)/test/$', TestModelAdminView, name='%s_%s_test')
-
-    注册后，用户可以通过访问 ``/%(app_label)s/%(module_name)s/123/test`` 访问到该view
-
-    **Option 属性**
-
-        .. autoattribute:: fields
-        .. autoattribute:: exclude
-        .. autoattribute:: ordering
-        .. autoattribute:: model
-
-    **实例属性**
-
-        .. py:attribute:: opts
-
-            即 Model._meta
-
-        .. py:attribute:: app_label
-
-            即 Model._meta.app_label
-
-        .. py:attribute:: module_name
-
-            即 Model._meta.module_name
-
-        .. py:attribute:: model_info
-
-            即 (self.app_label, self.module_name)
-
-    """
-    fields = None    #: (list,tuple) 默认显示的字段
-    exclude = None   #: (list,tuple) 排除的字段，主要用在编辑页面
-    ordering = None  #: (dict) 获取 Model 的 queryset 时默认的排序规则
-    model = None     #: 绑定的 Model 类，在注册 Model 时，该项会自动附在 OptionClass 中，见方法 :meth:`AdminSite.register`
-    remove_permissions = []
-    app_label = None
-
-    def __init__(self, request, *args, **kwargs):
-        #: 即 Model._meta
-        self.opts = self.model._meta
-        #: 即 Model._meta.app_label
-        self.app_label = self.app_label or self.model._meta.app_label
-        #: 即 Model._meta.module_name
-        self.module_name = self.model._meta.module_name
-        #: 即 (self.app_label, self.module_name)
-        self.model_info = (self.model._meta.app_label, self.module_name)
-
-        super(ModelAdminView, self).__init__(request, *args, **kwargs)
-
-    @filter_hook
-    def get_context(self):
-        """
-        **Context Params** :
-
-            ``opts`` : Model 的 _meta
-
-            ``app_label`` : Model 的 app_label
-
-            ``module_name`` : Model 的 module_name
-
-            ``verbose_name`` : Model 的 verbose_name
-        """
-        new_context = {
-            "opts": self.opts,
-            "app_label": self.app_label,
-            "module_name": self.module_name,
-            "verbose_name": force_unicode(self.opts.verbose_name),
-            'model_icon': self.get_model_icon(self.model),
-        }
-        context = super(ModelAdminView, self).get_context()
-        context.update(new_context)
-        return context
-
-    @filter_hook
-    def get_breadcrumb(self):
-        bcs = super(ModelAdminView, self).get_breadcrumb()
-        item = {'title': self.opts.verbose_name_plural}
-        if self.has_view_permission():
-            item['url'] = self.model_admin_url('changelist')
-        bcs.append(item)
-        return bcs
-
-    @filter_hook
-    def get_object(self, object_id):
-        """
-        根据 object_id 获得唯一的 Model 实例，如果 pk 为 object_id 的 Model 不存在，则返回 None
-        """
-        queryset = self.queryset()
-        model = queryset.model
-        try:
-            object_id = model._meta.pk.to_python(object_id)
-            return queryset.get(pk=object_id)
-        except (model.DoesNotExist, ValidationError):
-            return None
-
-    @filter_hook
-    def get_object_url(self, obj):
-        if self.has_change_permission(obj):
-            return self.model_admin_url("change", getattr(obj, self.opts.pk.attname))
-        elif self.has_view_permission(obj):
-            return self.model_admin_url("detail", getattr(obj, self.opts.pk.attname))
-        else:
-            return None
-
-    def model_admin_url(self, name, *args, **kwargs):
-        """
-        等同于 :meth:`BaseCommon.get_admin_url` ，只是无需填写 model 参数， 使用本身的 :attr:`ModelAdminView.model` 属性。
-        """
-        return reverse(
-            "%s:%s_%s_%s" % (self.admin_site.app_name, self.opts.app_label,
-            self.module_name, name), args=args, kwargs=kwargs)
-
-    def get_model_perms(self):
-        """
-        返回包含 Model 所有权限的 dict。dict 的 key 值为： ``add`` ``view`` ``change`` ``delete`` ， 
-        value 为 boolean 值，表示当前用户是否具有相应的权限。
-        """
-        return {
-            'view': self.has_view_permission(),
-            'add': self.has_add_permission(),
-            'change': self.has_change_permission(),
-            'delete': self.has_delete_permission(),
-        }
-
-    def get_template_list(self, template_name):
-        """
-        根据 template_name 返回一个 templates 列表，生成页面是在这些列表中寻找存在的模板。这样，您就能方便的复写某些模板。列表的格式为::
-
-            "xadmin/%s/%s/%s" % (opts.app_label, opts.object_name.lower(), template_name),
-            "xadmin/%s/%s" % (opts.app_label, template_name),
-            "xadmin/%s" % template_name,
-
-        """
-        opts = self.opts
-        return (
-            "xadmin/%s/%s/%s" % (
-                opts.app_label, opts.object_name.lower(), template_name),
-            "xadmin/%s/%s" % (opts.app_label, template_name),
-            "xadmin/%s" % template_name,
-        )
-
-    def get_ordering(self):
-        """
-        返回 Model 列表的 ordering， 默认就是返回 :attr:`ModelAdminView.ordering` ，子类可以复写该方法
-        """
-        return self.ordering or ()
-        
-    def queryset(self):
-        """
-        返回 Model 的 queryset。可以使用该属性查询 Model 数据。
-        """
-        return self.model._default_manager.get_query_set()
-
-    def has_view_permission(self, obj=None):
-        """
-        返回当前用户是否有查看权限
-
-        .. note::
-
-            目前的实现为：如果一个用户有对数据的修改权限，那么他就有对数据的查看权限。当然您可以在子类中修改这一规则
-        """
-        return ('view' not in self.remove_permissions) and (self.user.has_perm('%s.view_%s' % self.model_info) or \
-            self.user.has_perm('%s.change_%s' % self.model_info))
-
-    def has_add_permission(self):
-        """
-        返回当前用户是否有添加权限
-        """
-        return ('add' not in self.remove_permissions) and self.user.has_perm('%s.add_%s' % self.model_info)
-
-    def has_change_permission(self, obj=None):
-        """
-        返回当前用户是否有修改权限
-        """
-        return ('change' not in self.remove_permissions) and self.user.has_perm('%s.change_%s' % self.model_info)
-
-    def has_delete_permission(self, obj=None):
-        """
-        返回当前用户是否有删除权限
-        """
-        return ('delete' not in self.remove_permissions) and self.user.has_perm('%s.delete_%s' % self.model_info)
-
-    def has_permission(self, perm_code):
-        raw_code = perm_code[:]
-        if perm_code in ('view', 'add', 'change', 'delete'):
-            perm_code = '%s.%s_%s' %(self.model._meta.app_label, perm_code ,self.module_name)
-        return (raw_code not in self.remove_permissions) and self.user.has_perm(perm_code)
-ModelView = ModelAdminView
