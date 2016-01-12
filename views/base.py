@@ -2,8 +2,7 @@
 import sys
 import copy
 import functools
-import datetime
-import decimal
+
 from functools import update_wrapper
 
 
@@ -12,14 +11,12 @@ from django.utils.encoding import force_unicode
 from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import ValidationError
-from django.core.serializers.json import DjangoJSONEncoder
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.template import Context, Template
 from django.template.response import TemplateResponse
 from django.utils.datastructures import SortedDict
 from django.utils.decorators import method_decorator, classonlymethod
-from django.utils.encoding import smart_unicode
 from django.utils.http import urlencode
 from django.utils.itercompat import is_iterable
 from django.utils.safestring import mark_safe
@@ -31,6 +28,7 @@ from django.views.generic import View
 from ..util import static, json, vendor, sortkeypicker
 from .. import defs
 from structs import filter_hook
+from ..dutils import JSONEncoder
 
 
 csrf_protect_m = method_decorator(csrf_protect)
@@ -68,26 +66,8 @@ def inclusion_tag(file_name, context_class=Context, takes_context=False):
     return wrap
 
 
-class JSONEncoder(DjangoJSONEncoder):
-    def default(self, o):
-        if isinstance(o, datetime.date):
-            return o.strftime('%Y-%m-%d')
-        elif isinstance(o, datetime.datetime):
-            return o.strftime('%Y-%m-%d %H:%M:%S')
-        elif isinstance(o, decimal.Decimal):
-            return str(o)
-        else:
-            try:
-                return super(JSONEncoder, self).default(o)
-            except Exception:
-                return smart_unicode(o)
-
-
 class BaseCommon(object):
-    """
-    通用方法、工具函数集合类
-    提供给BaseAdminView 和 BaseAdminPlugin 的通用基类，主要是提供了一些常用的通用方法
-    """
+
     def get_view(self, view_class, option_class=None, *args, **kwargs):
         """
         获取经过合并后的实际的view类
@@ -118,31 +98,16 @@ class BaseCommon(object):
 
     def get_model_url(self, model, name, *args, **kwargs):
         """
-        路径工具函数
-        通过 model, name 取得 url，会自动拼成 urlname，并会加上 AdminSite.app_name 的 url namespace
+        name  为 add、changelist
         """
-        return reverse(
-            '%s:%s_%s_%s' % (self.admin_site.app_name, model._meta.app_label,
-                             model._meta.module_name, name),
-            args=args, kwargs=kwargs, current_app=self.admin_site.name)
+        return self.admin_site.get_model_url(model, name, *args, **kwargs)
 
     def get_model_perm(self, model, name):
-        """
-        权限相关
-        获取 Model 的某种权限标签，标签的格式为::
-
-            >>> view.get_model_perm(User, 'view')
-            >>> 'auth.user_view'
-        """
         return '%s.%s_%s' % (model._meta.app_label, name, model._meta.module_name)
 
     def has_model_perm(self, model, name, user=None):
         """
-        权限判断
-        判断当前用户是否有某个 Model 的 某种权限，例如:
-
-            >>> view.has_model_perm(User, 'view')
-            >>> True
+        name  为 view、change
         """
         user = user or self.user
         return user.has_perm(self.get_model_perm(model, name)) or (name == 'view' and self.has_model_perm(model, 'change', user))
@@ -220,11 +185,10 @@ class BaseCommon(object):
         return HttpResponse(content)
 
     def template_response(self, template, context):
-        """
-        请求返回API
-        便捷方法，方便生成 TemplateResponse
-        """
-        return TemplateResponse(self.request, template, context, current_app=self.admin_site.name)
+        return self.render_tpl(template, context)
+    
+    def render_tpl(self, tpl, context):
+        return TemplateResponse(self.request, tpl, context, current_app=self.admin_site.name)
 
     def message_user(self, message, level='info'):
         """
@@ -235,6 +199,9 @@ class BaseCommon(object):
             getattr(messages, level)(self.request, message)
     
     def msg(self, message, level='info'):
+        '''
+        level 为 info、success、error
+        '''
         self.message_user(message, level)
 
     def static(self, path):
@@ -249,9 +216,7 @@ class BaseCommon(object):
     
     def log_change(self, obj, message):
         """
-        Log that an object has been successfully changed.
-
-        The default implementation creates an admin LogEntry object.
+        写对象日志
         """
         from django.contrib.admin.models import LogEntry, CHANGE
         from django.contrib.contenttypes.models import ContentType
