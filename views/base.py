@@ -361,24 +361,8 @@ BaseView = BaseAdminView
 
 
 class CommAdminView(BaseAdminView):
-    """
-    通用 AdminView 主要有:
-        * 网站标题
-        * 网站菜单
- 
-    属性
-        base_template
-        default_model_icon
-    """
 
     base_template = 'xadmin/base_site.html'    #: View模板继承的基础模板
-    #menu_template = 'xadmin/includes/sitemenu_default.html' # 用于菜单include的模板
-
-    #site_title = None
-    #site_footer = None
-
-    #default_model_icon = 'fa fa-circle-o'
-    #apps_icons = {'xadmin': 'fa fa-circle-o'}
 
     def get_site_menu(self):
         """不建议使用
@@ -394,86 +378,6 @@ class CommAdminView(BaseAdminView):
         """
         return None
 
-    #@filter_hook
-    def get_nav_menu(self):
-        """
-        返回网站菜单，get_site_menu 将把其返回结果作为菜单的第一部分
-        自动根据 App 和 Model 生成两级的菜单,置于其后
-        :rtype: 格式见 :meth:`get_site_menu` 返回格式
-        """
-        site_menu = list(self.get_site_menu() or [])
-
-        nav_menu = SortedDict()    #使用有序 dict，保证每次生成的菜单顺序固定
-        
-        for model, model_admin in self.admin_site._registry.items(): #self.admin_site.get_grup_registrys(self.app_label):    # 
-            if getattr(model_admin, 'hidden_menu', False):
-                continue
-            app_label = model._meta.app_label
-            model_dict = {
-                'title': unicode(capfirst(model._meta.verbose_name_plural)),
-                'url': self.get_model_url(model, "changelist"),
-                'icon': self.get_model_icon(model),
-                'perm': self.get_model_perm(model, 'view'),
-                'order': model_admin.order,
-            }
-
-            app_key = "app:%s" % app_label
-            if app_key in nav_menu:
-                nav_menu[app_key]['menus'].append(model_dict)
-            else:
-                # 得到app_title 
-                app_title = unicode(app_label.title())
-                mods = model.__module__.split('.')
-                if len(mods) > 1:
-                    mod = '.'.join(mods[0:-1])
-                    if mod in sys.modules:
-                        mod = sys.modules[mod]
-                        if 'verbose_name' in dir(mod):
-                            app_title = getattr(mod, 'verbose_name')
-
-                nav_menu[app_key] = {
-                    'title': app_title,
-                    'menus': [model_dict],
-                }
-              # first_icon  first_url 目前无用
-#            app_menu = nav_menu[app_key]
-#            if app_icon:
-#                app_menu['first_icon'] = app_icon
-#            elif ('first_icon' not in app_menu or
-#                    app_menu['first_icon'] == self.default_model_icon) and model_dict.get('icon'):
-#                app_menu['first_icon'] = model_dict['icon']
-#
-#            if 'first_url' not in app_menu and model_dict.get('url'):
-#                app_menu['first_url'] = model_dict['url']
-        for page in self.admin_site._registry_pages:
-            if getattr(page, 'hidden_menu', False):
-                continue
-            app_label = page.app_label
-            model_dict = {
-                'title': page.verbose_name,
-                'url': page.get_page_url(),
-                'icon': page.icon,
-                'perm': 'auth.'+ (page.perm or page.__name__),
-                'order': page.order,
-            }
-            app_key = "app:%s" % app_label
-            if app_key in nav_menu:
-                nav_menu[app_key]['menus'].append(model_dict)
-            else:
-                app_title = unicode(app_label.title())
-                nav_menu[app_key] = {
-                    'title': app_title,
-                    'menus': [model_dict],
-                }
-        # model排序
-        for menu in nav_menu.values():
-            menu['menus'].sort(key=sortkeypicker(['order', 'title']))
-        # app排序
-        nav_menu = nav_menu.values()
-        nav_menu.sort(key=lambda x: x['title'])
-
-        site_menu.extend(nav_menu)
-        return site_menu
 
     @filter_hook
     def get_context(self):
@@ -483,7 +387,7 @@ class CommAdminView(BaseAdminView):
         """
         context = super(CommAdminView, self).get_context()
 
-        # DEBUG模式会首先尝试从SESSION中取得缓存的菜单项
+        # DEBUG模式会首先尝试从SESSION中取得缓存的 app 菜单项
         if 0 and not settings.DEBUG and 'nav_menu' in self.request.session:
             nav_menu = json.loads(self.request.session['nav_menu'])
         else:
@@ -554,29 +458,6 @@ class CommAdminView(BaseAdminView):
 
     @filter_hook
     def get_model_icon(self, model):
-        """
-        取得 Model 图标，Model 图标会作为 css class，一般生成 HTML 如下::
-
-            <i class="icon-model icon-{{model_icon}}"></i>
-
-        这是 Bootstrap 标准的图标格式，xadmin 目前是用了 Font Icon (Font-Awesome)，您可以制作自己的图标，具体信息可以参考
-        `如何制作自己的字体图标 <http://fortawesome.github.com/Font-Awesome/#contribute>`_
-
-        .. note::
-
-            Model 图标，目前被使用在以下几个地方，当然您也可以随时使用在自己实现的页面中:
-
-                * 系统菜单
-                * 列表页面标题中
-                * 添加、修改及删除页面的标题中
-
-        ``FAQ: 如果定义 Model 图标``
-
-        您可以在 :class:`CommAdminView` 的 OptionClass 中通过 :attr:`CommAdminView.globe_models_icon` 属性设定全局的 Model 图标。
-        或者在 Model 的 OptionClass 中设置 :attr:`model_icon` 属性。
-        """
-        # 首先从全局图标中获取
-#        icon = self.global_models_icon.get(model)
         icon = None
         if model in self.admin_site._registry:
             # 如果 Model 的 OptionClass 中有 model_icon 属性，则使用该属性
@@ -586,6 +467,9 @@ class CommAdminView(BaseAdminView):
 
     @filter_hook
     def get_breadcrumb(self):
+        u'''
+        导航链接基础部分
+        '''
         return [{
             'url': self.get_admin_url('index'),
             'title': _('Home')
