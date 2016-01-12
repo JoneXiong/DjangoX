@@ -5,7 +5,7 @@ import json
 from django.template.response import SimpleTemplateResponse
 from django.template.response import TemplateResponse
 from django.http import HttpResponseRedirect
-from django.core.paginator import InvalidPage, Paginator
+from django.core.paginator import InvalidPage, Paginator, Page
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.utils.safestring import mark_safe
 from django.core.urlresolvers import reverse
@@ -16,9 +16,9 @@ import xadmin
 from base import BaseAdminView, CommAdminView, filter_hook, inclusion_tag, csrf_protect_m
 from form import FormAdminView
 from list import ResultRow, ResultItem, ResultHeader, COL_LIST_VAR
+from xadmin.db.query import Collection
+from xadmin.defs import DOT, PAGE_VAR
 
-DOT = '.'
-PAGE_VAR = 'p'
 
 class PageView(CommAdminView):
     verbose_name = None
@@ -40,7 +40,7 @@ class PageView(CommAdminView):
         if self.perm:
             if not self.user.has_perm('auth.'+self.perm):
                 raise PermissionDenied
-        if '_pop' in self.request.GET:
+        if '_pop' in self.request.GET or 'pop' in self.request.GET:
             self.pop = True
             self.base_template = 'xadmin/base_pure.html'
     
@@ -76,6 +76,16 @@ class FormPage(FormAdminView,PageView):
             return '<a href="%s/page/%s/?_redirect=%s" class="btn btn-primary"><i class="%s"></i> %s</a>'%( m_root, cls.__name__.lower(), _redirect, cls.icon, cls.verbose_name )
         else:
             return '<a href="%s/page/%s/" class="btn btn-primary"><i class="%s"></i> %s</a>'%( m_root, cls.__name__.lower(), cls.icon, cls.verbose_name )
+        
+class RpcPaginator(Paginator):
+
+    def page(self, number):
+        number = self.validate_number(number)
+        bottom = (number - 1) * self.per_page
+        top = bottom + self.per_page
+        if top + self.orphans >= self.count:
+            top = self.count
+        return Page(self.object_list.get_slice(bottom,self.per_page), number, self)
 
 class GridPage(PageView):
     template = 'xadmin/views/grid.html'
@@ -91,7 +101,8 @@ class GridPage(PageView):
     
     list_per_page = 30             #: 每页显示数据的条数
     list_max_show_all = 200        #: 每页最大显示数据的条数
-    paginator_class = Paginator    #: 分页类
+    paginator_class = RpcPaginator    #: 分页类
+    queryset_class = Collection
     
     result_count = 3
     result_list = [1,2,3,4,5]
@@ -105,6 +116,8 @@ class GridPage(PageView):
     
     pop = False
     search_sphinx_ins = True
+    
+    _meta = None
     
 #    brand_icon
 #    brand_name
@@ -121,8 +134,7 @@ class GridPage(PageView):
         return list(self.base_list_display)
 
     def init_request(self, *args, **kwargs):
-#        if not self.has_view_permission():
-#            raise PermissionDenied
+        super(GridPage, self).init_request(*args, **kwargs)
         
         request = self.request
         
@@ -158,7 +170,7 @@ class GridPage(PageView):
                         'results': self.results() or [],
                         'nav_buttons': mark_safe(''.join(self.get_nav_btns()) ),
                         'col_ctrl': self.col_ctrl,
-                        'bottom_buttons': mark_safe(''.join(self.get_bottom_btns()) ),
+                        'bottom_buttons': mark_safe('\n'.join(self.get_bottom_btns()) ),
                         'check_box': self.check_box
                         })
         return context
@@ -197,7 +209,7 @@ class GridPage(PageView):
         if self.list_display_links_details:
             media += self.vendor('xadmin.plugin.details.js', 'xadmin.form.css')
         if self.check_box:
-            media += self.vendor('xadmin.plugin.actions.js', 'xadmin.plugins.css')
+            media += self.vendor('xadmin.plugin.actions.js', 'xadmin.plugins.css', 'xadmin.form.css')
         return media
     
     @filter_hook
@@ -244,8 +256,7 @@ class GridPage(PageView):
     
     @filter_hook
     def get_list_queryset(self):
-        from xadmin.db.query import Collection
-        return Collection([])
+        return self.queryset_class([])
     
     @filter_hook
     def results(self):
@@ -268,6 +279,10 @@ class GridPage(PageView):
             results.append(row)
         return results
         #return self.result_list
+        
+    def select_addition(self, id, show):
+        from django.utils.html import format_html
+        return format_html(' class="for_multi_select" show="{0}" sid="{1}" ', show, id)
     
     def make_result_list(self):
 #        row = ResultRow()
@@ -373,16 +388,17 @@ class GridPage(PageView):
         
     # Block Views
     def block_results_bottom(self, context, nodes):
-        if self.check_box and self.result_count and not self.pop:
+        if self.check_box and self.result_count:
             nodes.append(loader.render_to_string('xadmin/blocks/grid.results_bottom.actions.html', context_instance=context))
             
     def get_bottom_btns(self):
-        return [ ac.render_bottom_btn(self.get_url()) for ac in self.form_actions ]
+        return [ ac.render_bottom_btn(self.get_url()) for ac in self.form_actions if ac.perm and self.user.has_perm('auth.'+ac.perm) ]
     
 class FormAction(FormPage):
     
     template = 'xadmin/views/form_action.html'
     hidden_menu = True
+    icon = 'fa fa-tasks'
     
     def get_id_list(self):
             ids = self.request.GET.get('ids')
@@ -393,6 +409,6 @@ class FormAction(FormPage):
     def render_bottom_btn(cls, _redirect=None):
         m_root = xadmin.ROOT_PATH_NAME and '/'+xadmin.ROOT_PATH_NAME or ''
         if _redirect:
-            return '<a href="%s/page/%s/?_redirect=%s" class="btn btn-success" onclick="return $.do_form_action(this);"><i class="%s"></i> %s</a>&nbsp;'%( m_root, cls.__name__.lower(), _redirect, cls.icon, cls.verbose_name )
+            return '<a href="%s/page/%s/?_redirect=%s" class="btn btn-default" onclick="return $.do_form_action(this);"><i class="%s"></i> %s</a>'%( m_root, cls.__name__.lower(), _redirect, cls.icon, cls.verbose_name )
         else:
-            return '<a href="%s/page/%s/" class="btn btn-success" onclick="return $.do_form_action(this);"><i class="%s"></i> %s</a>&nbsp;'%( m_root, cls.__name__.lower(), cls.icon, cls.verbose_name )
+            return '<a href="%s/page/%s/" class="btn btn-default" onclick="return $.do_form_action(this);"><i class="%s"></i> %s</a>'%( m_root, cls.__name__.lower(), cls.icon, cls.verbose_name )
