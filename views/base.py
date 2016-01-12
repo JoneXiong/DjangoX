@@ -5,7 +5,7 @@ import functools
 import datetime
 import decimal
 from functools import update_wrapper
-from inspect import getargspec
+
 
 from django import forms
 from django.utils.encoding import force_unicode
@@ -27,83 +27,13 @@ from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic import View
-from xadmin.util import static, json, vendor, sortkeypicker
+
+from ..util import static, json, vendor, sortkeypicker
 from .. import defs
+from structs import filter_hook
 
-#: 通用的csrf_protect_m装饰器，给其他模块的 AdminView 使用
+
 csrf_protect_m = method_decorator(csrf_protect)
-
-
-class IncorrectPluginArg(Exception):
-    """ 当插件的方法参数错误时抛出该异常 """
-    pass
-
-
-def filter_chain(filters, token, func, *args, **kwargs):
-    if token == -1:
-        return func()
-    else:
-        def _inner_method():
-            fm = filters[token]
-            fargs = getargspec(fm)[0]
-            if len(fargs) == 1:
-                # 只有 self 一个参数，这时如果 AdminView 方法的执行结果是 None 则没有问题，否则会抛出异常
-                result = func()
-                if result is None:
-                    return fm()
-                else:
-                    raise IncorrectPluginArg(u'Plugin filter method need a arg to receive parent method result.')
-            else:
-                # 如果第一个参数为 ``__`` ，传入的参数为 func， 而非 func()
-                return fm(func if fargs[1] == '__' else func(), *args, **kwargs)
-        return filter_chain(filters, token - 1, _inner_method, *args, **kwargs)
-
-
-def filter_hook(func):
-    """
-    表明 AdminView 的方法可以被插件插入的装饰器。执行使用了该装饰器的方法时，会按照以下过程执行:
-
-        1. 首先将实例的 plugins 属性取出，取出含有同样方法名的插件
-
-        2. 按照插件方法的 ``priority`` 属性排序
-
-        3. 顺序执行插件方法，执行插件方法的规则:
-
-            * 如果插件方法没有参数，AdminView 方法的返回结果不为空则抛出异常
-
-            * 如果插件方法的第一个参数为 ``__`` ，则 AdminView 方法将作为第一个参数传入，注意，这时还未执行该方法，
-              在插件中可以通过 ``__()`` 执行，这样就可以实现插件在 AdminView 方法执行前实现一些自己的逻辑，例如::
-
-                def get_context(self, __):
-                    c = {'key': 'value'}
-                    c.update(__())
-                    return c
-
-            * 如果插件方法的第一个参数不为 ``__`` ，则执行 AdminView 方法，将结果作为第一个参数传入
-
-        4. 最终将插件顺序执行的结果返回
-
-    """
-    tag = func.__name__
-    func.__doc__ = "``filter_hook``\n\n" + (func.__doc__ or "")
-
-    @functools.wraps(func)
-    def method(self, *args, **kwargs):
-
-        # 将 AdminView 的方法先封装起来，方便后面执行
-        def _inner_method():
-            return func(self, *args, **kwargs)
-
-        if self.plugins:
-            # 首先取出所有含有同名方法的插件
-            filters = [(getattr(getattr(p, tag), 'priority', 10), getattr(p, tag))
-                       for p in self.plugins if callable(getattr(p, tag, None))]
-            # 按照 ``priority`` 属性排序
-            filters = [f for p, f in sorted(filters, key=lambda x:x[0])]
-            return filter_chain(filters, len(filters) - 1, _inner_method, *args, **kwargs)
-        else:
-            return _inner_method()
-    return method
 
 
 def inclusion_tag(file_name, context_class=Context, takes_context=False):
