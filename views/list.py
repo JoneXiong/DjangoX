@@ -6,7 +6,7 @@ from django.http import HttpResponseRedirect
 from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_unicode, smart_unicode
-from django.utils.html import escape, conditional_escape, format_html
+from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
@@ -15,121 +15,27 @@ from django.utils.text import Truncator
 from xadmin.util import lookup_field, display_for_field, label_for_field, boolean_icon
 from xadmin.defs import EMPTY_CHANGELIST_VALUE
 from xadmin.defs import FILTER_PREFIX, SEARCH_VAR
+from xadmin.defs import TO_FIELD_VAR, ALL_VAR, ORDER_VAR, PAGE_VAR, COL_LIST_VAR, ERROR_FLAG, DOT
 
-from base import ModelAdminView, filter_hook, inclusion_tag, csrf_protect_m
-
-# 列表页面的一些特殊参数, 从 django admin 中继承来
-ALL_VAR = 'all'
-ORDER_VAR = 'o'
-PAGE_VAR = 'p'
-TO_FIELD_VAR = 't'
-COL_LIST_VAR = '_cols'
-ERROR_FLAG = 'e'
-
-DOT = '.'
-
-
-class FakeMethodField(object):
-    """
-    This class used when a column is an model function, wrap function as a fake field to display in select columns.
-    """
-    def __init__(self, name, verbose_name):
-        # Initial comm field attrs
-        self.name = name
-        self.verbose_name = verbose_name
-        self.primary_key = False
-
-
-class ResultRow(dict):
-    def __init__(self):
-        self.cells = []
-        
-    def add_cell(self,name, text):
-        item = ResultItem(name, self)
-        item.text = text
-        self.cells.append(item)
-
-
-class ResultItem(object):
-
-    def __init__(self, field_name, row):
-        self.classes = []
-        self.text = '&nbsp;'
-        self.wraps = []
-        self.tag = 'td'
-        self.tag_attrs = []
-        self.allow_tags = False
-        self.btns = []
-        self.menus = []
-        self.is_display_link = False
-        self.row = row
-        self.field_name = field_name
-        self.field = None
-        self.attr = None
-        self.value = None
-
-    @property
-    def label(self):
-        text = mark_safe(
-            self.text) if self.allow_tags else conditional_escape(self.text)
-        if force_unicode(text) == '':
-            text = mark_safe('&nbsp;')
-        for wrap in self.wraps:
-            text = mark_safe(wrap % text)
-        return text
-
-    @property
-    def tagattrs(self):
-        return mark_safe(
-            '%s%s' % ((self.tag_attrs and ' '.join(self.tag_attrs) or ''),
-            (self.classes and (' class="%s"' % ' '.join(self.classes)) or '')))
-
-
-class ResultHeader(ResultItem):
-
-    def __init__(self, field_name, row):
-        super(ResultHeader, self).__init__(field_name, row)
-        self.tag = 'th'
-        self.tag_attrs = ['scope="col"']
-        self.sortable = False
-        self.allow_tags = True
-        self.sorted = False
-        self.ascending = None
-        self.sort_priority = None
-        self.url_primary = None
-        self.url_remove = None
-        self.url_toggle = None
+from base import filter_hook, inclusion_tag, csrf_protect_m
+from model_page import ModelAdminView
+from common import FakeMethodField, ResultRow, ResultItem, ResultHeader
 
 
 class ListAdminView(ModelAdminView):
-    """
-    显示数据列表的 AdminView, 该 View 实现了基本的数据排序和分页等功能.
 
-    **Option 属性**
-
-        .. autoattribute:: list_display
-        .. autoattribute:: list_display_links
-        .. autoattribute:: list_select_related
-        .. autoattribute:: list_per_page
-        .. autoattribute:: list_max_show_all
-
-        .. autoattribute:: list_exclude
-        .. autoattribute:: search_fields
-
-        .. autoattribute:: ordering
-        .. autoattribute:: object_list_template
-
-    """
-    list_display = ('__str__',)    #: 默认显示列
-    list_display_links = ()        #: 显示修改或查看数据详情连接的列
-    list_display_links_details = False  #: 点击列表连接后是否转到详情页面
+    list_display = ('__str__',)    #: 列表字段
+    list_display_links = ()        #: 链接字段
+    list_display_links_details = False  #: 链接到详情页面而非编辑页
     list_select_related = None     #: 是否提前加载关联数据, 使用 ``select_related``
     list_per_page = 50             #: 每页显示数据的条数
     list_max_show_all = 200        #: 每页最大显示数据的条数
     list_exclude = ()              #: 排除显示的列, 在显示列的设置中不会出现这些被排除的列
     search_fields = ()             #: 按照这些列搜索数据
     paginator_class = Paginator    #: 分页类
-    ordering = None                #: 默认的数据排序
+    ordering = None                #: 默认的数据排序规则
+    
+    exclude = None   #: (list,tuple) 排除的字段，主要用在编辑页面
 
     object_list_template = None    #: 显示数据的模板
     pop = False
@@ -144,10 +50,11 @@ class ListAdminView(ModelAdminView):
 
         request = self.request
         request.session['LIST_QUERY'] = (self.model_info, self.request.META['QUERY_STRING'])
-
+        # 模型的主键字段名
         self.pk_attname = self.opts.pk.attname
+        # 模型的 opts 信息
         self.lookup_opts = self.opts
-        self.list_display = self.get_list_display()
+        self.list_display = self.get_list_display() #插件在其后起作用
         self.list_display_links = self.get_list_display_links()
 
         # 获取当前页码
@@ -173,25 +80,20 @@ class ListAdminView(ModelAdminView):
     @filter_hook
     def get_list_display(self):
         """
-        获得列表显示的列. 如果 request 中有 ``_cols`` 参数, 则使用该参数, 否则使用 :attr:`list_display`.
-
-        .. note::
-
-            该方法会赋值 :attr:`base_list_display` 属性, 保存 list_display. 如果有插件修改了该方法的返回值
+            该方法赋值 base_list_display 属性, 保存 list_display. 如果有插件修改了该方法的返回值
             (例如: Action 插件), 可能会增加其他列. 但是这些列可能对其他插件没有意义(例如: 导出数据插件). 那么其他插件可以使用
-            :attr:`base_list_display` 这个属性, 取得最原始的显示列.
+            base_list_display 这个属性, 取得最原始的显示列.
         """
-        self.base_list_display = (COL_LIST_VAR in self.request.GET and self.request.GET[COL_LIST_VAR] != "" and \
-            self.request.GET[COL_LIST_VAR].split('.')) or self.list_display
+        self.base_list_display = ( COL_LIST_VAR in self.request.GET and self.request.GET[COL_LIST_VAR] != "" and \
+            self.request.GET[COL_LIST_VAR].split('.') ) or self.list_display
         return list(self.base_list_display)
 
     @filter_hook
     def get_list_display_links(self):
         """
         返回一组列, 这些列的数据会以链接形式显示, 连接地址可能是数据修改页面(如果有修改权限), 或是查看页面. 
-        默认情况下会使用 :attr:`list_display_links` , 如果 :attr:`list_display_links` 为空, 则返回 :attr:`list_display` 第一列.
+        默认情况下会使用 list_display_links , 如果 list_display_links 为空, 则返回 list_display 第一列.
         """
-        # 没有使用 :meth:`get_list_display` 返回的值, 因为 :meth:`get_list_display` 返回的值可能会被插件修改
         if self.list_display_links or not self.list_display:
             return self.list_display_links
         else:
@@ -199,7 +101,7 @@ class ListAdminView(ModelAdminView):
 
     def make_result_list(self):
         """
-        该方法负责生成数据列表及分页信息. 数据列表会赋值给属性 :attr:`result_list` , 插件可以在该方法后执行一些数据处理.
+        生成数据列表及分页信息. 数据列表会赋值给属性 :attr:`result_list` , 插件可以在该方法后执行一些数据处理.
         """
         # 基本 queryset
         self.base_queryset = self.queryset()
@@ -404,9 +306,9 @@ class ListAdminView(ModelAdminView):
         return self.get_query_string({COL_LIST_VAR: '.'.join(fields)})
 
     def get_model_method_fields(self):
-        """
-        将所有 OptionClass 中含有 ``is_column=True`` 的方法, 使用 :class:`FakeMethodField` 包装成一个假
-        的 DB Field. 用于在选择显示列的功能中显示.
+        u"""
+        获得模型的方法型字段
+        is_column、short_description
         """
         methods = []
         for name in dir(self):
