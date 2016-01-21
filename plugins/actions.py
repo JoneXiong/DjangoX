@@ -271,13 +271,13 @@ class ActionPlugin(BaseAdminPlugin):
 
     # Media
     def get_media(self, media):
-        if self.actions and self.admin_view.result_count and not self.admin_view.pop:
+        if self.actions and self.admin_view.result_count:
             media = media + self.vendor('xadmin.plugin.actions.js', 'xadmin.plugins.css')
         return media
 
     # Block Views
     def block_results_bottom(self, context, nodes):
-        if self.actions and self.admin_view.result_count and not self.admin_view.pop:
+        if self.actions and self.admin_view.result_count:
             nodes.append(loader.render_to_string('xadmin/blocks/model_list.results_bottom.actions.html', context_instance=context))
 
 
