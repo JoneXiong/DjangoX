@@ -68,7 +68,7 @@ class BaseFilter(object):
         self.admin_view = admin_view    # 当前页面主体对象
         # 确保子类设置了 title 成员
         if self.title is None:
-            raise ImproperlyConfigured(
+            raise ImproperlyConfigured(+
                 "The filter '%s' does not specify "
                 "a 'title'." % self.__class__.__name__)
 
@@ -141,7 +141,7 @@ class InputFilter(BaseFilter):
         return True
     
     def get_context(self):
-        context = super(TextBaseFilter, self).get_context()
+        context = super(InputFilter, self).get_context()
         context.update(self.context_params)
         context['remove_url'] = self.query_string( {}, map( lambda k: FILTER_PREFIX + k, self.used_params.keys() ) )
         return context
@@ -150,7 +150,7 @@ class InputFilter(BaseFilter):
         _param_name = self.lookup_formats[name] % self.parameter_name
         return self.used_params.get(_param_name, None)
 
-class FieldFilter(BaseFilter):
+class FieldFilter(InputFilter):
     u'''
     模型字段过滤器基类
     '''
@@ -235,7 +235,7 @@ class TextBaseFilter(InputFilter):
         return self.get_value('search')
     
     
-class NumberBaseFilter(BaseFilter):
+class NumberBaseFilter(InputFilter):
     
     template = 'xadmin/filters/number.html'
     lookup_formats = {'equal': '%s__exact', 'lt': '%s__lt', 'gt': '%s__gt',
@@ -249,13 +249,14 @@ class DateBaseFilter(ChoicesBaseFilter, InputFilter):
     lookup_formats = {'since': '%s__gte', 'until': '%s__lt'}
 
     def __init__(self, request, params, model, admin_view):
-        super(DateBaseFilter, self).__init__(request, params, model, admin_view)
-        
         # date_params 包含 FILTER_PREFIX 的 used_params
         self.field_generic = '%s__' % self.parameter_name
         self.date_params = dict([(FILTER_PREFIX + k, v) for k, v in params.items()
                                  if k.startswith(self.field_generic)])
+        
+        super(DateBaseFilter, self).__init__(request, params, model, admin_view)
 
+    def lookups(self, request, admin_view):
         now = timezone.now()
         if now.tzinfo is not None:
             current_tz = timezone.get_current_timezone()
@@ -263,10 +264,9 @@ class DateBaseFilter(ChoicesBaseFilter, InputFilter):
             if hasattr(current_tz, 'normalize'):
                 now = current_tz.normalize(now)
 
-        today = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        today = now.date()  #now.replace(hour=0, minute=0, second=0, microsecond=0)
         tomorrow = today + datetime.timedelta(days=1)
-
-        self.links = (
+        return (
             (_('全部'), {}),
             (_('Today'), {
                 self.lookup_since_name: str(today),
@@ -275,7 +275,7 @@ class DateBaseFilter(ChoicesBaseFilter, InputFilter):
         )
 
     def choices(self):
-        for title, param_dict in self.links:
+        for title, param_dict in self.lookups(self.request,self.admin_view):
             yield {
                 'selected': self.date_params == param_dict,
                 'query_string': self.query_string(
