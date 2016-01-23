@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 
 from base import CommAdminView, filter_hook
 
-class ModelAdminView(CommAdminView):
+class ModelPage(CommAdminView):
     """
     基于 Model 的 页面
     注册后，用户可以通过访问 ``/%(app_label)s/%(module_name)s/123/test`` 访问到该view
@@ -18,6 +18,8 @@ class ModelAdminView(CommAdminView):
     app_label = None
     module_name = None
     model_info = None
+    
+    remove_permissions = []
 
     def __init__(self, request, *args, **kwargs):
         self.opts = self.model._meta
@@ -135,12 +137,17 @@ class ModelAdminView(CommAdminView):
             'change': self.has_change_permission(),
             'delete': self.has_delete_permission(),
         }
-    
+        
+    @property
+    def pk_name(self):
+        return self.opts.pk.attname
+        
+ModelAdminView = ModelPage
 ModelView = ModelAdminView
 
 class ModelAdmin(object):
     
-    # 列表页相关
+    # 【列表页】相关配置项
     
     list_display = ('__str__',)    #: 列表字段
     list_exclude = ()              #: 排除显示的列
@@ -163,3 +170,7 @@ class ModelAdmin(object):
     
     
     relfield_style = 'fk-ajax'
+    
+    # 【列表页】相关可获取项
+    page_num = 0    # 当前第几页
+    paginator = None    #分页类实例

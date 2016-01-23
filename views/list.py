@@ -1,10 +1,8 @@
 # coding=utf-8
+
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
-from django.core.paginator import InvalidPage, Paginator
+from django.core.paginator import Paginator
 from django.db import models
-from django.http import HttpResponseRedirect
-from django.template.response import SimpleTemplateResponse, TemplateResponse
-from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_unicode, smart_unicode
 from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
@@ -13,30 +11,31 @@ from django.utils.translation import ugettext as _
 from django.utils.text import Truncator
 
 from xadmin.util import lookup_field, display_for_field, label_for_field, boolean_icon
-from xadmin.defs import EMPTY_CHANGELIST_VALUE
-from xadmin.defs import FILTER_PREFIX, SEARCH_VAR
-from xadmin.defs import TO_FIELD_VAR, ALL_VAR, ORDER_VAR, PAGE_VAR, COL_LIST_VAR, ERROR_FLAG, DOT
+from xadmin.defs import TO_FIELD_VAR, ALL_VAR, ORDER_VAR, PAGE_VAR, COL_LIST_VAR, ERROR_FLAG, SEARCH_VAR, EMPTY_CHANGELIST_VALUE
 
-from base import filter_hook, inclusion_tag, csrf_protect_m
-from model_page import ModelAdminView
+from base import filter_hook, csrf_protect_m
+from model_page import ModelPage
 from common import FakeMethodField, ResultRow, ResultItem, ResultHeader
+from grid import BaseGrid
 
 
-class ListAdminView(ModelAdminView):
+class ListAdminView(ModelPage, BaseGrid):
 
     list_display = ('__str__',)    #: 列表字段
+    list_exclude = ()              #: 排除显示的列, 在显示列的设置中不会出现这些被排除的列
+    
     list_display_links = ()        #: 链接字段
     list_display_links_details = False  #: 链接到详情页面而非编辑页
+    
     list_select_related = None     #: 是否提前加载关联数据, 使用 ``select_related``
+    
     list_per_page = 50             #: 每页显示数据的条数
     list_max_show_all = 200        #: 每页最大显示数据的条数
-    list_exclude = ()              #: 排除显示的列, 在显示列的设置中不会出现这些被排除的列
-    search_fields = ()             #: 按照这些列搜索数据
     paginator_class = Paginator    #: 分页类
+
+    search_fields = ()             #: 按照这些列搜索数据
     ordering = None                #: 默认的数据排序规则
     
-    exclude = None   #: (list,tuple) 排除的字段，主要用在编辑页面
-
     object_list_template = None    #: 显示数据的模板
     pop = False
     search_sphinx_ins = None 
@@ -50,10 +49,7 @@ class ListAdminView(ModelAdminView):
 
         request = self.request
         request.session['LIST_QUERY'] = (self.model_info, self.request.META['QUERY_STRING'])
-        # 模型的主键字段名
-        self.pk_attname = self.opts.pk.attname
-        # 模型的 opts 信息
-        self.lookup_opts = self.opts
+
         self.list_display = self.get_list_display() #插件在其后起作用
         self.list_display_links = self.get_list_display_links()
 
@@ -67,6 +63,7 @@ class ListAdminView(ModelAdminView):
         self.show_all = ALL_VAR in request.GET
         self.to_field = request.GET.get(TO_FIELD_VAR)
         self.params = dict(request.GET.items())
+        
         if 'pop' in self.request.GET:
             self.pop = True
             self.base_template = 'xadmin/base_pure.html'
@@ -79,10 +76,9 @@ class ListAdminView(ModelAdminView):
 
     @filter_hook
     def get_list_display(self):
-        """
-            该方法赋值 base_list_display 属性, 保存 list_display. 如果有插件修改了该方法的返回值
-            (例如: Action 插件), 可能会增加其他列. 但是这些列可能对其他插件没有意义(例如: 导出数据插件). 那么其他插件可以使用
-            base_list_display 这个属性, 取得最原始的显示列.
+        u"""
+        list_display 列表显示列
+        base_list_display    原始的显示列 导出使用
         """
         self.base_list_display = ( COL_LIST_VAR in self.request.GET and self.request.GET[COL_LIST_VAR] != "" and \
             self.request.GET[COL_LIST_VAR].split('.') ) or self.list_display
@@ -90,66 +86,19 @@ class ListAdminView(ModelAdminView):
 
     @filter_hook
     def get_list_display_links(self):
-        """
-        返回一组列, 这些列的数据会以链接形式显示, 连接地址可能是数据修改页面(如果有修改权限), 或是查看页面. 
-        默认情况下会使用 list_display_links , 如果 list_display_links 为空, 则返回 list_display 第一列.
+        u"""
+        用于显示链接的字段    修改链接/查看链接
+        list_display_links
         """
         if self.list_display_links or not self.list_display:
             return self.list_display_links
         else:
             return list(self.list_display)[:1]
 
-    def make_result_list(self):
-        """
-        生成数据列表及分页信息. 数据列表会赋值给属性 :attr:`result_list` , 插件可以在该方法后执行一些数据处理.
-        """
-        # 基本 queryset
-        self.base_queryset = self.queryset()
-        # 排序及过滤等处理后的 queryset
-        self.list_queryset = self.get_list_queryset()
-        self.ordering_field_columns = self.get_ordering_field_columns()
-        self.paginator = self.get_paginator()
-
-        # 获取当前据数目
-        self.result_count = self.paginator.count
-
-        if not self.list_queryset.query.where:
-            # 如果没有任何过滤条件, result_count 就是 全不数据条目
-            self.full_result_count = self.result_count
-        else:
-            self.full_result_count = self.base_queryset.count()
-
-        self.can_show_all = self.result_count <= self.list_max_show_all
-        self.multi_page = self.result_count > self.list_per_page
-
-        if (self.show_all and self.can_show_all) or not self.multi_page:
-            self.result_list = self.list_queryset._clone()
-        else:
-            try:
-                self.result_list = self.paginator.page(
-                    self.page_num + 1).object_list
-            except InvalidPage:
-                # 分页错误, 这里的错误页面需要调整一下
-                if ERROR_FLAG in self.request.GET.keys():
-                    return SimpleTemplateResponse('xadmin/views/invalid_setup.html', {
-                        'title': _('Database error'),
-                    })
-                return HttpResponseRedirect(self.request.path + '?' + ERROR_FLAG + '=1')
-        self.has_more = self.result_count > (
-            self.list_per_page * self.page_num + len(self.result_list))
-
-    @filter_hook
-    def get_result_list(self):
-        return self.make_result_list()
-
-    @filter_hook
-    def post_result_list(self):
-        return self.make_result_list()
-
     @filter_hook
     def get_list_queryset(self):
-        """
-        取得 Model 的 queryset, 该 queryset 已经进行排序和过滤过. 其他插件可以在这里修改 queryset
+        u"""
+        取得模型查询结果集
         """
         # 首先取得基本的 queryset
         if self.search_sphinx_ins:
@@ -196,27 +145,12 @@ class ListAdminView(ModelAdminView):
         
         return queryset
 
-    # List ordering
-    def _get_default_ordering(self):
-        ordering = []
-        if self.ordering:
-            ordering = self.ordering
-        elif self.opts.ordering:
-            ordering = self.opts.ordering
-        return ordering
+
 
     @filter_hook
     def get_ordering_field(self, field_name):
         """
-        根据参数 ``field_name`` 获取需要排序 Field 的名字. ``field_name`` 可能是 Model 的一个标准 DB Field, 
-        也有可能是可执行方法, 或是 OptionClass 及 Model 的一个属性, 这种情况下会取其 ``admin_order_field`` 属性
-        作为排序字段, 如果取不到, 则返回 ``None``. 例如::
-
-            class UserAdmin(object):
-                def my_field(self, obj):
-                    return obj.name.lower()
-                my_field.admin_order_field = 'name'
-
+        验证排序字段 field_name 的有效性
         """
         try:
             field = self.opts.get_field(field_name)
@@ -233,64 +167,21 @@ class ListAdminView(ModelAdminView):
 
     @filter_hook
     def get_ordering(self):
-        """
-        Returns the list of ordering fields for the change list.
-        First we check the get_ordering() method in model admin, then we check
-        the object's default ordering. Then, any manually-specified ordering
-        from the query string overrides anything. Finally, a deterministic
-        order is guaranteed by ensuring the primary key is used as the last
-        ordering field.
-        """
-        ordering = list(super(ListAdminView, self).get_ordering()
-                        or self._get_default_ordering())
+        ordering = list(super(ListAdminView, self).get_ordering() or self._get_default_ordering())
         if ORDER_VAR in self.params and self.params[ORDER_VAR]:
             # Clear ordering and used params
-            ordering = [pfx + self.get_ordering_field(field_name) for n, pfx, field_name in
-                        map(
-                        lambda p: p.rpartition('-'),
-                        self.params[ORDER_VAR].split('.'))
-                        if self.get_ordering_field(field_name)]
+            order_list = map( lambda p: p.rpartition('-'), self.params[ORDER_VAR].split('.') )
+            ordering = []
+            for __, pfx, field_name in order_list:
+                check_name = self.get_ordering_field(field_name)
+                if check_name:
+                    ordering.append(pfx + check_name)
 
-        # Ensure that the primary key is systematically present in the list of
-        # ordering fields so we can guarantee a deterministic order across all
-        # database backends.
         pk_name = self.opts.pk.name
         if not (set(ordering) & set(['pk', '-pk', pk_name, '-' + pk_name])):
-            # The two sets do not intersect, meaning the pk isn't present. So
-            # we add it.
             ordering.append('-pk')
-
         return ordering
 
-    @filter_hook
-    def get_ordering_field_columns(self):
-        """
-        Returns a SortedDict of ordering field column numbers and asc/desc
-        """
-
-        # We must cope with more than one column having the same underlying sort
-        # field, so we base things on column numbers.
-        ordering = self._get_default_ordering()
-        ordering_fields = SortedDict()
-        if ORDER_VAR not in self.params or not self.params[ORDER_VAR]:
-            # for ordering specified on ModelAdmin or model Meta, we don't know
-            # the right column numbers absolutely, because there might be more
-            # than one column associated with that ordering, so we guess.
-            for field in ordering:
-                if field.startswith('-'):
-                    field = field[1:]
-                    order_type = 'desc'
-                else:
-                    order_type = 'asc'
-                for attr in self.list_display:
-                    if self.get_ordering_field(attr) == field:
-                        ordering_fields[field] = order_type
-                        break
-        else:
-            for p in self.params[ORDER_VAR].split('.'):
-                none, pfx, field_name = p.rpartition('-')
-                ordering_fields[field_name] = 'desc' if pfx == '-' else 'asc'
-        return ordering_fields
 
     def get_check_field_url(self, f):
         """
@@ -358,31 +249,9 @@ class ListAdminView(ModelAdminView):
         context.update(new_context)
         return context
 
-    @filter_hook
-    def get_response(self, context, *args, **kwargs):
-        """
-        在 :meth:`get_context` 之后执行. 该方法默认无返回内容, 插件可以复写该方法, 返回指定的 HttpResponse.
-        """
-        pass
-
-    @csrf_protect_m
-    @filter_hook
-    def get(self, request, *args, **kwargs):
-        """
-        显示 Model 列表. 
-        """
-        # 首选获取列表 result_list
-        response = self.get_result_list()
-        if response:
-            return response
-
-        context = self.get_context()
-        context.update(kwargs or {})
-
-        response = self.get_response(context, *args, **kwargs)
-
-        return response or TemplateResponse(request, self.object_list_template or
-                                            self.get_template_list('views/model_list.html'), context, current_app=self.admin_site.name)
+    @property
+    def _tpl(self):
+        return self.object_list_template or self.get_template_list('views/model_list.html')
 
     @filter_hook
     def post_response(self, *args, **kwargs):
@@ -399,26 +268,6 @@ class ListAdminView(ModelAdminView):
         """
         return self.post_result_list() or self.post_response(*args, **kwargs) or self.get(request, *args, **kwargs)
 
-    @filter_hook
-    def get_paginator(self):
-        """
-        返回 paginator 实例, 使用 :attr:`paginator_class` 类实例化
-        """
-        return self.paginator_class(self.list_queryset, self.list_per_page, 0, True)
-
-    @filter_hook
-    def get_page_number(self, i):
-        """
-        返回翻页组件各页码显示的 HTML 内容. 默认使用 bootstrap 样式
-
-        :param i: 页码, 可能是 ``DOT``
-        """
-        if i == DOT:
-            return mark_safe(u'<span class="dot-page">...</span> ')
-        elif i == self.page_num:
-            return mark_safe(u'<span class="this-page">%d</span> ' % (i + 1))
-        else:
-            return mark_safe(u'<a href="%s"%s>%d</a> ' % (escape(self.get_query_string({PAGE_VAR: i})), (i == self.paginator.num_pages - 1 and ' class="end"' or ''), i + 1))
 
     @filter_hook
     def result_header(self, field_name, row):
@@ -526,6 +375,8 @@ class ListAdminView(ModelAdminView):
         :param row: :class:`ResultHeader` 实例
         """
         item = ResultItem(field_name, row) # 首先初始化
+        field_name_split = field_name.split('.')
+        field_name = field_name_split[0]
         try:
             f, attr, value = lookup_field(field_name, obj, self)
         except (AttributeError, ObjectDoesNotExist):
@@ -547,7 +398,10 @@ class ListAdminView(ModelAdminView):
                     if field_val is None:
                         item.text = mark_safe("<span class='text-muted'>%s</span>" % EMPTY_CHANGELIST_VALUE)
                     else:
-                        item.text = field_val
+                        if len(field_name_split)>1:
+                            item.text = getattr(field_val,field_name_split[1])
+                        else:
+                            item.text = field_val
                 else:
                     item.text = display_for_field(value, f)
                 if isinstance(f, models.DateField)\
@@ -565,13 +419,13 @@ class ListAdminView(ModelAdminView):
             item.row['is_display_first'] = False
             item.is_display_link = True
             if self.list_display_links_details:
-                item_res_uri = self.model_admin_url("detail", getattr(obj, self.pk_attname))
+                item_res_uri = self.model_admin_url("detail", getattr(obj, self.pk_name))
                 if item_res_uri:
-                    edit_url = self.model_admin_url("change", getattr(obj, self.pk_attname))
+                    edit_url = self.model_admin_url("change", getattr(obj, self.pk_name))
                     item.wraps.append('<a data-res-uri="%s" data-edit-uri="%s" class="details-handler" rel="tooltip" title="%s">%%s</a>'
                                      % (item_res_uri, edit_url, _(u'Details of %s') % str(obj)))
             else:
-                url = self.url_for_result(obj)
+                url = self.get_object_url(obj)
                 if self.pop:
                     if 's' in self.request.GET:
                         show = getattr(obj, self.request.GET.get('s'))
@@ -610,70 +464,4 @@ class ListAdminView(ModelAdminView):
             results.append(self.result_row(obj))
         return results
 
-    @filter_hook
-    def url_for_result(self, result):
-        """
-        返回列表内容连接. 如果当前用户有修改权限就返回修改页面的连接, 否则返回查看详情页面连接
-        
-        :param result: Model 对象
-        """
-        return self.get_object_url(result)
 
-    # Media
-    @filter_hook
-    def get_media(self):
-        """
-        返回列表页面的 Media, 该页面添加了 ``xadmin.page.list.js`` 文件
-        """
-        media = super(ListAdminView, self).get_media() + self.vendor('xadmin.page.list.js', 'xadmin.page.form.js')
-        if self.list_display_links_details:
-            media += self.vendor('xadmin.plugin.details.js', 'xadmin.form.css')
-        return media
-
-    # Blocks
-    @inclusion_tag('xadmin/includes/pagination.html')
-    def block_pagination(self, context, nodes, page_type='normal'):
-        paginator, page_num = self.paginator, self.page_num
-
-        pagination_required = (
-            not self.show_all or not self.can_show_all) and self.multi_page
-        if not pagination_required:
-            page_range = []
-        else:
-            ON_EACH_SIDE = {'normal': 5, 'small': 3}.get(page_type, 3)
-            ON_ENDS = 2
-
-            # If there are 10 or fewer pages, display links to every page.
-            # Otherwise, do some fancy
-            if paginator.num_pages <= 10:
-                page_range = range(paginator.num_pages)
-            else:
-                # Insert "smart" pagination links, so that there are always ON_ENDS
-                # links at either end of the list of pages, and there are always
-                # ON_EACH_SIDE links at either end of the "current page" link.
-                page_range = []
-                if page_num > (ON_EACH_SIDE + ON_ENDS):
-                    page_range.extend(range(0, ON_EACH_SIDE - 1))
-                    page_range.append(DOT)
-                    page_range.extend(
-                        range(page_num - ON_EACH_SIDE, page_num + 1))
-                else:
-                    page_range.extend(range(0, page_num + 1))
-                if page_num < (paginator.num_pages - ON_EACH_SIDE - ON_ENDS - 1):
-                    page_range.extend(
-                        range(page_num + 1, page_num + ON_EACH_SIDE + 1))
-                    page_range.append(DOT)
-                    page_range.extend(range(
-                        paginator.num_pages - ON_ENDS, paginator.num_pages))
-                else:
-                    page_range.extend(range(page_num + 1, paginator.num_pages))
-
-        need_show_all_link = self.can_show_all and not self.show_all and self.multi_page
-        return {
-            'cl': self,
-            'pagination_required': pagination_required,
-            'show_all_url': need_show_all_link and self.get_query_string({ALL_VAR: ''}),
-            'page_range': map(self.get_page_number, page_range),
-            'ALL_VAR': ALL_VAR,
-            '1': 1,
-        }
