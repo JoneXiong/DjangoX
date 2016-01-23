@@ -4,7 +4,8 @@ import copy
 from django import forms
 from django.template.response import TemplateResponse
 
-from base import filter_hook, ModelAdminView
+from base import filter_hook
+from model_page import ModelAdminView
 from xadmin.layout import FormHelper, Layout, Fieldset, TabHolder, Container, Column, Col, Field
 from xadmin.defs import ACTION_CHECKBOX_NAME
 

@@ -18,7 +18,8 @@ from xadmin.layout import FormHelper, Layout, Fieldset, Container, Column, Field
 from xadmin.util import unquote, lookup_field, display_for_field, boolean_icon, label_for_field
 from xadmin.defs import EMPTY_CHANGELIST_VALUE
 
-from base import ModelAdminView, filter_hook, csrf_protect_m
+from base import filter_hook, csrf_protect_m
+from model_page import ModelAdminView
 
 
 class ShowField(Field):

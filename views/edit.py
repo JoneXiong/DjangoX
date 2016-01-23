@@ -18,7 +18,8 @@ from xadmin.layout import FormHelper, Layout, Fieldset, TabHolder, Container, Co
 from xadmin.util import unquote
 from xadmin.views.detail import DetailAdminUtil
 
-from base import ModelAdminView, filter_hook, csrf_protect_m
+from base import filter_hook, csrf_protect_m
+from model_page import ModelAdminView
 
 #在显示 Form 时，系统默认的 DBField 对应的 FormField的属性。
 FORMFIELD_FOR_DBFIELD_DEFAULTS = {
@@ -107,6 +108,8 @@ class ModelFormAdminView(ModelAdminView):
     hidde_other_field = False
     add_redirect_url = None
     edit_redirect_url = None
+    
+    fields = None    #: (list,tuple) 默认显示的字段
     
     """
     页面 Form 的 Layout 对象，是一个标准的 Crispy Form Layout 对象。使用 Layout 可以方便的定义整个 Form 页面的结构。
