@@ -350,6 +350,8 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
     True, the resolved attribute (which could be a callable) is also returned.
     This will be None if (and only if) the name refers to a field.
     """
+    name_split = name.split('.')
+    name = name_split[0]
     attr = None
     try:
         field = model._meta.get_field_by_name(name)[0]
@@ -414,7 +416,11 @@ def display_for_field(value, field):
     from xadmin.defs import EMPTY_CHANGELIST_VALUE
 
     if field.flatchoices:
-        return dict(field.flatchoices).get(value, EMPTY_CHANGELIST_VALUE)
+        if hasattr(value,'__iter__'):
+            rets = [ dict(field.flatchoices).get(e, EMPTY_CHANGELIST_VALUE) for e in  value]
+            return ','.join(rets)
+        else:
+            return dict(field.flatchoices).get(value, EMPTY_CHANGELIST_VALUE)
     # NullBooleanField needs special-case null-handling, so it comes
     # before the general null test.
     elif isinstance(field, models.BooleanField) or isinstance(field, models.NullBooleanField):

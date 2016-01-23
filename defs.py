@@ -24,3 +24,16 @@ TO_FIELD_VAR = 't'
 SHOW_FIELD_VAR = 's'
 
 ACTION_CHECKBOX_NAME = '_selected_action'
+
+# list 页用到的
+ALL_VAR = 'all'
+
+ORDER_VAR = 'o'
+
+PAGE_VAR = 'p'
+
+COL_LIST_VAR = '_cols'
+
+ERROR_FLAG = 'e'
+
+DOT = '.'
