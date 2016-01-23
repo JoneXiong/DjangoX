@@ -12,6 +12,14 @@ from django.utils.translation import ugettext as _
 
 from util import vendor
 
+class ReadonlyWidget(forms.TextInput):
+    
+    def __init__(self, attrs=None):
+        if attrs:
+            attrs['readonly'] = 'readonly'
+        else:
+            attrs = {'readonly': 'readonly'}
+        super(ReadonlyWidget, self).__init__(attrs)
 
 class DateWidget(forms.DateInput):
 

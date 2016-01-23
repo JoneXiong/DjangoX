@@ -17,6 +17,7 @@ from django.template import loader
 from util import vendor
 import defs
 
+
 def url_params_from_lookup_dict(lookups):
     """
     Converts the type of lookups specified in a ForeignKey limit_choices_to
@@ -91,9 +92,13 @@ class RawIdWidget(forms.TextInput):
         if attrs is None:
             attrs = {}
         extra = []
-        if self.r_model in self.admin_view.admin_site._registry:
-            related_url = self.admin_view.get_admin_url(
-                '%s_%s_changelist' % (to_opts.app_label, to_opts.module_name))
+        if 1:#self.r_model in self.admin_view.admin_site._registry:
+            from views.page import GridPage
+            if issubclass(self.r_model, GridPage):
+                related_url = self.r_model.get_page_url()
+            else:
+                related_url = self.admin_view.get_admin_url(
+                    '%s_%s_changelist' % (to_opts.app_label, to_opts.module_name))
 
             params = self.url_parameters(name)
             if params:
@@ -105,14 +110,14 @@ class RawIdWidget(forms.TextInput):
 
             if value:
                 if attrs['class'] == 'vManyToManyRawIdAdminField':
-                    self.label_format = '<span style="display: inline-block; width:300px"><textarea class="textarea-field admintextareawidget form-control" id="id_%s_show"  readonly="readonly" rows="10">%s</textarea></span>'
+                    self.label_format = '<span style="display: inline-block;"><div class="obj-show " id="id_%s_show">%s</div></span>'
                 extra.append( self.label_for_value(value, name=name) )
             else:
                 if attrs['class'] == 'vManyToManyRawIdAdminField':
-                    input_html = '<textarea class="textarea-field admintextareawidget form-control" id="id_%s_show" readonly="readonly" rows="10"></textarea>'%name
+                    input_html = '<div class="obj-show " id="id_%s_show"></div>'%name
                 else:
                     input_html = '<input type="text" id="id_%s_show" class="form-control" value="" readonly="readonly" />'%name
-                extra.append('<span style="display: inline-block; width:300px">%s</span>'%input_html)
+                extra.append('<span style="display: inline-block;">%s</span>'%input_html)
             
             extra.append('&nbsp;&nbsp;<a class="related-lookup" id="remove_id_%s" href="javascript://" onclick="return removeRelatedObject(this);" >x</a>&nbsp;&nbsp;'%name)
             extra.append('<a href="%s%s" class="related-lookup" id="lookup_id_%s" onclick="return showRelatedObjectLookupPopup(this);"> '
@@ -130,7 +135,7 @@ class RawIdWidget(forms.TextInput):
     
     @property
     def media(self):
-        return vendor('xadmin.widget.RelatedObjectLookups.js',)
+        return vendor('xadmin.widget.RelatedObjectLookups.js','xadmin.widget.select-related.css')
 
 
 class ForeignKeyRawIdWidget(RawIdWidget):
@@ -182,9 +187,14 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
         m_value = value.split(',')
         m_value = [e for e in m_value if e]
         key = self.rel.get_related_field().name
-        objs = self.rel.to._default_manager.using(self.db).filter(**{key+'__in': m_value})
-        tar_list = [escape(Truncator(obj).words(14, truncate='...')) for obj in objs]
-        return self.label_format %(name, '\n'.join(tar_list) )
+        objs = objs = self.rel.to._default_manager.using(self.db).filter(**{key+'__in': m_value})
+        li_format = '''<a class="btn btn-sm" onclick="removeSingleObject(this,'%s', '%s');">%s</a>'''
+        tar_list = ''
+        for obj in objs:
+            show_val = escape(Truncator(obj).words(14, truncate='...'))
+            val = getattr(obj, key)
+            tar_list += li_format%( 'id_'+name, val, show_val)
+        return self.label_format %(name, tar_list )
 
     def value_from_datadict(self, data, files, name):
         value = data.get(name)
@@ -230,16 +240,20 @@ class ForeignKeyPopupWidget(RawIdWidget):
 
     def label_for_value(self, value, name=None):
         key = self.t_name
-        try:
-            obj = self.r_model._default_manager.using(self.db).get(**{key: value})
-            if self.s_name:
-                show_val = getattr(obj, self.s_name)
-                if callable(show_val):show_val = show_val()
-            else:
-                show_val = obj
-            return self._render_label(name, show_val)
-        except (ValueError, self.r_model.DoesNotExist):
-            return ''
+        from views.page import GridPage
+        if issubclass(self.r_model, GridPage):
+            return self._render_label( name, self.r_model.queryset_class().verbose(value) )
+        else:
+            try:
+                obj = self.r_model._default_manager.using(self.db).get(**{key: value})
+                if self.s_name:
+                    show_val = getattr(obj, self.s_name)
+                    if callable(show_val):show_val = show_val()
+                else:
+                    show_val = obj
+                return self._render_label(name, show_val)
+            except (ValueError, self.r_model.DoesNotExist):
+                return ''
         
 
 class ManyToManyPopupWidget(ForeignKeyPopupWidget):
@@ -259,15 +273,18 @@ class ManyToManyPopupWidget(ForeignKeyPopupWidget):
         m_value = [e for e in m_value if e]
         key = self.t_name
         objs = self.r_model._default_manager.using(self.db).filter(**{key+'__in': m_value})
-        if self.s_name:
-            tar_list = []
-            for obj in objs:
+        li_format = '''<a class="btn btn-sm" onclick="removeSingleObject(this,'%s', '%s');">%s</a>'''
+        tar_list = ''
+        for obj in objs:
+            if self.s_name:
                 show_val = getattr(obj, self.s_name)
                 if callable(show_val):show_val = show_val()
-                tar_list.append(escape(Truncator(show_val).words(14, truncate='...')))
-        else:
-            tar_list = [escape(Truncator(obj).words(14, truncate='...')) for obj in objs]
-        return self.label_format %(name, '\n'.join(tar_list) )
+                show_val = escape(Truncator(show_val).words(14, truncate='...'))
+            else:
+                show_val = escape(Truncator(obj).words(14, truncate='...'))
+            val = getattr(obj, key)
+            tar_list += li_format%( 'id_'+name, val, show_val)
+        return self.label_format %(name, tar_list )
 
     def value_from_datadict(self, data, files, name):
         value = data.get(name)
