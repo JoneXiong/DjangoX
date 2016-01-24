@@ -155,7 +155,7 @@ class FilterPlugin(BaseAdminPlugin):
         try:
             for key, value in lookup_params.items():
                 use_distinct = (
-                    use_distinct or lookup_needs_distinct(self.opts, key))
+                    use_distinct or False)#lookup_needs_distinct(self.opts, key))
         except FieldDoesNotExist, e:
             raise IncorrectLookupParameters(e)
 
@@ -226,7 +226,7 @@ class FilterPlugin(BaseAdminPlugin):
                     'xadmin/blocks/model_list.nav_form.search_form.html',
                     {'search_var': SEARCH_VAR,
                         'remove_search_url': self.admin_view.get_query_string(remove=[SEARCH_VAR]),
-                        'search_form_params': self.admin_view.get_form_params(remove=[SEARCH_VAR])},
+                        'search_form_params': self.admin_view.get_form_params(remove=[SEARCH_VAR,'p'])},
                     context_instance=context))
 
 site.register_plugin(FilterPlugin, ListAdminView)
