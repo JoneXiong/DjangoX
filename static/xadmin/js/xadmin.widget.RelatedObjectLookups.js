@@ -26,7 +26,7 @@ function windowname_to_id(text) {
     text = text.replace(/__dash__/g, '-');
     return text;
 }
-
+// 打开选择对象的列表页窗口
 function showRelatedObjectLookupPopup(triggeringLink) {
     var name = triggeringLink.id.replace(/^lookup_/, '');
     name = id_to_windowname(name);
@@ -41,32 +41,66 @@ function showRelatedObjectLookupPopup(triggeringLink) {
     return false;
 }
 
-// GRAPPELLI CUSTOM
+// 清空所有选择
 function removeRelatedObject(triggeringLink) {
     var id = triggeringLink.id.replace(/^remove_/, '');
     var elem = document.getElementById(id);
     var show = document.getElementById(id+'_show');
     elem.value = "";
-    show.value = "";
+    try{
+    	show.innerHTML = "";
+    }catch (e) {};
+    try{
+    	show.value = "";
+    }catch (e) {};
+}
+// 移除单个选择
+function removeSingleObject(tar, name, chosenId) {
+	var elem = document.getElementById(name);
+	var show = document.getElementById(name+'_show');
+	var m_val = ','+elem.value+',';
+	m_val = m_val.replace(','+chosenId+',', ',');
+	if (m_val.length==1){
+		elem.value = '';
+	}else{
+		elem.value = m_val.substring(1,m_val.length-1);
+	}
+	show.removeChild(tar);
+}
+// 添加对象
+function addObject(elem, show, chosenId, desc){
+	
 }
 
+// 设置所选的对象
 function dismissRelatedLookupPopup(win, chosenId, desc) {
     var name = windowname_to_id(win.name);
     var elem = document.getElementById(name);
     var show = document.getElementById(name+'_show');
-    if (elem.className.indexOf('vManyToManyRawIdAdminField') != -1 && elem.value) {
+    if (elem.className.indexOf('vManyToManyRawIdAdminField') != -1) {
     	if ( elem.value.split(",").indexOf(''+chosenId)<0 ){
-	        elem.value += ',' + chosenId;
-	        show.value += '\n' + desc;
+    		if (elem.value){
+    			elem.value += ',' + chosenId;
+    		}else{
+    			elem.value = chosenId;
+    		}
+	        var span = document.createElement("a");
+	        span.setAttribute("class","btn btn-sm");
+	        span.onclick=function (){
+				removeSingleObject(this,name, chosenId);
+	        };
+	        var content = document.createTextNode(desc);
+	        span.appendChild(content);
+	        show.appendChild(span);
     	}
     } else {
-        document.getElementById(name).value = chosenId;
+        elem.value = chosenId;
         show.value = desc;
     }
     $(elem).change();
     //win.close();
 }
-
+// 判断是否可以多选
 function can_multi_select_check(win){
 	var name = windowname_to_id(win.name);
 	var elem = document.getElementById(name);
