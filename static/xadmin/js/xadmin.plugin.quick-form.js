@@ -227,5 +227,9 @@
   $.fn.exform.renders.push(function(f){
     f.find('a.btn-ajax').ajax_addbtn()
   })
-
+  
+  $(function(){
+    $('.ajaxform-handler').ajax_addbtn();
+  });
+  
 })(jQuery)

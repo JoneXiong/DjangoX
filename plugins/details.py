@@ -38,6 +38,8 @@ class DetailsPlugin(BaseAdminPlugin):
     show_all_rel_details = True
 
     def result_item(self, item, obj, field_name, row):
+        field_name_split = field_name.split('.')
+        field_name = field_name_split[0]
         if (self.show_all_rel_details or (field_name in self.show_detail_fields)):
             rel_obj = None
             if hasattr(item.field, 'rel') and isinstance(item.field.rel, models.ManyToOneRel):

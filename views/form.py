@@ -34,6 +34,9 @@ class FormAdminView(CommAdminView):
 
     def init_request(self, *args, **kwargs):
         # comm method for both get and post
+        if self.perm:
+            if not self.user.has_perm('auth.'+self.perm):
+                raise PermissionDenied
         self.prepare_form()
         if '_pop' in self.request.GET:
             self.pop = True
@@ -115,7 +118,12 @@ class FormAdminView(CommAdminView):
         self.setup_forms()
 
         if self.valid_forms():
-            self.save_forms()
+            ret = self.save_forms()
+            if isinstance(ret, basestring):
+                self.message_user(ret,'error')
+                return self.get_response()
+            if isinstance(ret, HttpResponse):
+                return ret
             response = self.post_response()
             if isinstance(response, basestring):
                 return HttpResponseRedirect(response)

@@ -10,7 +10,8 @@ from xadmin.util import unquote, get_deleted_objects
 
 from xadmin.views.edit import UpdateAdminView
 from xadmin.views.detail import DetailAdminView
-from xadmin.views.base import ModelAdminView, filter_hook, csrf_protect_m
+from xadmin.views.base import filter_hook, csrf_protect_m
+from xadmin.views.model_page import ModelAdminView
 
 class DeleteAdminView(ModelAdminView):
     """

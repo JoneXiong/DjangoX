@@ -152,7 +152,7 @@ class ListRelateDisplayPlugin(BaseRelateDisplayPlugin):
             queryset = self.relate_obj.filter(queryset)
         return queryset
 
-    def url_for_result(self, url, result):
+    def get_object_url(self, url, result):
         return self._get_url(url)
 
     def get_context(self, context):

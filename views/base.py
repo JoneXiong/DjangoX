@@ -148,7 +148,7 @@ class BaseCommon(object):
         p = dict(self.request.GET.items()).copy()
         for r in remove:
             for k in p.keys():
-                if k.startswith(r):
+                if k.startswith(r) and k!='pop':
                     del p[k]
         for k, v in new_params.items():
             if v is None:

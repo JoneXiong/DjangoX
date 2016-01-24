@@ -4,25 +4,25 @@ import copy
 from django import forms
 from django.template.response import TemplateResponse
 
-from base import filter_hook, ModelAdminView
+from base import filter_hook
+from model_page import ModelAdminView
 from xadmin.layout import FormHelper, Layout, Fieldset, TabHolder, Container, Column, Col, Field
 from xadmin.defs import ACTION_CHECKBOX_NAME
 
 class BaseActionView(ModelAdminView):
-    action_name = None
-    #description = None
+    action_name = None  # key名，默认为类名
     verbose_name = None
     icon = 'fa fa-tasks'
 
-    model_perm = None#'change'
-    perm = None
+    model_perm = None   #模型权限 'view', 'add', 'change', 'delete'
+    perm = None #自定义权限
 
     @classmethod
     def has_perm(cls, list_view):
         if cls.model_perm:
             perm_code = cls.model_perm
         else:
-            perm_code = cls.perm or cls.__name__
+            perm_code = cls.perm or 'not_setting_perm'
             perm_code= 'auth.'+perm_code
         return list_view.has_permission(perm_code)
 

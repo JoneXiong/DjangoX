@@ -111,6 +111,22 @@
       $('#action').val(name);
       $('#changelist-form').submit();
     }
+    $.do_form_action = function(tar){
+      $tar = $(tar)
+      
+		var id_array=new Array();
+		$('input[name="_selected_action"]:checked').each(function(){
+			id_array.push($(this).val());
+		});
+	  if (id_array.length>0){
+	  	var ids=id_array.join('||');
+	  	$tar.attr("href",$tar.attr("href")+"&ids="+ids);
+	  	return true;
+	  }else{
+	  	alert('请先选择');
+	  	return false;
+	  }
+    }
 
     $(document).ready(function($) {
         $(".results input.action-select").actions();

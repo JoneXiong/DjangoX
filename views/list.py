@@ -19,7 +19,7 @@ from common import FakeMethodField, ResultRow, ResultItem, ResultHeader
 from grid import BaseGrid
 
 
-class ListAdminView(ModelPage, BaseGrid):
+class ListAdminView(BaseGrid,ModelPage):
 
     list_display = ('__str__',)    #: 列表字段
     list_exclude = ()              #: 排除显示的列, 在显示列的设置中不会出现这些被排除的列
@@ -39,6 +39,7 @@ class ListAdminView(ModelPage, BaseGrid):
     object_list_template = None    #: 显示数据的模板
     pop = False
     search_sphinx_ins = None 
+    col_ctrl = True
 
     def init_request(self, *args, **kwargs):
         """
@@ -251,7 +252,7 @@ class ListAdminView(ModelPage, BaseGrid):
 
     @property
     def _tpl(self):
-        return self.object_list_template or self.get_template_list('views/model_list.html')
+        return self.object_list_template or self.get_template_list('views/grid.html')
 
     @filter_hook
     def post_response(self, *args, **kwargs):

@@ -13,8 +13,8 @@ class QuerySet(object):
 
     """
 
-    def __init__(self, data):
-        self.data = data
+    def __init__(self, data=None):
+        self.data = (data==None and [] or data)
 
     def filter(self, *args, **kwargs):
         """Filters data using the lookup parameters
@@ -83,6 +83,15 @@ class QuerySet(object):
     def get_slice(self, start, end):
         if self.data:
             return self.data[start:end]
+        else:
+            return []
+        
+    def verbose(self,key):
+        return key
+    
+    def _clone(self):
+        if self.data:
+            return self.data[:]
         else:
             return []
 

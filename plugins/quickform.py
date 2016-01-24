@@ -6,7 +6,7 @@ from django.forms.models import modelform_factory
 import copy
 from xadmin.sites import site
 from xadmin.util import get_model_from_relation, vendor
-from xadmin.views import BaseAdminPlugin, ModelFormAdminView
+from xadmin.views import BaseAdminPlugin, ModelFormAdminView, FormAdminView
 from xadmin.layout import Layout
 
 
@@ -16,6 +16,7 @@ class QuickFormPlugin(BaseAdminPlugin):
         if self.request.method == 'GET' and self.request.is_ajax() or self.request.GET.get('_ajax'):
             self.admin_view.add_form_template = 'xadmin/views/quick_form.html'
             self.admin_view.change_form_template = 'xadmin/views/quick_form.html'
+            self.admin_view.template = 'xadmin/views/quick_form.html'
             return True
         return False
 
@@ -105,3 +106,4 @@ class QuickAddBtnPlugin(BaseAdminPlugin):
 
 site.register_plugin(QuickFormPlugin, ModelFormAdminView)
 site.register_plugin(QuickAddBtnPlugin, ModelFormAdminView)
+site.register_plugin(QuickFormPlugin, FormAdminView)

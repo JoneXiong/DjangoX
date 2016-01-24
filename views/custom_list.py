@@ -1,6 +1,7 @@
 # coding=utf-8
 
 import json
+import urllib
 
 from django.core.paginator import Paginator, Page
 from django.utils.safestring import mark_safe
@@ -24,7 +25,7 @@ class RpcPaginator(Paginator):
             top = self.count
         return Page(self.object_list.get_slice(bottom,self.per_page), number, self)
 
-class GridPage(PageView,BaseGrid):
+class GridPage(BaseGrid,PageView):
     template = 'xadmin/views/grid.html'
     icon = 'fa fa-circle-o'
     
@@ -57,6 +58,7 @@ class GridPage(PageView,BaseGrid):
     _meta = None
 
     opts = None
+    ordering = None
     
 #    brand_icon
 #    brand_name
@@ -104,22 +106,23 @@ class GridPage(PageView,BaseGrid):
         context.update({
                         'cl': self,
                         'brand_icon': self.icon,
+                        'brand_name': context.get('title',''),
                         'model_fields': self.model_fields(),
                         'result_headers': self.result_headers(),
                         'results': self.results() or [],
                         'nav_buttons': mark_safe(''.join(self.get_nav_btns()) ),
-                        'col_ctrl': self.col_ctrl,
-                        'bottom_buttons': mark_safe('\n'.join(self.get_bottom_btns()) ),
+                        #'col_ctrl': self.col_ctrl,
+#                         'bottom_buttons': mark_safe('\n'.join(self.get_bottom_btns()) ),
                         'check_box': self.check_box
                         })
         return context
     
-    @filter_hook
-    def get_media(self):
-        media = super(GridPage, self).get_media() 
-        if self.check_box:
-            media += self.vendor('xadmin.plugin.actions.js', 'xadmin.plugins.css', 'xadmin.form.css')
-        return media
+#     @filter_hook
+#     def get_media(self):
+#         media = super(GridPage, self).get_media() 
+#         if self.check_box:
+#             media += self.vendor('xadmin.plugin.actions.js', 'xadmin.plugins.css', 'xadmin.form.css')
+#         return media
     
     @filter_hook
     def result_headers(self):
@@ -128,15 +131,20 @@ class GridPage(PageView,BaseGrid):
         """
         row = ResultRow()
         row['num_sorted_fields'] = 0
-        for field_name, text in self.head:
+        _dict = dict(self.head)
+        for field_name in self.list_display:
+            if field_name!='action_checkbox':
+                text = _dict[field_name]
+            else:
+                text = self.action_checkbox.short_description
             m_rh = ResultHeader(field_name, row)
             m_rh.text = text
             row.cells.append(m_rh)
-        if self.check_box:
-            check_box_rh = ResultHeader('action_checkbox', row)
-            check_box_rh.text = '<input type="checkbox" id="action-toggle">'
-            check_box_rh.classes.append("action-checkbox-column")
-            row.cells.insert(0,check_box_rh)
+#         if self.check_box:
+#             check_box_rh = ResultHeader('action_checkbox', row)
+#             check_box_rh.text = '<input type="checkbox" id="action-toggle">'
+#             check_box_rh.classes.append("action-checkbox-column")
+#             row.cells.insert(0,check_box_rh)
         return row
 
     def model_fields(self):
@@ -150,6 +158,12 @@ class GridPage(PageView,BaseGrid):
     def get_ordering(self):
         return []
     
+    def pk(self, data):
+        m_data = {}
+        for e in self.val_list:
+            m_data[e] = data[e]
+        return urllib.quote( json.dumps(m_data) ) 
+    
     @filter_hook
     def results(self):
         """
@@ -158,17 +172,14 @@ class GridPage(PageView,BaseGrid):
         results = []
         for data in self.result_list:
             row = ResultRow()
-            m_data = {}
-            for e in self.val_list:
-                m_data[e] = data[e]
-            import urllib
-            row.add_cell('_data', urllib.quote( json.dumps(m_data) ) )
+            data['_pk'] = self.pk(data)
+#             row.add_cell('_data', data['_pk'])
             for key in self.list_display:
-                if key!='action_checkbox':
-                    if data.has_key(key):
-                        row.add_cell(key, data[key])
-                    else:
-                        row.add_cell(key, getattr(self, key)(data) )
+#                 if key!='action_checkbox':
+                if data.has_key(key):
+                    row.add_cell(key, data[key])
+                else:
+                    row.add_cell(key, getattr(self, key)(data) )
             results.append(row)
         return results
         #return self.result_list
@@ -187,9 +198,9 @@ class GridPage(PageView,BaseGrid):
 
         
     # Block Views
-    def block_results_bottom(self, context, nodes):
-        if self.check_box and self.result_count:
-            nodes.append(loader.render_to_string('xadmin/blocks/grid.results_bottom.actions.html', context_instance=context))
+#     def block_results_bottom(self, context, nodes):
+#         if self.check_box and self.result_count:
+#             nodes.append(loader.render_to_string('xadmin/blocks/grid.results_bottom.actions.html', context_instance=context))
             
     def get_bottom_btns(self):
         return [ ac.render_bottom_btn(self.get_url()) for ac in self.form_actions if not ac.perm  or ( ac.perm and self.user.has_perm('auth.'+ac.perm) ) ]

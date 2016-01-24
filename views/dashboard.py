@@ -19,7 +19,8 @@ from xadmin import widgets as exwidgets
 from xadmin.layout import FormHelper
 from xadmin.models import UserSettings, UserWidget
 from xadmin.sites import site
-from xadmin.views.base import CommAdminView, ModelAdminView, filter_hook, csrf_protect_m
+from xadmin.views.base import CommAdminView, filter_hook, csrf_protect_m
+from xadmin.views.model_page import ModelAdminView
 from xadmin.views.edit import CreateAdminView
 from xadmin.views.list import ListAdminView
 from xadmin.util import unquote
