@@ -13,7 +13,7 @@ DEFAULT_LAYOUTS = {
         'key': 'table',
         'icon': 'fa fa-table',
         'name': _(u'Table'),
-        'template': 'views/model_list.html',
+        'template': 'views/grid.html',
     },
     'thumbnails': {
         'key': 'thumbnails',
