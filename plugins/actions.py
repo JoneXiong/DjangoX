@@ -198,7 +198,7 @@ class ActionPlugin(BaseAdminPlugin):
 
     def block_results_bottom(self, context, nodes):
         if self.admin_view.result_count:
-            nodes.append(loader.render_to_string('xadmin/blocks/model_list.results_bottom.actions.html', context_instance=context))
+            nodes.append(loader.render_to_string('xadmin/blocks/grid.results_bottom.actions.html', context_instance=context))
 
 
 site.register_plugin(ActionPlugin, ListAdminView)
