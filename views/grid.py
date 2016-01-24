@@ -190,7 +190,7 @@ class BaseGrid(object):
         """
         返回列表页面的 Media, 该页面添加了 ``xadmin.page.list.js`` 文件
         """
-        media = super(BaseGrid, self).get_media() + self.vendor('xadmin.page.list.js', 'xadmin.page.form.js')
+        media = super(BaseGrid, self).get_media() + self.vendor('xadmin.page.list.js', 'xadmin.page.form.js', 'xadmin.form.css')
         if self.list_display_links_details:
-            media += self.vendor('xadmin.plugin.details.js', 'xadmin.form.css')
+            media += self.vendor('xadmin.plugin.details.js')
         return media
