@@ -1,0 +1,51 @@
+{% extends base_template %}
+{% load i18n l10n%}
+{% load url from future %}
+{% load xadmin_tags %}
+{% load crispy_forms_tags %}
+
+{% block breadcrumbs %}
+<ul class="breadcrumb">
+    <li><a href="{% url 'xadmin:index' %}">{% trans 'Home' %}</a></li>
+    <li><a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a></li>
+    <li>{{ title }}</li>
+</ul>
+{% endblock %}
+
+{% block nav_title %}
+{% if model_icon %}<i class="{{model_icon}}"><sub class="fa fa-{% if add%}plus{%else%}pencil{%endif%}"></sub></i> {% endif %}
+确定{{ title }} ({{count}})？{% endblock %}
+
+{% block content %}
+<form class="exform" {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="" method="post" id="{{ opts.module_name }}_form">{% csrf_token %}
+  {% block form_top %}{% endblock %}
+  {% view_block 'form_top' %}
+
+  {% if errors %}
+      <div class="alert alert-danger alert-dismissable">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+      {% blocktrans count counter=errors|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
+      </div>
+      {{ form.non_field_errors }}
+  {% endif %}
+
+  {% for obj in queryset %}
+  <input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk|unlocalize }}" />
+  {% endfor %}
+  <input type="hidden" name="action" value="{{action_name}}" />
+  <input type="hidden" name="post" value="yes" />
+  
+  {% view_block 'before_fieldsets' %}
+
+  {% crispy form %}
+
+  {% view_block 'after_fieldsets' %}
+
+  <div class="form-actions well well-sm clearfix">
+  <button type="submit" class="default btn btn-primary" name="_save" data-loading-text="{% trans "Saving.." %}"/><i class="fa fa-save"></i> 确定</button>
+  {% view_block 'submit_line' %}
+  <a class="btn btn-default pull-right" onclick="javascript:history.back();" >{% trans 'Cancel' %}</a>
+  </div>
+
+</form>
+{% endblock %}
