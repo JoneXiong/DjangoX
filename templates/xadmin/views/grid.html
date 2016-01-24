@@ -1,6 +1,7 @@
-{% extends "xadmin/base_site.html" %}
-{% load i18n xadmin_tags %}
+{% extends base_template %}
+{% load i18n %}
 {% load url from future %}
+{% load xadmin_tags %}
 
 {% block extrastyle %}
 <style type="text/css">
@@ -10,7 +11,7 @@
 {% endblock %}
 {% block bodyclass %}change-list{% endblock %}
 
-{% block nav_title %}{% if brand_icon %}<i class="{{brand_icon}}"></i> {% endif %} {{ title }} {% endblock %}
+{% block nav_title %}{% if brand_icon %}<i class="{{brand_icon}}"></i> {% endif %}{{brand_name}}{% endblock %}
 
 {% block nav_toggles %}
 {% include "xadmin/includes/toggle_menu.html" %}
@@ -23,15 +24,21 @@
 {% endblock %}
 
 {% block nav_btns %}
-    {{ nav_buttons }}
+{% if cl.pop %}
+  <a href="#" id="confirm_select" class="btn btn-primary"><i class="fa fa-plus"></i> 确认选择</a>
+{% else %}
+  {% if has_add_permission %}
+    <a href="{{add_url}}" class="btn btn-primary"><i class="fa fa-plus"></i> 
+    {% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}</a>
+  {% endif %}
+  {{ nav_buttons }}
+{% endif %}
 {% endblock nav_btns %}
 
 {% block content %}
-
   <div class="content-toolbar btn-toolbar pull-right clearfix">
     {% view_block 'top_toolbar' %}
-
-	{% if col_ctrl %}
+	{% if cl.col_ctrl %}
     <div class="btn-group">
       <a class="dropdown-toggle btn btn-default btn-sm" data-toggle="dropdown" href="#">
         <i class="fa fa-list-alt"></i> 显示列 <span class="caret"></span>
@@ -47,7 +54,6 @@
       </ul>
     </div>
 	{% endif %}
-
     {% block toolbar_layouts %}
     <div class="btn-group layout-btns" data-toggle="buttons">
       <label class="btn btn-default btn-sm layout-normal active">
@@ -67,16 +73,13 @@
     {% endblock toolbar_fullscreen %}
     {% view_block 'top_btns' %}
   </div>
-  
+
   <ul class="pagination pagination-sm pagination-left pagination-inline">
     {% view_block 'pagination' 'small' %}
   </ul>
-
-
-
-  <form id="changelist-form" action="" method="post">{% csrf_token %}
-  {% view_block 'results_top' %}
   
+  <form id="changelist-form" action="" method="post"{% view_block 'result_list_form' %}>{% csrf_token %}
+  {% view_block 'results_top' %}
   <div class="results table-responsive">
   {% if results %}
   {% block results_grid %}
@@ -114,20 +117,31 @@
     {% block results_grid_body %}
     <tbody>
     {% for row in results %}
-      <tr class="grid-item">
-      	{% if check_box %}
-		<td class="action-checkbox">
-            <input class="action-select" name="_selected_action" type="checkbox" value="{{ row.cells.0.label }}">
-        </td>
-        {% endif %}
-      	{% for o in row.cells %}
-      	{% ifnotequal o.field_name '_data' %}
-        <td>
+      <tr class="grid-item{% if row.css_class %} {{row.css_class}}{%endif%}">{% for o in row.cells %}
+        <td {{o.tagattrs}}>
+          {% if o.btns %}
+            <div class="btn-group pull-right">
+              {% for b in o.btns %}
+                {{b|safe}}
+              {% endfor %}
+            </div>
+          {% endif %}
+          {% if o.menus %}
+            <div class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                {{ o.label }}
+              </a>
+              <ul class="dropdown-menu">
+                {% for m in o.menus %}
+                  {{m|safe}}
+                {% endfor %}
+              </ul>
+            </div>
+          {% else %}
             {{ o.label }}
+          {% endif %}
         </td>
-        {% endifnotequal  %}
-        {% endfor %}
-	  </tr>
+      {% endfor %}</tr>
       {% view_block 'result_row' row %}
     {% endfor %}
     </tbody>
@@ -138,14 +152,10 @@
     <p class="well">无数据</p>
   {% endif %}
   </div>
-  
   {% view_block 'results_bottom' %}
   </form>
-
-
 
   <ul class="pagination">
     {% view_block 'pagination' %}
   </ul>
-{{ content }}
 {% endblock %}
