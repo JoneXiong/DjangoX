@@ -20,6 +20,8 @@ class ModelPage(CommAdminView):
     model_info = None
     
     remove_permissions = []
+    exclude = None #用在编辑页或详情页
+    fields = None #用在编辑页或详情页
 
     def __init__(self, request, *args, **kwargs):
         self.opts = self.model._meta
@@ -174,3 +176,4 @@ class ModelAdmin(object):
     # 【列表页】相关可获取项
     page_num = 0    # 当前第几页
     paginator = None    #分页类实例
+    result_count = None #总记录数

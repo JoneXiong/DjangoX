@@ -1,13 +1,16 @@
 
-from base import BaseAdminPlugin, BaseAdminView, CommAdminView, ModelAdminView, filter_hook, csrf_protect_m, BaseCommon
+from base import BaseAdminPlugin, BaseAdminView, CommAdminView, filter_hook, csrf_protect_m, BaseCommon
 
+from model_page import ModelAdminView
 from list import ListAdminView
 from edit import CreateAdminView, UpdateAdminView, ModelFormAdminView
 from delete import DeleteAdminView
 from detail import DetailAdminView
+
 from form import FormAdminView
 from action import Action
 from dashboard import Dashboard, BaseWidget, widget_manager, ModelDashboard
+
 from website import IndexView, LoginView, LogoutView, UserSettingView
 
 __all__ = (
