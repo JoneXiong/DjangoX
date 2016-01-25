@@ -1,0 +1,115 @@
+{% extends base_template %}
+{% load i18n %}
+{% load url from future %}
+{% load xadmin_tags %}
+{% load crispy_forms_tags %}
+
+
+{% block extrastyle %}
+<style>
+	.add_params_box {
+		margin-bottom:80px
+	}
+
+	.controls_me {
+		float:left;
+	}
+	.control-group{
+		clear:both;
+	}
+</style>
+{% endblock %}
+
+{% block extrahead %}
+<script type="text/javascript">
+	$(document).ready(function() {
+	        
+	        var get_alert = function(js_data,js_num) {
+	                var alert_html = $("#"+js_data+"_html").val();
+	                alert_html = alert_html.replace(/\{num\}/g,js_num);     
+	                $("."+js_data+"_box").append(alert_html);
+	        }
+
+	        $("legend").on("click", "a.js_alert", function() {
+	                var js_data = $(this).attr('js_data'); 
+	                var js_num = Number($(this).attr('js_num'));   
+	                js_num+=1;
+	                get_alert(js_data,js_num);
+	                $(this).attr('js_num',js_num);
+	        });
+			
+		$('#id_product').change(function(){
+			$("legend a.js_alert").click();
+			$(".add_params_box").find("input[name=param]:last").val( $("#s2id_id_product ").find("span:first").html())
+		})
+	});
+</script>
+
+{% endblock %}
+
+{% block nav_title %}{% if model_icon %}<i class="{{model_icon}}"><sub class="fa fa-{% if add%}plus{%else%}pencil{%endif%}"></sub></i> {% endif %}
+{{ title }}{% endblock %}
+
+{% block content %}
+<form class="exform" {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post" id="{{ opts.module_name }}_form">{% csrf_token %}
+  {% block form_top %}{% endblock %}
+  {% view_block 'form_top' %}
+
+  {% if errors %}
+      <div class="alert alert-danger alert-dismissable">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+      {% blocktrans count counter=errors|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
+      </div>
+      {{ form.non_field_errors }}
+  {% endif %}
+
+  {% view_block 'before_fieldsets' %}
+
+<textarea class="hide" id="add_params_html">
+			<div class="alert alert-block">
+				<button type="button" class="close" data-dismiss="alert">×</button>
+				<div class="control-group">
+					<div class="controls controls_me" >
+						<label>标签</label>：<input  type="text"   name="param" value=""> <font color="rgb(217, 237, 247)"></font><br/>
+					</div>
+					<div class="controls controls_me" >
+						<label>x坐标</label>：<input class="input-xxlarge" type="text"   name="descript"  value=""> <font color="rgb(217,237,247)"></font>
+					</div>
+					<div class="controls controls_me" >
+						<label>y坐标</label>：<input  type="text"   name="type"  > <font color="rgb(217, 237, 247)"></font> 
+					</div>
+				</div>
+			</div>
+</textarea>
+<div style="width:65%">
+    {% crispy form %}
+		<legend id="val_type3"><a js_data="add_params" js_num="2"  href="javascript:void(0);" data-original-title="增加" style="background-color: rgb(248, 148, 6);" class="label tooltip-info js_alert">+ 增加</a></legend>
+		<div class="add_params_box">
+			{% for param in pa_list %}
+				<div class="alert alert-block">
+					<button type="button" class="close" data-dismiss="alert">×</button>
+					<div class="control-group">
+						<div class="controls controls_me" >
+							<label>标签</label>：<input value="{{ param.param }}"   type="text"   name="param"  style="height:30px"> <font color="rgb(217, 237, 247)"></font><br/>
+						</div>
+						<div class="controls controls_me" >
+							<label>x坐标</label>：<input value="{{ param.descript }}" type="text"   name="descript"  style="height:30px"> <font color="rgb(217,237,247)"></font>
+						</div>
+						<div class="controls controls_me" >
+							<label>y坐标</label>：<input class="input-xxlarge" type="text" value="{{ param.type }}"  name="type"  style="height:30px"> <font color="rgb(217, 237, 247)"></font> 
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+
+  {% view_block 'after_fieldsets' %}
+  </div>
+
+  <div class="form-actions well well-sm clearfix">
+  <button type="submit" class="default btn btn-primary" name="_save" data-loading-text="{% trans "Saving.." %}"/><i class="fa fa-save"></i> {% trans 'Save' %}</button>
+  {% view_block 'submit_line' %}
+  </div>
+
+</form>
+{% endblock %}

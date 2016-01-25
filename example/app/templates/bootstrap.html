@@ -1,0 +1,181 @@
+{% extends "xadmin/base_site.html" %}
+{% load i18n xadmin_tags %}
+{% load url from future %}
+
+{% block content %}
+{{ content }}
+  <div class="jumbotron">
+    <h1>我的第一个 Bootstrap 页面</h1>
+    <p>重置窗口大小，查看响应式效果！</p> 
+  </div>
+  
+  <div class="row">
+    <div class="col-sm-4">
+      <h3>第一列</h3>
+      <p>学的不仅是技术，更是梦想！</p>
+      <p>再牛逼的梦想,也抵不住你傻逼似的坚持！</p>
+    </div>
+    <div class="col-sm-4">
+      <h3>第二列</h3>
+      <p>学的不仅是技术，更是梦想！</p>
+      <p>再牛逼的梦想,也抵不住你傻逼似的坚持！</p>
+    </div>
+    <div class="col-sm-4">
+      <h3>第三列</h3>        
+      <p>学的不仅是技术，更是梦想！</p>
+      <p>再牛逼的梦想,也抵不住你傻逼似的坚持！</p>
+    </div>
+  </div>
+  
+  
+      <h2>图像</h2>
+      <p>创建项应式图片(将扩展到父元素)。 另外：图片以椭圆型展示：</p>            
+      <img src="http://www.runoob.com/try/demo_source/cinqueterre.jpg" class="img-responsive img-circle" alt="Cinque Terre" width="304" height="236"> 
+      
+      <h2>图标</h2>
+      <p>插入图标:</p>      
+      <p>云图标: <span class="glyphicon glyphicon-cloud"></span></p>      
+      <p>信件图标: <span class="glyphicon glyphicon-envelope"></span></p>            
+      <p>搜索图标: <span class="glyphicon glyphicon-search"></span></p>
+      <p>打印图标: <span class="glyphicon glyphicon-print"></span></p>      
+      <p>下载图标：<span class="glyphicon glyphicon-download"></span></p>      
+  
+  
+  
+      <h2>表格</h2>
+      <p>创建响应式表格 (将在小于768px的小型设备下水平滚动)。另外：添加交替单元格的背景色：</p>      
+      <div class="table-responsive">          
+       <table class="table table-striped table-bordered">
+         <thead>
+           <tr>
+             <th>#</th>
+             <th>Name</th>
+             <th>Street</th>
+           </tr>
+         </thead>
+         <tbody>
+           <tr>
+             <td>1</td>
+             <td>Anna Awesome</td>
+             <td>Broome Street</td>
+           </tr>
+           <tr>
+             <td>2</td>
+             <td>Debbie Dallas</td>
+             <td>Houston Street</td>
+           </tr>
+           <tr>
+             <td>3</td>
+             <td>John Doe</td>
+             <td>Madison Street</td>
+           </tr>
+         </tbody>
+       </table>
+      </div>
+  
+  <h2>响应式图像</h2>
+  <img src="http://www.runoob.com/try/demo_source/cinqueterre.jpg" class="img-responsive" alt="响应式图像">
+  
+  <h1>我是标题1 h1. <small>我是副标题1 h1</small></h1> 
+  
+  
+  <h2>强调</h2>
+<small>本行内容是在标签内</small><br>
+<strong>本行内容是在标签内</strong><br>
+<em>本行内容是在标签内，并呈现为斜体</em><br>
+<p class="text-left">向左对齐文本</p>
+<p class="text-center">居中对齐文本</p>
+<p class="text-right">向右对齐文本</p>
+<p class="text-muted">本行内容是减弱的</p>
+<p class="text-primary">本行内容带有一个 primary class</p>
+<p class="text-success">本行内容带有一个 success class</p>
+<p class="text-info">本行内容带有一个 info class</p>
+<p class="text-warning">本行内容带有一个 warning class</p>
+<p class="text-danger">本行内容带有一个 danger class</p>
+  
+ 
+ <h2>缩写</h2>
+<abbr title="World Wide Web">WWW</abbr><br>
+<abbr title="Real Simple Syndication" class="initialism">RSS</abbr>
+
+
+<h2>引用（Blockquote）</h2>
+<blockquote><p>
+这是一个默认的引用实例。这是一个默认的引用实例。这是一个默认的引用实例。这是一个默认的引用实例。这是一个默认的引用实例。这是一个默认的引用实例。这是一个默认的引用实例。这是一个默认的引用实例。</p>
+</blockquote>
+<blockquote>这是一个带有源标题的引用。<small>Someone famous in <cite title="Source Title">Source Title</cite></small></blockquote>
+<blockquote class="pull-right">这是一个向右对齐的引用。<small>Someone famous in <cite title="Source Title">Source Title</cite></small></blockquote>
+
+
+<h2>列表</h2>
+<h4>有序列表</h4>
+<ol>
+  <li>Item 1</li>
+  <li>Item 2</li>
+  <li>Item 3</li>
+  <li>Item 4</li>
+</ol>
+<h4>无序列表</h4>
+<ul>
+  <li>Item 1</li>
+  <li>Item 2</li>
+  <li>Item 3</li>
+  <li>Item 4</li>
+</ul>
+<h4>未定义样式列表</h4>
+<ul class="list-unstyled">
+  <li>Item 1</li>
+  <li>Item 2</li>
+  <li>Item 3</li>
+  <li>Item 4</li>
+</ul>
+<h4>内联列表</h4>
+<ul class="list-inline">
+  <li>Item 1</li>
+  <li>Item 2</li>
+  <li>Item 3</li>
+  <li>Item 4</li>
+</ul>
+<h4>定义列表</h4>
+<dl>
+  <dt>Description 1</dt>
+  <dd>Item 1</dd>
+  <dt>Description 2</dt>
+  <dd>Item 2</dd>
+</dl>
+<h4>水平的定义列表</h4>
+<dl class="dl-horizontal">
+  <dt>Description 1</dt>
+  <dd>Item 1</dd>
+  <dt>Description 2</dt>
+  <dd>Item 2</dd>
+</dl>
+
+		 <p>设置 pre 元素可滚动：</p>
+
+		<pre class="pre-scrollable">
+		内容可滚动
+		Text in a pre element
+		is displayed in a fixed-width
+		font, and it preserves
+		both      spaces and
+		line breaks.
+		Text in a pre element
+		is displayed in a fixed-width
+		font, and it preserves
+		both      spaces and
+		line breaks.
+		</pre>
+
+
+<h2>代码</h2>
+<p><code>&lt;header&gt;</code> 作为内联元素被包围。</p>
+<p>如果需要把代码显示为一个独立的块元素，请使用 <pre> 标签：</p>
+<pre>
+  &lt;article&gt;
+    &lt;h1&gt;Article Heading&lt;/h1&gt;
+  &lt;/article&gt;
+</pre>
+
+
+{% endblock %}
