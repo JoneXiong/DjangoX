@@ -13,6 +13,8 @@ from xadmin import defs
 
 class BaseGrid(object):
     
+    can_show_all = False # 默认隐藏"显示所有"链接
+    
     @property
     def _tpl(self):
         return self.template
@@ -165,12 +167,12 @@ class BaseGrid(object):
 
         # 获取当前据数目
         self.result_count = self.paginator.count
-
-        self.can_show_all = self.result_count <= self.list_max_show_all
+        if self.can_show_all:
+            self.can_show_all = self.result_count <= self.list_max_show_all
         self.multi_page = self.result_count > self.list_per_page
 
         if (self.show_all and self.can_show_all) or not self.multi_page:
-            self.result_list = self.list_queryset._clone()
+            self.result_list = self.list_queryset._clone(count=self.result_count)
         else:
             try:
                 self.result_list = self.paginator.page(

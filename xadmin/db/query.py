@@ -89,11 +89,11 @@ class QuerySet(object):
     def verbose(self,key):
         return key
     
-    def _clone(self):
+    def _clone(self, count=None):
         if self.data:
-            return self.data[:]
+            return self.data[:count]
         else:
-            return []
+            return self.get_slice(0, count)
 
 Collection = QuerySet
 
