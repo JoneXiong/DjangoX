@@ -12,6 +12,7 @@ from django.utils.encoding import force_unicode
 from django.utils.html import escape
 from django.template import loader
 from django.utils.translation import ugettext as _
+from django.http import HttpResponse
 
 from xadmin import widgets
 from xadmin.layout import FormHelper, Layout, Fieldset, TabHolder, Container, Column, Col, Field
@@ -402,7 +403,14 @@ class ModelFormAdminView(ModelAdminView):
 
         if self.valid_forms():
             self.save_forms()
-            self.save_models()
+            
+            ret = self.save_models()
+            if isinstance(ret, basestring):
+                self.message_user(ret,'error')
+                return self.get_response()
+            if isinstance(ret, HttpResponse):
+                return ret
+            
             self.save_related()
             response = self.post_response()
             if isinstance(response, basestring):
