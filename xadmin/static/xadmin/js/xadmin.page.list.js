@@ -35,6 +35,7 @@ jQuery(function($){
     });
     
     $('#confirm_select').click(function(e){
+    	var $this = $(this);
 		var id_array=new Array();
 		var m_count = 0;
 		var checked_list = $('input[name="_selected_action"]:checked');
@@ -51,7 +52,9 @@ jQuery(function($){
 			m_count ++;
 		});
 	  if (m_count>0){
-	  	window.close();
+	    if ($this.hasClass('select_close')){
+	      window.close();
+	     }
 	  	return true;
 	  }else{
 	  	alert('请先选择');

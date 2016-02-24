@@ -25,7 +25,7 @@
 
 {% block nav_btns %}
 {% if cl.pop %}
-  <a href="#" id="confirm_select" class="btn btn-primary"><i class="fa fa-plus"></i> 确认选择</a>
+  <a href="#" id="confirm_select" class="btn btn-primary {% if cl.select_close %}select_close{% endif %}"><i class="fa fa-plus"></i> 确认选择</a>
 {% else %}
   {% if has_add_permission %}
     <a href="{{add_url}}" class="btn btn-primary"><i class="fa fa-plus"></i> 

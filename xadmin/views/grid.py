@@ -14,6 +14,7 @@ from xadmin import defs
 class BaseGrid(object):
     
     can_show_all = False # 默认隐藏"显示所有"链接
+    select_close = True
     
     @property
     def _tpl(self):
