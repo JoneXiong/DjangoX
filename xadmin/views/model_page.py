@@ -45,7 +45,7 @@ class ModelPage(CommAdminView):
         return context
 
     @filter_hook
-    def get_breadcrumb(self):
+    def get_breadcrumb(self): 
         u'''
         导航链接基础部分
         '''

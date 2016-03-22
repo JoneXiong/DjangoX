@@ -60,3 +60,9 @@ class PageView(CommAdminView):
     def get_page_url(cls):
         m_root = xadmin.ROOT_PATH_NAME and '/'+xadmin.ROOT_PATH_NAME or ''
         return '%s/page/%s/'%(m_root, cls.__name__.lower())
+    
+    @filter_hook
+    def get_breadcrumb(self):
+        bcs = super(PageView, self).get_breadcrumb()
+        bcs.append({'title': self.verbose_name or self.__class__.__bases__ [1].__name__})
+        return bcs
