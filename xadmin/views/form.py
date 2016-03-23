@@ -169,12 +169,6 @@ class FormAdminView(CommAdminView):
         return data
 
     @filter_hook
-    def get_breadcrumb(self):
-        bcs = super(FormAdminView, self).get_breadcrumb()
-        bcs.append({'title': self.title})
-        return bcs
-
-    @filter_hook
     def get_response(self):
         context = self.get_context()
         context.update(self.kwargs or {})
