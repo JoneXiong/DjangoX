@@ -214,16 +214,24 @@ class BaseCommon(object):
         """
         写对象日志
         """
-        from django.contrib.admin.models import LogEntry, CHANGE
+        from django.contrib.admin.models import CHANGE
         from django.contrib.contenttypes.models import ContentType
         from django.utils.encoding import force_text
+        type_id = ContentType.objects.get_for_model(obj).pk
+        obj_id = obj.pk
+        obj_des = force_text(obj)
+        aciton_id = CHANGE
+        self.log(type_id, obj_id, obj_des, aciton_id, message)
+        
+    def log(self, type_id, obj_id, obj_des, aciton_id, msg=''):
+        from django.contrib.admin.models import LogEntry
         LogEntry.objects.log_action(
             user_id         = self.request.user.pk,
-            content_type_id = ContentType.objects.get_for_model(obj).pk,
-            object_id       = obj.pk,
-            object_repr     = force_text(obj),
-            action_flag     = CHANGE,
-            change_message  = message
+            content_type_id = type_id,
+            object_id       = obj_id,
+            object_repr     = obj_des,
+            action_flag     = aciton_id,
+            change_message  = msg
         )
 
 
@@ -466,10 +474,17 @@ class CommAdminView(BaseAdminView):
         u'''
         导航链接基础部分
         '''
-        return [{
+        base = [{
             'url': self.get_admin_url('index'),
             'title': _('Home')
             }]
+        if hasattr(self, 'app_label') and self.app_label:
+            app_mod = self.admin_site.app_dict[self.app_label]
+            base.append({
+                         'url': '/index/%s/'%self.app_label,
+                         'title':  hasattr(app_mod,'verbose_name') and app_mod.verbose_name or self.app_label
+                         })
+        return base
 SiteView = CommAdminView
 
 
