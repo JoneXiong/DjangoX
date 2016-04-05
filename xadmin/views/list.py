@@ -433,7 +433,7 @@ class ListAdminView(BaseGrid,ModelPage):
                         if callable(show):show = show()
                     else:
                         show = escape(Truncator(obj).words(14, truncate='...'))
-                    show = show.replace('%','%%').replace("\'","\\\'")
+                    show = str(show).replace('%','%%').replace("\'","\\\'")
                     pop = format_html(' class="for_multi_select" show="{0}" sid="{1}" ', show, getattr(obj, self.request.GET.get('t')) )
                 else:
                     pop = ''
