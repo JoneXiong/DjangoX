@@ -199,7 +199,7 @@ class ListAdminView(BaseGrid,ModelPage):
 
     def get_model_method_fields(self):
         u"""
-        获得模型的方法型字段
+        获得模型的方法型字段 （目前主要用在显示列的控制）
         is_column、short_description
         """
         methods = []
@@ -211,6 +211,14 @@ class ListAdminView(BaseGrid,ModelPage):
                 pass
         return [FakeMethodField(name, getattr(method, 'short_description', capfirst(name.replace('_', ' '))))
                 for name, method in methods]
+        
+    def get_model_fields(self):
+        u'''
+        获取所有可供显示的列的信息
+        '''
+        model_fields = [(f, f.name in self.list_display, self.get_check_field_url(f))
+                        for f in (self.opts.fields + self.get_model_method_fields()) if f.name not in self.list_exclude]
+        return model_fields
 
     @filter_hook
     def get_context(self):
@@ -236,7 +244,7 @@ class ListAdminView(BaseGrid,ModelPage):
             'module_name': force_unicode(self.opts.verbose_name_plural),
             'title': self.title,
             'cl': self,
-            'model_fields': model_fields,
+            'model_fields': self.get_model_fields(),
             'clean_select_field_url': self.get_query_string(remove=[COL_LIST_VAR]),
             'has_add_permission': self.has_add_permission(),
             'app_label': self.app_label,

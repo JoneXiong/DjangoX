@@ -197,3 +197,6 @@ class BaseGrid(object):
         if self.list_display_links_details:
             media += self.vendor('xadmin.plugin.details.js')
         return media
+    
+    def get_model_fields(self):
+        return []

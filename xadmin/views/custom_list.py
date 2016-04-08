@@ -107,7 +107,7 @@ class GridPage(BaseGrid,PageView):
                         'cl': self,
                         'brand_icon': self.icon,
                         'brand_name': context.get('title',''),
-                        'model_fields': self.model_fields(),
+                        'model_fields': self.get_model_fields(),
                         'result_headers': self.result_headers(),
                         'results': self.results() or [],
                         'nav_buttons': mark_safe(''.join(self.get_nav_btns()) ),
@@ -147,7 +147,7 @@ class GridPage(BaseGrid,PageView):
 #             row.cells.insert(0,check_box_rh)
         return row
 
-    def model_fields(self):
+    def get_model_fields(self):
         return [ ({"verbose_name": text}, True, '?_cols='+field_name) for field_name, text in self.head  ]
     
     @filter_hook
