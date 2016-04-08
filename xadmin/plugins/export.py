@@ -1,30 +1,9 @@
 # coding=utf-8
 """
 数据导出
-========
-
-功能
-----
-
-该插件在数据列表页面提供了数据导出功能, 可以导出 Excel, CSV, XML, json 格式.
-
-截图
-----
-
-.. image:: /images/plugins/export.png
-
-使用
-----
-
-.. note:: 如果想要导出 Excel 数据, 需要安装 `xlwt <http://pypi.python.org/pypi/xlwt>`_.
-
-默认情况下, xadmin 会提供 Excel, CSV, XML, json 四种格式的数据导出. 您可以通过设置 OptionClass 的 ``list_export`` 属性来指定使用
-哪些导出格式 (四种各使用分别用 ``xls``, ``csv``, ``xml``, ``json`` 表示), 或是将 ``list_export`` 设置为 ``None`` 来禁用数据导出功能. 示例如下::
-
-    class MyModelAdmin(object):
-
-        list_export = ('xls', xml', 'json')
-
+默认情况下, xadmin 会提供 Excel, CSV, XML, json 四种格式的数据导出. 
+可以通过设置 list_export 属性来指定使用哪些导出格式 (四种各使用分别用 ``xls``, ``csv``, ``xml``, ``json`` 表示)
+将 list_export 设置为 None 来禁用数据导出功能. 
 """
 import StringIO
 import datetime
@@ -85,6 +64,9 @@ class ExportPlugin(BaseAdminPlugin):
                     'xml': 'application/xhtml+xml', 'json': 'application/json'}
 
     def init_request(self, *args, **kwargs):
+        u'''
+        当列表页 url 中包含 _do_=export 时识别为导出请求
+        '''
         return self.request.GET.get('_do_') == 'export'
 
     def _format_value(self, o):
@@ -114,6 +96,9 @@ class ExportPlugin(BaseAdminPlugin):
         return new_rows
 
     def get_xlsx_export(self, context):
+        u'''
+        导出 xlsx
+        '''
         datas = self._get_datas(context)
         output = StringIO.StringIO()
         export_header = (
@@ -151,6 +136,9 @@ class ExportPlugin(BaseAdminPlugin):
         return output.getvalue()
 
     def get_xls_export(self, context):
+        u'''
+        导出 xls
+        '''
         datas = self._get_datas(context)
         output = StringIO.StringIO()
         export_header = (
@@ -256,11 +244,17 @@ class ExportPlugin(BaseAdminPlugin):
 
     # View Methods
     def get_result_list(self, __):
+        u'''
+        控制导出的grid数据
+        '''
         if self.request.GET.get('all', 'off') == 'on':
             self.admin_view.list_per_page = xadmin.EXPORT_MAX#sys.maxint
         return __()
 
     def result_header(self, item, field_name, row):
+        u'''
+        控制是否导出
+        '''
         item.export = not item.attr or field_name == '__str__' or getattr(item.attr, 'allow_export', True)
         return item
 
