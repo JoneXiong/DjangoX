@@ -474,14 +474,16 @@ class CommAdminView(BaseAdminView):
         u'''
         导航链接基础部分
         '''
+        import xadmin
         base = [{
             'url': self.get_admin_url('index'),
             'title': _('Home')
             }]
         if hasattr(self, 'app_label') and self.app_label:
             app_mod = self.admin_site.app_dict[self.app_label]
+            pref_url = xadmin.ROOT_PATH_NAME and '/'+xadmin.ROOT_PATH_NAME or ''
             base.append({
-                         'url': '/index/%s/'%self.app_label,
+                         'url': '%s/index/%s/'%(pref_url, self.app_label),
                          'title':  hasattr(app_mod,'verbose_name') and app_mod.verbose_name or self.app_label
                          })
         return base
