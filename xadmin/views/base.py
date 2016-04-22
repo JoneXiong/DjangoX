@@ -468,6 +468,9 @@ class CommAdminView(BaseAdminView):
             icon = getattr(self.admin_site._registry[model],
                            'model_icon', defs.DEFAULT_MODEL_ICON)
         return icon
+    
+    def block_top_account_menu(self, context, nodes):
+        return '<li><a href="%s"><i class="fa fa-key"></i> %s</a></li>' % (self.get_admin_url('account_password'), _('Change Password'))
 
     @filter_hook
     def get_breadcrumb(self):
