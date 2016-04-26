@@ -144,7 +144,7 @@ class FormAdminView(CommAdminView):
         context.update({
             'form': self.form_obj,
             'title': self.title,
-            'nav_buttons': mark_safe(''.join(self.get_nav_btns()) ),
+            'nav_buttons': mark_safe(' '.join(self.get_nav_btns()) ),
         })
         return context
     

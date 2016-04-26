@@ -110,7 +110,7 @@ class GridPage(BaseGrid,PageView):
                         'model_fields': self.get_model_fields(),
                         'result_headers': self.result_headers(),
                         'results': self.results() or [],
-                        'nav_buttons': mark_safe(''.join(self.get_nav_btns()) ),
+                        'nav_buttons': mark_safe(' '.join(self.get_nav_btns()) ),
                         #'col_ctrl': self.col_ctrl,
 #                         'bottom_buttons': mark_safe('\n'.join(self.get_bottom_btns()) ),
                         'check_box': self.check_box
