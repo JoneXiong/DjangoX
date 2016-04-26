@@ -25,6 +25,7 @@ from base import CommAdminView, filter_hook, csrf_protect_m
 class FormAdminView(CommAdminView):
     form = forms.ModelForm
     title = None
+    verbose_name = None
     readonly_fields = ()
 
     template = 'xadmin/views/form.html'
@@ -143,7 +144,7 @@ class FormAdminView(CommAdminView):
         context = super(FormAdminView, self).get_context()
         context.update({
             'form': self.form_obj,
-            'title': self.title,
+            'title': self.verbose_name or self.title,
             'nav_buttons': mark_safe(' '.join(self.get_nav_btns()) ),
         })
         return context
