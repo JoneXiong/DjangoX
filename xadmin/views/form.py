@@ -22,7 +22,7 @@ from xadmin.plugins.ajax import JsonErrorDict
 
 from base import CommAdminView, filter_hook, csrf_protect_m
 
-class FormAdminView(CommAdminView):
+class FormView(CommAdminView):
     form = forms.ModelForm
     title = None
     verbose_name = None
@@ -141,7 +141,7 @@ class FormAdminView(CommAdminView):
 
     @filter_hook
     def get_context(self):
-        context = super(FormAdminView, self).get_context()
+        context = super(FormView, self).get_context()
         context.update({
             'form': self.form_obj,
             'title': self.verbose_name or self.title,
@@ -154,7 +154,7 @@ class FormAdminView(CommAdminView):
 
     @filter_hook
     def get_media(self):
-        return super(FormAdminView, self).get_media() + self.form_obj.media + \
+        return super(FormView, self).get_media() + self.form_obj.media + \
             self.vendor('xadmin.page.form.js', 'xadmin.form.css')
 
     def get_initial_data(self):

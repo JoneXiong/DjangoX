@@ -4,12 +4,12 @@ import json
 
 import xadmin
 from base import filter_hook
-from form import FormAdminView
+from form import FormView
 
 from custom_page import PageView
 
     
-class FormPage(FormAdminView,PageView):
+class FormPage(FormView,PageView):
     
     @filter_hook
     def get_redirect_url(self):
