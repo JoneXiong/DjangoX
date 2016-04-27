@@ -534,7 +534,7 @@ class AdminSite(object):
                 'title': page.verbose_name,
                 'url': page.get_page_url(),
                 'icon': page.icon,
-                'perm': 'auth.'+ (page.perm or page.__name__),
+                'perm': 'auth.'+ (page.perm or 'not_setting_perm'),
                 'order': page.order,
             }
             m_menu = self.sys_menu[app_label]
