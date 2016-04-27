@@ -554,6 +554,7 @@ class Dashboard(CommAdminView):
                     for col in portal_pos.split('|'):
                         ws = []
                         for wid in col.split(','):
+                            if not wid:continue
                             try:
                                 widget = user_widgets.get(int(wid))
                                 if widget:
