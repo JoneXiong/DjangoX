@@ -24,7 +24,6 @@ from base import CommAdminView, filter_hook, csrf_protect_m
 
 class FormView(CommAdminView):
     form = forms.ModelForm
-    title = None
     verbose_name = None
     readonly_fields = ()
 
@@ -32,6 +31,8 @@ class FormView(CommAdminView):
 
     form_layout = None
     pop = False
+    #弃用
+    title = None
 
     def init_request(self, *args, **kwargs):
         # comm method for both get and post
@@ -182,7 +183,7 @@ class FormView(CommAdminView):
     def post_response(self):
         request = self.request
 
-        msg = _('The %s was changed successfully.') % self.title
+        msg = _('操作成功')
         self.message_user(msg, 'success')
         
         if "_continue" in request.REQUEST:
