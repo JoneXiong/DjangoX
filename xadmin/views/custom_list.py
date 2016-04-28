@@ -33,7 +33,6 @@ class GridPage(BaseGrid,PageView):
     search_fields = ()
     
     list_display_links_details = False
-    check_box = False
     form_actions = ()
     val_list = ()
     
@@ -113,7 +112,6 @@ class GridPage(BaseGrid,PageView):
                         'nav_buttons': mark_safe(' '.join(self.get_nav_btns()) ),
                         #'col_ctrl': self.col_ctrl,
 #                         'bottom_buttons': mark_safe('\n'.join(self.get_bottom_btns()) ),
-                        'check_box': self.check_box
                         })
         return context
     
