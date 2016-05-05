@@ -3,6 +3,7 @@ import copy
 
 from django import forms
 from django.template.response import TemplateResponse
+from django.utils.translation import ugettext as _
 
 from base import filter_hook
 from model_page import ModelAdminView
