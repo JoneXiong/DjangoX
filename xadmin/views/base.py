@@ -381,53 +381,48 @@ class CommAdminView(BaseAdminView):
             })
         """
         return None
-
-
-    @filter_hook
-    def get_context(self):
-        """
-        **Context Params** :
-            ``nav_menu`` : 权限过滤后的系统菜单项，如果在非 DEBUG 模式，该项会缓存在 SESSION 中
-        """
-        context = super(CommAdminView, self).get_context()
-
+    
+    def _check_menu_permission(self, item):
+        need_perm = item.pop('perm', None)
+        if need_perm is None:
+            return True
+        elif callable(need_perm):
+            return need_perm(self.user)
+        elif need_perm == 'super':    # perm项如果为 super 说明需要超级用户权限
+            return self.user.is_superuser
+        else:
+            return self.user.has_perm(need_perm)
+        
+    def get_nav_menu(self):
         # DEBUG模式会首先尝试从SESSION中取得缓存的 app 菜单项
-        if 0 and not settings.DEBUG and 'nav_menu' in self.request.session:
-            nav_menu = json.loads(self.request.session['nav_menu'])
+        menu_session_key = 'nav_menu_%s'%self.app_label
+        if not settings.DEBUG and menu_session_key in self.request.session:
+            nav_menu = json.loads(self.request.session[menu_session_key])
         else:
             if hasattr(self, 'app_label') and self.app_label:
                 menus = copy.deepcopy(self.admin_site.get_app_menu(self.app_label)) #copy.copy(self.get_nav_menu())
             else:
                 menus = []
 
-            def check_menu_permission(item):
-                need_perm = item.pop('perm', None)
-                if need_perm is None:
-                    return True
-                elif callable(need_perm):
-                    return need_perm(self.user)
-                elif need_perm == 'super':    # perm项如果为 ``super`` 说明需要超级用户权限
-                    return self.user.is_superuser
-                else:
-                    return self.user.has_perm(need_perm)
-
             def filter_item(item):
                 if 'menus' in item:
                     #before_filter_length = len(item['menus'])
                     item['menus'] = [filter_item(
-                        i) for i in item['menus'] if check_menu_permission(i)]
+                        i) for i in item['menus'] if self._check_menu_permission(i)]
                     after_filter_length = len(item['menus'])
                     if after_filter_length == 0:
                         return None
                 return item
 
-            nav_menu = [filter_item(item) for item in menus if check_menu_permission(item)]
+            nav_menu = [filter_item(item) for item in menus if self._check_menu_permission(item)]
             nav_menu = filter(lambda x:x, nav_menu)
 
-            if 0 and not settings.DEBUG:
-                self.request.session['nav_menu'] = json.dumps(nav_menu)
+            if not settings.DEBUG:
+                self.request.session[menu_session_key] = json.dumps(nav_menu)
                 self.request.session.modified = True
-
+        return nav_menu
+ 
+    def deal_selected(self, nav_menu):
         def check_selected(menu, path):
             # 判断菜单项是否被选择，使用当前url跟菜单项url对比
             selected = False
@@ -447,6 +442,19 @@ class CommAdminView(BaseAdminView):
             return selected
         for menu in nav_menu:
             if check_selected(menu, self.request.path):break
+
+    @filter_hook
+    def get_context(self):
+        """
+        **Context Params** :
+            ``nav_menu`` : 权限过滤后的系统菜单项，如果在非 DEBUG 模式，该项会缓存在 SESSION 中
+        """
+        context = super(CommAdminView, self).get_context()
+
+        nav_menu = []
+        if '_pop' not in self.request.GET:
+            nav_menu = self.get_nav_menu()
+            self.deal_selected(nav_menu)
         
         m_site = self.admin_site
         context.update({
