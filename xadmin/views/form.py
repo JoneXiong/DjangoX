@@ -1,3 +1,5 @@
+# coding=utf-8
+
 import copy
 
 from django import forms
@@ -36,9 +38,9 @@ class FormView(CommAdminView):
 
     def init_request(self, *args, **kwargs):
         # comm method for both get and post
-        if self.perm:
-            if not self.user.has_perm('auth.'+self.perm):
-                raise PermissionDenied
+        perm_code = self.perm or 'not_setting_perm'
+        if not self.user.has_perm('auth.'+perm_code):
+            raise PermissionDenied
         self.prepare_form()
         if '_pop' in self.request.GET:
             self.pop = True
