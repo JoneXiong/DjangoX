@@ -38,7 +38,6 @@ Action = BaseActionView
 
 class FormAction(Action):
     form = forms.Form
-    title = None
     form_layout = None
     form_template = 'xadmin/views/model_form_action.html'
     
