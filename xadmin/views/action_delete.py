@@ -5,6 +5,8 @@ from django.db import router
 from django.utils.encoding import force_unicode
 from django.template.response import TemplateResponse
 from django.utils.translation import ugettext as _
+from django.utils.encoding import force_text
+from django.contrib.contenttypes.models import ContentType
 
 from base import filter_hook
 from xadmin.views.action import Action
@@ -27,6 +29,9 @@ class DeleteSelectedAction(Action):
         u'''orm删除对象'''
         n = queryset.count()
         if n:
+            if self.log:
+                for obj in queryset:
+                    self.log_deletion(self.request, obj)
             queryset.delete()
             self.message_user(_("Successfully deleted %(count)d %(items)s.") % {"count": n, "items": model_ngettext(self.opts, n) }, 'success')
 
@@ -77,3 +82,16 @@ class DeleteSelectedAction(Action):
 
         return TemplateResponse(self.request, self.delete_selected_confirmation_template or
                                 self.get_template_list('views/model_delete_selected_confirm.html'), context, current_app=self.admin_site.name)
+        
+    def log_deletion(self, request, object):
+        """
+        删除对象日志
+        """
+        from django.contrib.admin.models import LogEntry, DELETION
+        LogEntry.objects.log_action(
+            user_id         = request.user.pk,
+            content_type_id = ContentType.objects.get_for_model(self.model).pk,
+            object_id       = object.pk,
+            object_repr     = force_text(object),
+            action_flag     = DELETION
+        )

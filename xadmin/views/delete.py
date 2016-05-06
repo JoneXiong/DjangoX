@@ -6,8 +6,10 @@ from django.template.response import TemplateResponse
 from django.utils.encoding import force_unicode
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
+from django.utils.encoding import force_text
+from django.contrib.contenttypes.models import ContentType
+        
 from xadmin.util import unquote, get_deleted_objects
-
 from xadmin.views.edit import UpdateAdminView
 from xadmin.views.detail import DetailAdminView
 from xadmin.views.base import filter_hook, csrf_protect_m
@@ -15,20 +17,11 @@ from xadmin.views.model_page import ModelAdminView
 
 class DeleteAdminView(ModelAdminView):
     """
-    删除 Model 的 AdminView。主要用于删除数据
-
-    **Option属性**
-
-        .. autoattribute:: delete_confirmation_template
-
-    **实例属性**
-
-        .. attribute:: obj
-
-            即将被删除的对象
+    主要用于删除模型数据
     """
-    #: 删除时确认删除页面的模板名称
+    # 删除时确认删除页面的模板名称
     delete_confirmation_template = None
+    log = False
 
     def init_request(self, object_id, *args, **kwargs):
         """
@@ -77,6 +70,11 @@ class DeleteAdminView(ModelAdminView):
         """
         删除 ``self.obj``
         """
+        self.do_delete()
+        
+    def do_delete(self):
+        if self.log:
+            self.log_deletion(self.request, self.obj)
         self.obj.delete()
 
     @filter_hook
@@ -136,3 +134,16 @@ class DeleteAdminView(ModelAdminView):
         if not self.has_view_permission():
             return self.get_admin_url('index')
         return self.model_admin_url('changelist')
+
+    def log_deletion(self, request, object):
+        """
+        删除对象日志
+        """
+        from django.contrib.admin.models import LogEntry, DELETION
+        LogEntry.objects.log_action(
+            user_id         = request.user.pk,
+            content_type_id = ContentType.objects.get_for_model(self.model).pk,
+            object_id       = object.pk,
+            object_repr     = force_text(object),
+            action_flag     = DELETION
+        )

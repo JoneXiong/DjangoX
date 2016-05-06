@@ -13,6 +13,7 @@ from django.utils.html import escape
 from django.template import loader
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse
+from django.utils.encoding import force_text
 
 from xadmin import widgets
 from xadmin.layout import FormHelper, Layout, Fieldset, TabHolder, Container, Column, Col, Field
@@ -501,6 +502,9 @@ class CreateAdminView(ModelFormAdminView):
     """
     创建数据的 ModeAdminView 继承自 :class:`ModelFormAdminView` ，用于创建数据。
     """
+    
+    log = False
+    
     def init_request(self, *args, **kwargs):
         self.org_obj = None
 
@@ -599,12 +603,40 @@ class CreateAdminView(ModelFormAdminView):
                     return self.model_admin_url('changelist')
             else:
                 return self.get_admin_url('index')
+            
+    def log_addition(self, request, object):
+        """
+        添加对象日志
+        """
+        from django.contrib.admin.models import LogEntry, ADDITION
+        LogEntry.objects.log_action(
+            user_id         = request.user.pk,
+            content_type_id = ContentType.objects.get_for_model(object).pk,
+            object_id       = object.pk,
+            object_repr     = force_text(object),
+            action_flag     = ADDITION
+        )
+        
+    def do_add(self):
+        self.new_obj.save()
+        if self.log:
+            self.log_addition(self.request, self.new_obj)
+
+    @filter_hook
+    def save_models(self):
+        """
+        保存数据到数据库中
+        """
+        return self.do_add()
 
 
 class UpdateAdminView(ModelFormAdminView):
     """
     修改数据的 ModeAdminView 继承自 :class:`ModelFormAdminView` ，用于修改数据。
     """
+    
+    log = False
+    
     def init_request(self, object_id, *args, **kwargs):
         self.org_obj = self.get_object(unquote(object_id))
 
@@ -708,6 +740,66 @@ class UpdateAdminView(ModelFormAdminView):
                 return change_list_url
             else:
                 return self.get_admin_url('index')
+            
+    def do_update(self):
+        '''
+        self.org_obj
+        self.new_obj
+        '''
+        self.new_obj.save()
+        if self.log:
+            change_message = self.construct_change_message(self.request, self.form_obj, getattr(self,'formsets',[ ]) )
+            self.log_change(self.request, self.new_obj, change_message)
+
+    @filter_hook
+    def save_models(self):
+        """
+        保存数据到数据库中
+        """
+        return self.do_update()
+    
+    def log_change(self, request, object, message):
+        """
+        更新对象日志
+        """
+        from django.contrib.admin.models import LogEntry, CHANGE
+        LogEntry.objects.log_action(
+            user_id         = request.user.pk,
+            content_type_id = ContentType.objects.get_for_model(object).pk,
+            object_id       = object.pk,
+            object_repr     = force_text(object),
+            action_flag     = CHANGE,
+            change_message  = message
+        )
+    
+    def construct_change_message(self, request, form, formsets):
+        """
+        Construct a change message from a changed object.
+        """
+        from django.utils.encoding import force_text
+        from django.utils.text import get_text_list
+        
+        change_message = []
+        if form.changed_data:
+            change_message.append(_('Changed %s.') % get_text_list(form.changed_data, _('and')))
+
+        if formsets:
+            for formset in formsets:
+                for added_object in formset.new_objects:
+                    change_message.append(_('Added %(name)s "%(object)s".')
+                                          % {'name': force_text(added_object._meta.verbose_name),
+                                             'object': force_text(added_object)})
+                for changed_object, changed_fields in formset.changed_objects:
+                    change_message.append(_('Changed %(list)s for %(name)s "%(object)s".')
+                                          % {'list': get_text_list(changed_fields, _('and')),
+                                             'name': force_text(changed_object._meta.verbose_name),
+                                             'object': force_text(changed_object)})
+                for deleted_object in formset.deleted_objects:
+                    change_message.append(_('Deleted %(name)s "%(object)s".')
+                                          % {'name': force_text(deleted_object._meta.verbose_name),
+                                             'object': force_text(deleted_object)})
+        change_message = ' '.join(change_message)
+        return change_message or _('No fields changed.')
 
 
 class ModelFormAdminUtil(ModelFormAdminView):
