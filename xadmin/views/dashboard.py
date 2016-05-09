@@ -526,10 +526,14 @@ class Dashboard(CommAdminView):
                 try:
                     widget = UserWidget(user=self.user, page_id=self.get_page_id(), widget_type=opts['type'])
                     widget.set_value(opts)
-                    widget.save()
+                    if self.widget_customiz:
+                        widget.save()
+                    else:
+                        widget.id = 0
                     portal_col.append(self.get_widget(widget))
                 except (PermissionDenied, WidgetDataError):
-                    widget.delete()
+                    if self.widget_customiz:
+                        widget.delete()
                     continue
             portal.append(portal_col)
         if self.widget_customiz:
