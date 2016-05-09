@@ -49,7 +49,7 @@ class ListAdminView(BaseGrid,ModelPage):
             raise PermissionDenied
 
         request = self.request
-        request.session['LIST_QUERY'] = (self.model_info, self.request.META['QUERY_STRING'])
+        #request.session['LIST_QUERY'] = (self.model_info, self.request.META['QUERY_STRING'])
 
         self.list_display = self.get_list_display() #插件在其后起作用
         self.list_display_links = self.get_list_display_links()
