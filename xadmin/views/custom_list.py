@@ -189,10 +189,6 @@ class GridPage(BaseGrid,PageView):
     
     def get_nav_btns(self):
         return []
-    
-    def get_url(self):
-        m_root = xadmin.ROOT_PATH_NAME and '/'+xadmin.ROOT_PATH_NAME or ''
-        return '%s/page/%s/'%(m_root, self.__class__.__bases__ [0].__name__.lower())
 
         
     # Block Views

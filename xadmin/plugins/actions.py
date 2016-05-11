@@ -70,8 +70,7 @@ class ActionPlugin(BaseAdminPlugin):
         else:
             for ac in self.actions:
                 ac_url = ac.get_page_url()
-                av_url = self.admin_view.get_url()
-                choices.append( (ac_url+'?_redirect='+av_url, ac.verbose_name, ac.icon) )
+                choices.append( (ac_url+'?', ac.verbose_name, ac.icon) )
         return choices
 
     def get_context(self, context):

@@ -30,6 +30,19 @@ class FormAction(FormPage):
     hidden_menu = True
     icon = 'fa fa-tasks'
     
+    @filter_hook
+    def get_response(self):
+        response = super(FormAction, self).get_response()
+        if "_continue" not in self.request.REQUEST:
+            action_return_url = self.request.META['HTTP_REFERER']
+            response.set_cookie("_action_return_url", action_return_url)
+        return response
+    
+    @filter_hook
+    def get_redirect_url(self):
+        action_return_url = self.request.COOKIES["_action_return_url"]
+        return action_return_url
+    
     def get_id_list(self):
             ids = self.request.GET.get('ids')
             m_list = ids.split('||')
