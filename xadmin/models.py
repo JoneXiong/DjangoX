@@ -5,16 +5,11 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
-from django.core.serializers.json import DjangoJSONEncoder
-from django.utils.encoding import smart_unicode
-
 from django.db.models.signals import post_syncdb
 from django.contrib.auth.models import Permission
 
 from dutils import JSONEncoder
 
-import datetime
-import decimal
 
 if django.VERSION[1] > 4:
     AUTH_USER_MODEL = django.contrib.auth.get_user_model()
