@@ -9,6 +9,12 @@
 {% block nav_title %}{% if model_icon %}<i class="{{model_icon}}"><sub class="fa fa-{% if add%}plus{%else%}pencil{%endif%}"></sub></i> {% endif %}
 {{ title }}{% endblock %}
 
+{% block nav_btns %}
+{% if change %}
+<a href="{% url 'xadmin:index' %}admin/logentry/?_p_content_type={{ content_type_id }}&_p_object_id={{ original.pk }}" target="_blank" class="btn"><i class="fa fa-eye"></i> 历史</a>
+{% endif %}
+{% endblock nav_btns %}
+
 {% block content %}
 <form class="exform" {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post" id="{{ opts.module_name }}_form">{% csrf_token %}
   {% block form_top %}{% endblock %}
