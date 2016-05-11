@@ -6,11 +6,12 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db.models.base import ModelBase
 from django.utils.encoding import smart_unicode
 
 from django.db.models.signals import post_syncdb
 from django.contrib.auth.models import Permission
+
+from dutils import JSONEncoder
 
 import datetime
 import decimal
@@ -64,23 +65,6 @@ class Bookmark(models.Model):
     class Meta:
         verbose_name = _(u'Bookmark')
         verbose_name_plural = _('Bookmarks')
-
-
-class JSONEncoder(DjangoJSONEncoder):
-    def default(self, o):
-        if isinstance(o, datetime.date):
-            return o.strftime('%Y-%m-%d')
-        elif isinstance(o, datetime.datetime):
-            return o.strftime('%Y-%m-%d %H:%M:%S')
-        elif isinstance(o, decimal.Decimal):
-            return str(o)
-        elif isinstance(o, ModelBase):
-            return '%s.%s' % (o._meta.app_label, o._meta.module_name)
-        else:
-            try:
-                return super(JSONEncoder, self).default(o)
-            except Exception:
-                return smart_unicode(o)
 
 
 class UserSettings(models.Model):

@@ -5,6 +5,7 @@ import decimal
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.encoding import smart_unicode
+from django.db.models.base import ModelBase
 
 
 class JSONEncoder(DjangoJSONEncoder):
@@ -15,6 +16,8 @@ class JSONEncoder(DjangoJSONEncoder):
             return o.strftime('%Y-%m-%d %H:%M:%S')
         elif isinstance(o, decimal.Decimal):
             return str(o)
+        elif isinstance(o, ModelBase):
+            return '%s.%s' % (o._meta.app_label, o._meta.module_name)
         else:
             try:
                 return super(JSONEncoder, self).default(o)
