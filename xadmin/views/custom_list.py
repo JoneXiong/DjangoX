@@ -110,8 +110,6 @@ class GridPage(BaseGrid,PageView):
                         'result_headers': self.result_headers(),
                         'results': self.results() or [],
                         'nav_buttons': mark_safe(' '.join(self.get_nav_btns()) ),
-                        #'col_ctrl': self.col_ctrl,
-#                         'bottom_buttons': mark_safe('\n'.join(self.get_bottom_btns()) ),
                         })
         return context
     
@@ -195,7 +193,4 @@ class GridPage(BaseGrid,PageView):
 #     def block_results_bottom(self, context, nodes):
 #         if self.check_box and self.result_count:
 #             nodes.append(loader.render_to_string('xadmin/blocks/grid.results_bottom.actions.html', context_instance=context))
-            
-    def get_bottom_btns(self):
-        return [ ac.render_bottom_btn(self.get_url()) for ac in self.form_actions if not ac.perm  or ( ac.perm and self.user.has_perm('auth.'+ac.perm) ) ]
     
