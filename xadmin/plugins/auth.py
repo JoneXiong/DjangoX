@@ -15,6 +15,8 @@ from xadmin.layout import Fieldset, Main, Side, Row, FormHelper
 from xadmin.sites import site
 from xadmin.util import unquote, User
 from xadmin.views import BaseAdminPlugin, ModelFormAdminView, ModelAdminView, CommAdminView, csrf_protect_m
+from xadmin.views.action import FormAction
+from xadmin import widgets
 
 
 ACTION_NAME = {
@@ -38,7 +40,27 @@ class PermissionModelMultipleChoiceField(ModelMultipleChoiceField):
 
     def label_from_instance(self, p):
         return get_permission_name(p)
+    
 
+class GroupAddUsers(FormAction):
+    verbose_name = '批量添加成员'
+    app_label = 'xadmin'
+    
+    def prepare_form(self):
+        class GroupAddUsersForm(forms.Form):
+            users = forms.CharField(label=u'选择用户', widget=widgets.ManyToManyPopupWidget(self, User, 'id') )
+        
+        self.view_form = GroupAddUsersForm
+        
+    def action(self, queryset):
+        m_data = self.form_obj.cleaned_data
+        users = m_data.get('users').split(',')
+        users = map(int,users)
+
+        for group in queryset:
+            for user in users:
+                user_obj = User.objects.get(id=user)
+                user_obj.groups.add(group)
 
 class GroupAdmin(object):
     search_fields = ('name',)
@@ -47,6 +69,8 @@ class GroupAdmin(object):
     model_icon = 'fa fa-group'
     app_label = 'xadmin'
     menu_group = 'auth_group'
+    
+    actions = [GroupAddUsers]
 
     def get_field_attrs(self, db_field, **kwargs):
         attrs = super(GroupAdmin, self).get_field_attrs(db_field, **kwargs)
