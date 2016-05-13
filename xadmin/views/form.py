@@ -25,7 +25,7 @@ from xadmin.plugins.ajax import JsonErrorDict
 from base import CommAdminView, filter_hook, csrf_protect_m
 
 class FormView(CommAdminView):
-    form = forms.ModelForm
+    form = forms.Form
     verbose_name = None
     readonly_fields = ()
 
