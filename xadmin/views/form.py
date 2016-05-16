@@ -147,10 +147,7 @@ class FormView(CommAdminView):
         """
         获取表单的错误信息列表。
         """
-        errors = forms.util.ErrorList()
-        if self.form_obj.is_bound:
-            errors.extend(self.form_obj.errors.values())
-        return errors
+        return JsonErrorDict(self.form_obj.errors, self.form_obj).as_json()
 
     @filter_hook
     def get_context(self):
