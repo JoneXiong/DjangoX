@@ -141,6 +141,16 @@ class FormView(CommAdminView):
                 return self.render_response(result)
 
         return self.get_response()
+    
+    @filter_hook
+    def get_error_list(self):
+        """
+        获取表单的错误信息列表。
+        """
+        errors = forms.util.ErrorList()
+        if self.form_obj.is_bound:
+            errors.extend(self.form_obj.errors.values())
+        return errors
 
     @filter_hook
     def get_context(self):
@@ -149,6 +159,7 @@ class FormView(CommAdminView):
             'form': self.form_obj,
             'title': self.verbose_name or self.title,
             'nav_buttons': mark_safe(' '.join(self.get_nav_btns()) ),
+            'errors': self.get_error_list(),
         })
         return context
     
