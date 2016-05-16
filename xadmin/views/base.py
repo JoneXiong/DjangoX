@@ -221,9 +221,9 @@ class BaseCommon(object):
         obj_id = obj.pk
         obj_des = force_text(obj)
         aciton_id = CHANGE
-        self.log(type_id, obj_id, obj_des, aciton_id, message)
+        self._log(type_id, obj_id, obj_des, aciton_id, message)
         
-    def log(self, type_id, obj_id, obj_des, aciton_id, msg=''):
+    def _log(self, type_id, obj_id, obj_des, aciton_id, msg=''):
         from django.contrib.admin.models import LogEntry
         LogEntry.objects.log_action(
             user_id         = self.request.user.pk,
