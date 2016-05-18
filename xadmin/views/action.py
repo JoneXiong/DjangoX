@@ -17,6 +17,7 @@ class BaseActionView(ModelAdminView):
 
     model_perm = None   #模型权限 'view', 'add', 'change', 'delete'
     perm = None #自定义权限
+    log = False
 
     @classmethod
     def has_perm(cls, list_view):
