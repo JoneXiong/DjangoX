@@ -6,7 +6,7 @@ from django.forms.models import modelform_factory
 import copy
 from xadmin.sites import site
 from xadmin.util import get_model_from_relation, vendor
-from xadmin.views import BaseAdminPlugin, ModelFormAdminView, FormAdminView
+from xadmin.views import BaseAdminPlugin, ModelFormAdminView, FormView
 from xadmin.layout import Layout
 
 
@@ -77,6 +77,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
                           % (
                               self.add_url, (_('Create New %s') % self.rel.to._meta.verbose_name), name,
                               "%s?_field=%s&%s=" % (self.rel_add_url, name, name)))
+        self.widget.attrs['class'] = self.attrs.get('class', '')
         output.extend(['<div class="control-wrap" id="id_%s_wrap_container">' % name,
                   self.widget.render(name, value, *args, **kwargs), '</div>'])
         return mark_safe(u''.join(output))
@@ -106,4 +107,4 @@ class QuickAddBtnPlugin(BaseAdminPlugin):
 
 site.register_plugin(QuickFormPlugin, ModelFormAdminView)
 site.register_plugin(QuickAddBtnPlugin, ModelFormAdminView)
-site.register_plugin(QuickFormPlugin, FormAdminView)
+site.register_plugin(QuickFormPlugin, FormView)
