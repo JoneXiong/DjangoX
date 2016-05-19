@@ -15,6 +15,7 @@ from django.utils.translation import ugettext as _
 from django.http import HttpResponse
 from django.utils.encoding import force_text
 
+import xadmin
 from xadmin import widgets
 from xadmin.layout import FormHelper, Layout, Fieldset, TabHolder, Container, Column, Col, Field
 from xadmin.util import unquote
@@ -36,9 +37,9 @@ FORMFIELD_FOR_DBFIELD_DEFAULTS = {
     models.IPAddressField: {'widget': widgets.AdminTextInputWidget},
     models.ImageField: {'widget': widgets.AdminFileWidget},
     models.FileField: {'widget': widgets.AdminFileWidget},
-    models.ForeignKey: {'widget': widgets.SelectWidget},
-    models.OneToOneField: {'widget': widgets.SelectWidget},
-    models.ManyToManyField: {'widget': widgets.AdminSelectMultiple},
+    models.ForeignKey: {'widget': widgets.AdminIntegerFieldWidget},
+    models.OneToOneField: {'widget': widgets.AdminIntegerFieldWidget},
+    models.ManyToManyField: {'widget': widgets.MultiTextInputWidget},
 }
 
 
@@ -197,6 +198,14 @@ class ModelFormAdminView(ModelAdminView):
             # 如果字段是关联字段，并且关联字段的 ModelAdmin 设置了 `relfield_style` 属性，则使用该值作为 FieldStyle
             if related_modeladmin and hasattr(related_modeladmin, 'relfield_style'):
                 attrs = self.get_field_style(db_field, related_modeladmin.relfield_style, **kwargs)
+                if attrs:
+                    return attrs
+            if isinstance(db_field, models.ForeignKey):
+                _style= xadmin.DEFAULT_RELFIELD_STYLE.get('fk','')
+            elif isinstance(db_field, models.ManyToManyField):
+                _style= xadmin.DEFAULT_RELFIELD_STYLE.get('m2m','')
+            if _style:
+                attrs = self.get_field_style(db_field, _style, **kwargs)
                 if attrs:
                     return attrs
 
