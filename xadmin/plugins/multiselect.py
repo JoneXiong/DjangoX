@@ -13,6 +13,8 @@ class M2MSelectPlugin(BaseAdminPlugin):
             return {'widget': widgets.SelectMultipleTransfer(db_field.verbose_name, False), 'help_text': ''}
         if style == 'm2m_dropdown' and isinstance(db_field, ManyToManyField):
             return {'widget': widgets.SelectMultipleDropdown, 'help_text': ''}
+        if style == 'm2m_select' and isinstance(db_field, ManyToManyField):
+            return {'widget': widgets.AdminSelectMultiple}
         
         if style == 'm2m_raw' and isinstance(db_field, ManyToManyField):
             db = kwargs.get('using')

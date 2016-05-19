@@ -15,6 +15,9 @@ class RelateFieldPlugin(BaseAdminPlugin):
             #if (db_field.rel.to in self.admin_view.admin_site._registry) and self.has_model_perm(db_field.rel.to, 'view'):
             db = kwargs.get('using')
             return dict(attrs or {}, widget=widgets.ForeignKeyRawIdWidget(db_field.rel, self.admin_view, using=db))
+        if style == 'fk_select' and isinstance(db_field, models.ForeignKey):
+            db = kwargs.get('using')
+            return dict(attrs or {}, widget=widgets.SelectWidget)
         return attrs
 
 site.register_plugin(RelateFieldPlugin, ModelFormAdminView)
