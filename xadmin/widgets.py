@@ -222,6 +222,25 @@ class AdminTextInputWidget(forms.TextInput):
         if attrs is not None:
             final_attrs.update(attrs)
         super(AdminTextInputWidget, self).__init__(attrs=final_attrs)
+        
+class MultiTextInputWidget(forms.TextInput):
+    def __init__(self, attrs=None):
+        final_attrs = {'class': 'text-field'}
+        if attrs is not None:
+            final_attrs.update(attrs)
+        super(MultiTextInputWidget, self).__init__(attrs=final_attrs)
+        
+    def _format_value(self, value):
+        if value:
+            value = map(str, value)
+            return ','.join(value)
+        else:
+            return ''
+
+    def value_from_datadict(self, data, files, name):
+        value = data.get(name)
+        if value:
+            return value.split(',')
 
 
 class AdminURLFieldWidget(forms.TextInput):
