@@ -39,7 +39,7 @@ FORMFIELD_FOR_DBFIELD_DEFAULTS = {
     models.FileField: {'widget': widgets.AdminFileWidget},
     models.ForeignKey: {'widget': widgets.AdminIntegerFieldWidget},
     models.OneToOneField: {'widget': widgets.AdminIntegerFieldWidget},
-    models.ManyToManyField: {'widget': widgets.MultiTextInputWidget},
+    models.ManyToManyField: {'widget': widgets.MultiTextInputWidget, 'help_text': ''},
 }
 
 
