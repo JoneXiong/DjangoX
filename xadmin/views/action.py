@@ -4,6 +4,7 @@ import copy
 from django import forms
 from django.template.response import TemplateResponse
 from django.utils.translation import ugettext as _
+from django.http import HttpResponse
 
 from base import filter_hook
 from model_page import ModelAdminView
@@ -37,7 +38,7 @@ class BaseActionView(ModelAdminView):
 
     @filter_hook
     def do_action(self, queryset):
-        self.action(queryset)
+        return self.action(queryset)
     
 Action = BaseActionView
 
@@ -125,9 +126,15 @@ class FormAction(Action):
         
         if self.request.POST.get('post') and '_save' in self.request.POST:
             if self.form_obj.is_valid():
-                self.action(queryset)
-                self.message_user(u'操作成功', 'success')
-                return None
+                ret = self.action(queryset)
+                if ret:
+                    if isinstance(ret, basestring):
+                        self.message_user(ret,'error')
+                    elif isinstance(ret, HttpResponse):
+                        return ret
+                else:
+                    self.message_user(u'操作成功', 'success')
+                    return None
             
         context = self.get_context()
         context.update({

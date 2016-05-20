@@ -112,9 +112,11 @@ class ActionPlugin(BaseAdminPlugin):
                     if not select_across:
                         queryset = av.list_queryset.filter(pk__in=selected)
                     
-                    response = self._response_action(ac, queryset)
-                    if isinstance(response, HttpResponse):
-                        return response
+                    ret = self._response_action(ac, queryset)
+                    if isinstance(ret, basestring):
+                        self.message_user(ret,'error')
+                    if isinstance(ret, HttpResponse):
+                        return ret
                     else:
                         return HttpResponseRedirect(request.get_full_path())
         return response
