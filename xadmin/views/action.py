@@ -32,9 +32,12 @@ class BaseActionView(ModelAdminView):
         self.list_view = list_view
         self.admin_site = list_view.admin_site
 
+    def action(self, queryset):
+        pass
+
     @filter_hook
     def do_action(self, queryset):
-        pass
+        self.action(queryset)
     
 Action = BaseActionView
 
