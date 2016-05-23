@@ -115,6 +115,10 @@ select.selectmultiple {
             box-shadow: 2px 2px 16px rgba(0, 0, 0, 0.5);
     right: 10px;
   }
+  
+  .fixed2left {
+      left: 10px;
+  }
 
   .form-actions.fixed .pull-right{
     float: none !important;

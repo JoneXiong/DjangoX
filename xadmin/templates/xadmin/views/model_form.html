@@ -36,4 +36,12 @@
 
   {% block submit_buttons_bottom %}{% include "xadmin/includes/submit_line.html" %}{% endblock %}
 </form>
+
+{% if change %}
+<form id="changelist-form" action="{% url opts|admin_urlname:'changelist' %}" method="post">{% csrf_token %}
+    <input name="_selected_action" type="hidden" value="{{ original.pk }}" />
+    {% view_block 'results_bottom' %}
+</form>
+{% endif %}
+
 {% endblock %}

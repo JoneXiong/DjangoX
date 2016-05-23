@@ -32,6 +32,10 @@ class BaseActionView(ModelAdminView):
     def init_action(self, list_view):
         self.list_view = list_view
         self.admin_site = list_view.admin_site
+        
+    def get_redirect_url(self):
+        action_return_url = self.request.META['HTTP_REFERER']
+        return action_return_url
 
     def action(self, queryset):
         pass
@@ -115,6 +119,10 @@ class FormAction(Action):
     @filter_hook
     def instance_forms(self):
         self.form_obj = self.view_form(**self.get_form_datas())
+        
+    def get_redirect_url(self):
+        action_return_url = self.request.POST.get('_action_return_url')
+        return action_return_url
 
     def action(self, queryset):
         pass
@@ -145,7 +153,8 @@ class FormAction(Action):
             "opts": self.opts,
             "app_label": self.app_label,
             'action_checkbox_name': ACTION_CHECKBOX_NAME,
-            'action_name': 'act_'+ self.__class__.__bases__ [1].__name__
+            'action_name': 'act_'+ self.__class__.__bases__ [1].__name__,
+            'return_url': self.request.POST.get('_action_return_url') if '_action_return_url' in self.request.POST else self.request.META['HTTP_REFERER']
         })
         
         return TemplateResponse(self.request, self.form_template, context, current_app=self.admin_site.name)

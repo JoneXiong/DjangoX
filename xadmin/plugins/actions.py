@@ -19,6 +19,7 @@ from xadmin.defs import ACTION_CHECKBOX_NAME
 from xadmin.views.action import BaseActionView
 from xadmin.views.action_delete import DeleteSelectedAction
 from xadmin.views.grid import BaseGrid
+from xadmin.views import UpdateAdminView
 
 checkbox_form_field = forms.CheckboxInput({'class': 'action-select'}, lambda value: False)
 
@@ -118,12 +119,13 @@ class ActionPlugin(BaseAdminPlugin):
                     if isinstance(ret, HttpResponse):
                         return ret
                     else:
-                        return HttpResponseRedirect(request.get_full_path())
+                        return HttpResponseRedirect(self.action_view.get_redirect_url())
         return response
 
     def _response_action(self, ac, queryset):
         if isinstance(ac, type) and issubclass(ac, BaseActionView):
             action_view = self.get_model_view(ac, self.admin_view.model)
+            self.action_view = action_view
             action_view.init_action(self.admin_view)
             return action_view.do_action(queryset)
         else:
@@ -137,7 +139,7 @@ class ActionPlugin(BaseAdminPlugin):
         
         if self.actions is None:
             return SortedDict()
-        if self.model:
+        if self.model and self.admin_view.grid:
             actions = [self._get_action(action) for action in [DeleteSelectedAction] ]
         else:
             actions = []
@@ -199,8 +201,10 @@ class ActionPlugin(BaseAdminPlugin):
 
     def block_results_bottom(self, context, nodes):
         if self.admin_view.result_count:
-            nodes.append(loader.render_to_string('xadmin/blocks/grid.results_bottom.actions.html', context_instance=context))
+            _tpl = 'xadmin/blocks/grid.results_bottom.actions.html' if self.admin_view.grid else 'xadmin/blocks/form.results_bottom.actions.html'
+            nodes.append(loader.render_to_string(_tpl, context_instance=context))
 
 
 site.register_plugin(ActionPlugin, ListAdminView)
 site.register_plugin(ActionPlugin, GridPage)
+site.register_plugin(ActionPlugin, UpdateAdminView)

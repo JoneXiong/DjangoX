@@ -114,6 +114,8 @@ class ModelFormAdminView(ModelAdminView):
     
     fields = None    #: (list,tuple) 默认显示的字段
     
+    grid = False
+    
     """
     页面 Form 的 Layout 对象，是一个标准的 Crispy Form Layout 对象。使用 Layout 可以方便的定义整个 Form 页面的结构。
     有关 Crispy Form 可以参考其文档 `Crispy Form 文档 <http://django-crispy-forms.readthedocs.org/en/latest/layouts.html>`_
@@ -645,6 +647,8 @@ class UpdateAdminView(ModelFormAdminView):
     """
     
     log = False
+    result_count = 1
+    result_list = []
     
     def init_request(self, object_id, *args, **kwargs):
         self.org_obj = self.get_object(unquote(object_id))
@@ -682,6 +686,7 @@ class UpdateAdminView(ModelFormAdminView):
         new_context = {
             'title': _('Change %s') % force_unicode(self.org_obj),
             'object_id': str(self.org_obj.pk),
+            'cl': self
         }
         context = super(UpdateAdminView, self).get_context()
         context.update(new_context)

@@ -17,7 +17,7 @@
 确定{{ title }} ({{count}})？{% endblock %}
 
 {% block content %}
-<form class="exform" {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="" method="post" id="{{ opts.module_name }}_form">{% csrf_token %}
+<form class="exform" {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="" method="post" id="{{ opts.module_name }}_form">
   {% block form_top %}{% endblock %}
   {% view_block 'form_top' %}
 
@@ -34,6 +34,7 @@
   {% endfor %}
   <input type="hidden" name="action" value="{{action_name}}" />
   <input type="hidden" name="post" value="yes" />
+  <input type="hidden" name="_action_return_url" value="{{ return_url }}" />
   
   {% view_block 'before_fieldsets' %}
 
