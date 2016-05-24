@@ -12,7 +12,7 @@ class PageView(CommAdminView):
     
     app_label = 'xadmin'
     menu_group = '_default_group'
-    icon = 'fa fa-plus'
+    icon = 'fa fa-cog'
     order = 0
     
     hidden_menu = False
