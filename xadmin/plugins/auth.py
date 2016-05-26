@@ -148,6 +148,9 @@ class PermissionAdmin(object):
     list_filter = ('name', 'codename', 'content_type')
     app_label = 'xadmin'
     menu_group = 'auth_group'
+    style_fields = {
+                    'content_type': 'fk_select'
+                    }
 
 site.register(Group, GroupAdmin)
 site.register(User, UserAdmin)
