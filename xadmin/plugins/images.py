@@ -1,7 +1,10 @@
+import urlparse
+
 from django.db import models
 from django import forms
 from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
+from django.conf import settings
 from xadmin.sites import site
 from xadmin.views import BaseAdminPlugin, ModelFormAdminView, DetailAdminView, ListAdminView
 
@@ -45,9 +48,14 @@ class AdminImageWidget(forms.FileInput):
     def render(self, name, value, attrs=None):
         output = []
         if value and hasattr(value, "url"):
+            db_value = str(value)
+            if db_value.startswith('/'):
+                file_path = urlparse.urljoin(settings.REMOTE_MEDIA_URL, db_value)
+            else:
+                file_path = value.url
             label = self.attrs.get('label', name)
             output.append('<a href="%s" target="_blank" title="%s" data-gallery="gallery"><img src="%s" class="field_img"/></a><br/>%s ' %
-                         (value.url, label, value.url, _('Change:')))
+                         (file_path, label, file_path, _('Change:')))
         output.append(super(AdminImageWidget, self).render(name, value, attrs))
         return mark_safe(u''.join(output))
 
@@ -69,7 +77,12 @@ class ModelDetailPlugin(BaseAdminPlugin):
         if isinstance(result.field, models.ImageField):
             if result.value:
                 img = getattr(result.obj, field_name)
-                result.text = mark_safe('<a href="%s" target="_blank" title="%s" data-gallery="gallery"><img src="%s" class="field_img"/></a>' % (img.url, result.label, img.url))
+                db_value = str(img)
+                if db_value.startswith('/'):
+                    file_path = urlparse.urljoin(settings.REMOTE_MEDIA_URL, db_value)
+                else:
+                    file_path = img.url
+                result.text = mark_safe('<a href="%s" target="_blank" title="%s" data-gallery="gallery"><img src="%s" class="field_img"/></a>' % (file_path, result.label, file_path))
                 self.include_image = True
         return result
 
