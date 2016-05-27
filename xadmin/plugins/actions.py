@@ -43,6 +43,7 @@ class ActionPlugin(BaseAdminPlugin):
     actions = []
     can_select_all = False
     can_select = True
+    can_delete_multi = False
     
 
     def init_request(self, *args, **kwargs):
@@ -139,7 +140,7 @@ class ActionPlugin(BaseAdminPlugin):
         
         if self.actions is None:
             return SortedDict()
-        if self.model and self.admin_view.grid:
+        if self.model and self.admin_view.grid and self.can_delete_multi:
             actions = [self._get_action(action) for action in [DeleteSelectedAction] ]
         else:
             actions = []
