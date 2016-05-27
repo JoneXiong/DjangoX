@@ -112,6 +112,24 @@ class ModelListPlugin(BaseAdminPlugin):
 
     def init_request(self, *args, **kwargs):
         return bool(self.list_gallery)
+    
+    def result_item(self, item, obj, field_name, row):
+        opts = obj._meta
+        try:
+            f = opts.get_field(field_name)
+        except models.FieldDoesNotExist:
+            f = None
+        if f:
+            if isinstance(f, models.ImageField):
+                img = getattr(obj, field_name)
+                if img:
+                    db_value = str(img)
+                    if db_value.startswith('/'):
+                        file_path = urlparse.urljoin(settings.REMOTE_MEDIA_URL, db_value)
+                    else:
+                        file_path = img.url
+                    item.text = mark_safe('<a href="%s" target="_blank" data-gallery="gallery"><img src="%s" class="field_img"/></a>' % (file_path, file_path))
+        return item
 
     # Media
     def get_media(self, media):
