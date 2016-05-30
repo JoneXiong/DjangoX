@@ -47,7 +47,7 @@ class AdminImageWidget(forms.FileInput):
 
     def render(self, name, value, attrs=None):
         output = []
-        if value and hasattr(value, "url"):
+        if value:
             db_value = str(value)
             if db_value.startswith('/'):
                 file_path = urlparse.urljoin(settings.REMOTE_MEDIA_URL, db_value)
