@@ -128,6 +128,8 @@ class ModelListPlugin(BaseAdminPlugin):
                         file_path = urlparse.urljoin(settings.REMOTE_MEDIA_URL, db_value)
                     else:
                         file_path = img.url
+                    if type(self.list_gallery)==str:
+                        file_path = '%s%s'%(file_path,self.list_gallery)
                     item.text = mark_safe('<a href="%s" target="_blank" data-gallery="gallery"><img src="%s" class="field_img"/></a>' % (file_path, file_path))
         return item
 
