@@ -224,8 +224,6 @@ class FormView(CommAdminView):
             '''
             return HttpResponse(mark_safe(js_str))
         else:
-            if self._has_file_field:
-                return self.request.get_full_path()
             return self.get_redirect_url()
 
     @filter_hook

@@ -13,6 +13,8 @@ class FormPage(FormView,PageView):
     
     @filter_hook
     def get_redirect_url(self):
+        if self._has_file_field:
+            return self.request.get_full_path()
         return self.get_response()
 
     @classmethod  
