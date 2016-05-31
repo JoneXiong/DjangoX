@@ -35,6 +35,8 @@ class FormView(CommAdminView):
     pop = False
     #弃用
     title = None
+    
+    _has_file_field = False
 
     def init_request(self, *args, **kwargs):
         # comm method for both get and post
@@ -58,6 +60,12 @@ class FormView(CommAdminView):
         helper = self.get_form_helper()
         if helper:
             self.form_obj.helper = helper
+        self.check_fields()
+            
+    def check_fields(self):
+        for name, field in self.form_obj.fields.items():
+            if isinstance(field,forms.FileField):
+                self._has_file_field = True
 
     @filter_hook
     def valid_forms(self):
@@ -157,6 +165,7 @@ class FormView(CommAdminView):
             'title': self.verbose_name or self.title,
             'nav_buttons': mark_safe(' '.join(self.get_nav_btns()) ),
             'errors': self.get_error_list(),
+            'has_file_field': self._has_file_field,
         })
         return context
     
@@ -197,6 +206,8 @@ class FormView(CommAdminView):
         self.message_user(msg, 'success')
         
         if "_continue" in request.REQUEST:
+            if self._has_file_field:
+                return self.request.get_full_path()
             return self.get_response()
         elif "_redirect" in request.REQUEST:
             return request.REQUEST["_redirect"]
@@ -213,6 +224,8 @@ class FormView(CommAdminView):
             '''
             return HttpResponse(mark_safe(js_str))
         else:
+            if self._has_file_field:
+                return self.request.get_full_path()
             return self.get_redirect_url()
 
     @filter_hook
