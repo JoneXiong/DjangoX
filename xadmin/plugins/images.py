@@ -51,8 +51,10 @@ class AdminImageWidget(forms.FileInput):
             db_value = str(value)
             if db_value.startswith('/'):
                 file_path = urlparse.urljoin(settings.REMOTE_MEDIA_URL, db_value)
-            else:
+            elif hasattr(value, "url"):
                 file_path = value.url
+            else:
+                file_path = ''
             label = self.attrs.get('label', name)
             output.append('<a href="%s" target="_blank" title="%s" data-gallery="gallery"><img src="%s" class="field_img"/></a><br/>%s ' %
                          (file_path, label, file_path, _('Change:')))
