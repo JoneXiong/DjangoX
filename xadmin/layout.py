@@ -1,3 +1,7 @@
+# coding=utf-8
+
+import math
+
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import *
 from crispy_forms.bootstrap import *
@@ -5,8 +9,6 @@ from crispy_forms.utils import render_field, flatatt
 
 from crispy_forms import layout
 from crispy_forms import bootstrap
-
-import math
 
 
 class Fieldset(layout.Fieldset):
