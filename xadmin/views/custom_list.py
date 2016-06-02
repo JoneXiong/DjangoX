@@ -184,10 +184,6 @@ class GridPage(BaseGrid,PageView):
         from django.utils.html import format_html
         return format_html(' class="for_multi_select" show="{0}" sid="{1}" ', show, id)
 
-    
-    def get_nav_btns(self):
-        return []
-
         
     # Block Views
 #     def block_results_bottom(self, context, nodes):

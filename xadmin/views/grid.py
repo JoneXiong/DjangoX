@@ -202,3 +202,7 @@ class BaseGrid(object):
     
     def get_model_fields(self):
         return []
+    
+    
+    def get_nav_btns(self):
+        return []

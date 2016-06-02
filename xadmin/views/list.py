@@ -252,7 +252,8 @@ class ListAdminView(BaseGrid,ModelPage):
             'brand_icon': self.get_model_icon(self.model),
             'add_url': self.model_admin_url('add'),
             'result_headers': self.result_headers(),
-            'results': self.results()
+            'results': self.results(),
+            'nav_buttons': mark_safe(' '.join(self.get_nav_btns()) ),
         }
         context = super(ListAdminView, self).get_context()
         context.update(new_context)
