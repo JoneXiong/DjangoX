@@ -14,9 +14,8 @@ from django.utils.encoding import force_text,force_unicode
 from django.forms.util import flatatt
 from django.template import loader
 
-from util import vendor
-import defs
-
+from ..util import vendor
+from .. import defs
 
 def url_params_from_lookup_dict(lookups):
     """
