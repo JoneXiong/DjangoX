@@ -1,13 +1,35 @@
 # coding=utf-8
 
+from django.conf import settings
+from django.utils.importlib import import_module
+from django.utils.module_loading import module_has_submodule
+
 from xadmin.sites import site
 
+
+def register_builtin_views(site):
+    from xadmin import views
+    site.register_view(r'^$', views.IndexView, name='index')
+    site.register_view(r'^login/$', views.LoginView, name='login')
+    site.register_view(r'^logout/$', views.LogoutView, name='logout')
+    site.register_view(r'^settings/user$', views.UserSettingView, name='user_settings')
+
+    site.register_modelview(r'^$', views.ListAdminView, name='%s_%s_changelist')
+    site.register_modelview(r'^add/$', views.CreateAdminView, name='%s_%s_add')
+    site.register_modelview(r'^(.+)/delete/$', views.DeleteAdminView, name='%s_%s_delete')
+    site.register_modelview(r'^(.+)/update/$', views.UpdateAdminView, name='%s_%s_change')
+    site.register_modelview(r'^(.+)/detail/$', views.DetailAdminView, name='%s_%s_detail')
+    site.register_modelview(r'^(.+)/dashboard/$', views.ModelDashboard, name='%s_%s_dashboard')
+
+    site.set_loginview(views.LoginView)
+    
+def register_builtin_plugins(site):
+    from xadmin.plugins import PLUGINS
+
+    exclude_plugins = getattr(settings, 'XADMIN_EXCLUDE_PLUGINS', [])
+    [import_module('xadmin.plugins.%s' % plugin) for plugin in PLUGINS if plugin not in exclude_plugins]
+
 def autodiscover():
-
-    from django.conf import settings
-    from django.utils.importlib import import_module
-    from django.utils.module_loading import module_has_submodule
-
     # 为 crispy_form 动态设置的settings项
     setattr(settings, 'CRISPY_TEMPLATE_PACK', 'bootstrap3')
     setattr(settings, 'CRISPY_CLASS_CONVERTERS', {
@@ -16,11 +38,9 @@ def autodiscover():
         "passwordinput": "textinput textInput form-control",
     })
     # 加载内置相关视图
-    from xadmin.views import register_builtin_views
     register_builtin_views(site)
 
     # 加载插件
-    from xadmin.plugins import register_builtin_plugins
     register_builtin_plugins(site)
 
     # 加载各app的 adminx
