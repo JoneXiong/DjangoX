@@ -18,6 +18,10 @@ class BaseGrid(object):
     
     grid = True
     
+    # 内部成员，不用于配置
+    result_count = None # grid总条数
+    result_list = None # 当前页记录集
+    
     @property
     def _tpl(self):
         return self.template

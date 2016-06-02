@@ -41,9 +41,6 @@ class GridPage(BaseGrid,PageView):
     paginator_class = RpcPaginator    #: 分页类
     queryset_class = Collection
     
-    result_count = 3
-    result_list = [1,2,3,4,5]
-    
     actions = []
 
     list_display = ('__str__',)    #: 默认显示列
@@ -58,14 +55,6 @@ class GridPage(BaseGrid,PageView):
 
     opts = None
     ordering = None
-    
-#    brand_icon
-#    brand_name
-#    
-#    model_fields
-#    
-#    results
-#    result_headers
 
     @filter_hook
     def get_list_display(self):
