@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-import django
+
+import datetime
+import decimal
+
 from django.db import models
 from django.db.models.sql.query import LOOKUP_SEP
 from django.db.models.deletion import Collector
@@ -15,8 +18,7 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.forms import Media
 from django.utils.translation import get_language
-import datetime
-import decimal
+
 
 if 'django.contrib.staticfiles' in settings.INSTALLED_APPS:
     from django.contrib.staticfiles.templatetags.staticfiles import static
