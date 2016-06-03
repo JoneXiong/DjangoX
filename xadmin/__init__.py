@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-VERSION = [0,5,0]
+VERSION = [0,1,0]
 
 ROOT_PATH_NAME = ''
 EXPORT_MAX = 100000
