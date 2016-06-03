@@ -1,7 +1,7 @@
 # DjangoX
 A web GUI suite for Django ORM data or API data management
 
-依托于实际项目和生产环境互联网产品的总结积累，继承和扩展[Xadmin](https://github.com/sshwsfc/xadmin), DjangoX 努力做 Django 框架的优秀实践项目。
+依托于实际项目和生产环境互联网产品的总结积累，继承和扩展[Xadmin](https://github.com/sshwsfc/xadmin) ———— DjangoX 努力做 Django 框架的优秀实践项目。
 
 # 特性
 1. 经过生产环境大数据量的考验
