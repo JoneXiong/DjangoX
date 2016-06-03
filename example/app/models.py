@@ -137,6 +137,7 @@ class Host(models.Model):
 
 class MaintainLog(models.Model):
     host = models.ForeignKey(Host)
+    idc = models.ForeignKey(IDC)
     maintain_type = models.CharField(max_length=32)
     hard_type = models.CharField(max_length=16)
     time = models.DateTimeField()
@@ -213,3 +214,5 @@ class AccessRecord(models.Model):
 
     def __unicode__(self):
         return "%s Access Record" % self.date.strftime('%Y-%m-%d')
+
+from model import *

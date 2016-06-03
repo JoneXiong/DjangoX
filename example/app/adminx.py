@@ -13,6 +13,8 @@ from xadmin.plugins.actions import BaseActionView
 xadmin.site.site_title = 'My Title'
 xadmin.site.site_footer = 'My Footer'
 
+import admins
+
 class MainDashboard(object):
     widgets = [
         [
@@ -78,14 +80,14 @@ class IDCAdmin(ModelAdmin):
 
 
 class HostAdmin(object):
+    
     def open_web(self, instance):
         return "<a href='http://%s' target='_blank'>Open</a>" % instance.ip
     open_web.short_description = "Acts"
     open_web.allow_tags = True
     open_web.is_column = True
 
-    list_display = ('name', 'idc', 'guarantee_date', 'service_type',
-                    'status', 'open_web', 'description')
+    list_display = ('name', 'idc', 'guarantee_date', 'service_type', 'status', 'open_web', 'description')
     list_display_links = ('name',)
     
 
@@ -96,7 +98,7 @@ class HostAdmin(object):
     list_filter = ['id','idc', 'guarantee_date', 'status', 'brand', 'model',
                    'cpu', 'core_num', 'hard_disk', 'memory', ('service_type',xadmin.filters.MultiSelectFieldListFilter)]
     
-    list_quick_filter = ['service_type',{'field':'idc__name','limit':10}]
+    #list_quick_filter = ['service_type',{'field':'idc__name','limit':10}]
     list_bookmarks = [{'title': "Need Guarantee", 'query': {'status__exact': 2}, 'order': ('-guarantee_date',), 'cols': ('brand', 'guarantee_date', 'service_type')}]
 
     show_detail_fields = ('idc',)
@@ -192,9 +194,9 @@ class HostGroupAdmin(object):
 class MaintainLogAdmin(object):
     list_display = (
         'host', 'maintain_type', 'hard_type', 'time', 'operator', 'note')
-    list_display_links = ('host',)
-
-    list_filter = ['host', 'maintain_type', 'hard_type', 'time', 'operator']
+#     list_display_links = ('host',)
+# 
+#     list_filter = ['host', 'maintain_type', 'hard_type', 'time', 'operator']
     search_fields = ['note']
 
     form_layout = (
@@ -216,6 +218,7 @@ class MaintainLogAdmin(object):
             )
     )
     reversion_enable = True
+    log = True
 
 
 class AccessRecordAdmin(object):
@@ -278,6 +281,7 @@ xadmin.site.register_appindex(DemoIndex)
 
 class AuthIndex(AppDashboard):
     app_label = 'xadmin'
+    widget_customiz = False
 #     template = 'app_dashboard.html'
     
 xadmin.site.register_appindex(AuthIndex)

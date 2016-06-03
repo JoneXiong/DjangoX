@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-verbose_name = u'Demo'
+verbose_name = u'示例App'
 
 menus = (
-         ('test_group', u'测试页面', 'test_icon'),
+         ('test_group', u'Pages', 'test_icon'),
          )
