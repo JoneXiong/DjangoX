@@ -92,7 +92,7 @@ class RawIdWidget(forms.TextInput):
             attrs = {}
         extra = []
         if 1:#self.r_model in self.admin_view.admin_site._registry:
-            from views.page import GridPage
+            from xadmin.views.page import GridPage
             if issubclass(self.r_model, GridPage):
                 related_url = self.r_model.get_page_url()
             else:
@@ -239,7 +239,7 @@ class ForeignKeyPopupWidget(RawIdWidget):
 
     def label_for_value(self, value, name=None):
         key = self.t_name
-        from views.page import GridPage
+        from xadmin.views.page import GridPage
         if issubclass(self.r_model, GridPage):
             return self._render_label( name, self.r_model.queryset_class().verbose(value) )
         else:
