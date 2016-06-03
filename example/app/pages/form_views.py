@@ -1,11 +1,11 @@
 # coding=utf-8
 
 import xadmin
-from xadmin.views.form import FormAdminView
+from xadmin.views.form import FormView
 
 from form import TestForm
 
-class TestFormView(FormAdminView):
+class TestFormView(FormView):
     form = TestForm
     title = u'测试表单视图'
 

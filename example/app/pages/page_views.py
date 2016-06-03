@@ -5,7 +5,7 @@ import xadmin
 from xadmin.views.page import PageView
 
 class TestPage1(PageView):
-    verbose_name = u'测试PageView1'
+    verbose_name = u'PageView1(基本)'
     app_label = 'app'
     menu_group = 'test_group'
 
@@ -16,7 +16,7 @@ xadmin.site.register_page(TestPage1)
 
 
 class TestPage2(PageView):
-    verbose_name = u'测试PageView2'
+    verbose_name = u'PageView2(带ajax页链接)'
     app_label = 'app'
     menu_group = 'test_group'
     
@@ -25,11 +25,11 @@ class TestPage2(PageView):
         return media
     
     def get_content(self):
-        return mark_safe('<a data-refresh-url="/page/testpage1/" href="/test_form" class="ajaxform-handler" title="测试AjaxForm">GO</a>') 
+        return mark_safe('<a data-refresh-url="/xadmin/page/testpage2/" href="/xadmin/page/formpage1" class="ajaxform-handler" title="测试AjaxForm">GO</a>') 
 xadmin.site.register_page(TestPage2)
 
 class TestPage3(PageView):
-    verbose_name = u'bootstrap练习'
+    verbose_name = u'PageView3(bootstrap常用)'
     app_label = 'app'
     menu_group = 'test_group'
     template = 'bootstrap.html'

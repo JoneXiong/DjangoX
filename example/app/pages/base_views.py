@@ -19,7 +19,7 @@ xadmin.site.register_view(r'^test_img$', TestImg, name='TestImg')
 
 class TestImgRedirect(BaseView):
     def get(self, request, *args, **kwargs):
-        return HttpResponseRedirect('http://meilapp.qiniucdn.com/FnBqr6pIt1pdXJyxcNPwH2WdmSO7')
+        return HttpResponseRedirect('http://xxx.qiniucdn.com/FnBqr6pIt1pdXJyxcNPwH2WdmSO7')
 
 xadmin.site.register_view(r'^abc.jpg$', TestImgRedirect, name='TestImgRedirect')
 

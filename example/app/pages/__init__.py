@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import base_view
-import form_view
-import model_view
-import page_view
-import form_page
-import grid_page
+import base_views
+#import form_views
+import model_views
+import page_views
+import form_pages
+import form_actions
+import grid_pages
