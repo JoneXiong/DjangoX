@@ -37,6 +37,7 @@ class FormView(CommAdminView):
     title = None
     
     _has_file_field = False
+    perm = None
 
     def init_request(self, *args, **kwargs):
         # comm method for both get and post
