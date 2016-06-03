@@ -9,6 +9,13 @@ A web GUI suite for Django ORM data or API data management
 3. 继承xadmin的强大的功能，将xadmin的内部能力API化
 4. 扩展xadmin并持续维护，使xadmin不仅能管理 Django ORM 数据还能对接外部非模型数据（如：REST API）
 
+# Screenshots
+![info](https://github.com/JoneXiong/DjangoX/raw/master/example/app/static/app/img/show1.png)
+
+![info](https://github.com/JoneXiong/DjangoX/raw/master/example/app/static/app/img/show2.png)
+
+![info](https://github.com/JoneXiong/DjangoX/raw/master/example/app/static/app/img/show3.png)
+
 # Document
 [示例启动脚本简析](http://www.oejia.net/blog/2016/01/25/djangox_start_py.html)
 
