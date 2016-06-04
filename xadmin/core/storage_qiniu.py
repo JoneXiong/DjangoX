@@ -1,5 +1,5 @@
 # coding=utf-8
-import Image, StringIO
+import StringIO
 import os
 import datetime
 import six
@@ -14,15 +14,18 @@ from django.core.files.storage import Storage
 from django.core.exceptions import SuspiciousOperation
 from django.conf import settings
 
-import qiniu    # for v6.1.6
-from qiniu import resumable_io as rio
-from qiniu import rs as qiniu_rs
-
+try:
+    import qiniu    # for v6.1.6
+    from qiniu import resumable_io as rio
+    from qiniu import rs as qiniu_rs
+    
+    qiniu.conf.ACCESS_KEY = settings.QINIU_CONF['access_key']
+    qiniu.conf.SECRET_KEY = settings.QINIU_CONF['secret_key']
+    qiniu_bucket = settings.QINIU_CONF['bucket']
+except:
+    pass
 
 log = logging.getLogger('django.request')
-qiniu.conf.ACCESS_KEY = settings.QINIU_CONF['access_key']
-qiniu.conf.SECRET_KEY = settings.QINIU_CONF['secret_key']
-qiniu_bucket = settings.QINIU_CONF['bucket']
 
 def upload_by_rawdata(rawdata, length):
     
@@ -40,6 +43,7 @@ def upload_by_rawdata(rawdata, length):
 
 
 def save_imgs(imgs, ret_size=False):
+    import Image
     result = []
     for img in imgs:
         qiniu_key = upload_by_rawdata(img, len(img))
