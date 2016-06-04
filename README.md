@@ -22,6 +22,10 @@ cd example/
 ```
 windows下则直接双击运行 run.cmd
 
+3.浏览
+http://127.0.0.1:81/xadmin/
+登陆：admin admin
+
 # Screenshots
 ![info](https://github.com/JoneXiong/DjangoX/raw/master/example/app/static/app/img/show1.png)
 
