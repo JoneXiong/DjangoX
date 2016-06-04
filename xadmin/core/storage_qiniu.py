@@ -2,9 +2,12 @@
 import StringIO
 import os
 import datetime
-import six
 import posixpath
-from six.moves.urllib_parse import urljoin
+try:
+    import six
+    from six.moves.urllib_parse import urljoin
+except:
+    pass
 import urlparse
 import logging
 
