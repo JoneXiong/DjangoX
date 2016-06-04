@@ -10,12 +10,12 @@ A web GUI suite for Django ORM data or API data management
 4. 扩展xadmin并持续维护，使xadmin不仅能管理 Django ORM 数据还能对接外部非模型数据（如：REST API）
 
 # 使用
-1. 安装 django 和 crispy_forms 模块
+1.安装 django 和 crispy_forms 模块
 ```
 easy_install django
 easy_install django-crispy_forms
 ```
-2. 运行
+2.运行
 ```
 cd example/
 . run.sh 
