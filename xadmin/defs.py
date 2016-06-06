@@ -3,7 +3,7 @@
 from django.utils.translation import ugettext as _
 
 # 数据表格中的值为空时显示的值
-EMPTY_CHANGELIST_VALUE = _('Null')
+EMPTY_CHANGELIST_VALUE = 'Null'
 
 FILTER_PREFIX = '_p_'
 
