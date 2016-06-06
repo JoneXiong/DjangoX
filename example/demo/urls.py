@@ -4,7 +4,7 @@ from django.conf import settings
 # Uncomment the next two lines to enable the admin:
 import xadmin
 xadmin.ROOT_PATH_NAME = 'xadmin'
-settings.XADMIN_EXCLUDE_PLUGINS = ('bookmark', 'themes')
+settings.XADMIN_EXCLUDE_PLUGINS = ('bookmark',)
 xadmin.autodiscover()
 
 # from xadmin.plugins import xversion

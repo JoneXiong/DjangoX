@@ -184,10 +184,10 @@ LOGGING = {
 
 SESSION_SAVE_EVERY_REQUEST = False
 
-REMOTE_MEDIA_URL = 'xxxxxxxx'
+REMOTE_MEDIA_URL = 'http://meilatest.qiniudn.com'
 
 QINIU_CONF = {
-              'access_key': 'xxxxxx',
-              'secret_key': 'xxxxxx',
-              'bucket': 'xxxxxx'
+              'access_key': 'o7Lv8DXCvYOQLBsLl4zcZBj6epECrxOQu1JNcxd4',
+              'secret_key': 'nn7-tSEdEGKpo07GK0xuDI6TkgL3-PoUIEIboMx9',
+              'bucket': 'meilatest'
               }
