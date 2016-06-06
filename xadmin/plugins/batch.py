@@ -62,7 +62,7 @@ class ChangeFieldWidgetWrapper(forms.Widget):
 class BatchChangeAction(BaseActionView):
 
     action_name = "change_selected"
-    description = ugettext_lazy(
+    verbose_name = ugettext_lazy(
         u'Batch Change selected %(verbose_name_plural)s')
 
     batch_change_form_template = None
