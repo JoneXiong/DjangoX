@@ -12,10 +12,7 @@ from django.contrib.auth.models import Permission
 from dutils import JSONEncoder
 
 
-if django.VERSION[1] > 4:
-    AUTH_USER_MODEL = django.contrib.auth.get_user_model()
-else:
-    AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
+AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
 
 def add_view_permissions(sender, **kwargs):
