@@ -8,6 +8,7 @@ from django.db.models.base import ModelBase
 from django.views.decorators.cache import never_cache
 from django.utils.text import capfirst
 from django.core.urlresolvers import reverse
+
 from util import sortkeypicker
 from core.structs import SortedDict
 import defs

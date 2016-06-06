@@ -15,5 +15,4 @@ menus = (
          ('auth_group', u'权限',  'auth_icon'),
          )
 
-from xadmin.sites import site
 from .initialize import autodiscover

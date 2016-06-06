@@ -4,8 +4,6 @@ from django.conf import settings
 from django.utils.importlib import import_module
 from django.utils.module_loading import module_has_submodule
 
-from xadmin.sites import site
-
 
 def register_builtin_views(site):
     from xadmin import views
@@ -30,6 +28,11 @@ def register_builtin_plugins(site):
     [import_module('xadmin.plugins.%s' % plugin) for plugin in PLUGINS if plugin not in exclude_plugins]
 
 def autodiscover():
+    import xadmin
+    from xadmin.sites import site
+    
+    xadmin.site = site
+    
     # 为 crispy_form 动态设置的settings项
     setattr(settings, 'CRISPY_TEMPLATE_PACK', 'bootstrap3')
     setattr(settings, 'CRISPY_CLASS_CONVERTERS', {
