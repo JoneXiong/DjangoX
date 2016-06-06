@@ -43,7 +43,7 @@ class ActionPlugin(BaseAdminPlugin):
     actions = []
     can_select_all = False
     can_select = True
-    can_delete_multi = False
+    can_delete_multi = True
     
 
     def init_request(self, *args, **kwargs):
