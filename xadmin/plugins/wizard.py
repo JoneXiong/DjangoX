@@ -5,11 +5,12 @@ from django.template import loader
 from django.contrib.formtools.wizard.storage import get_storage
 from django.contrib.formtools.wizard.forms import ManagementForm
 from django.contrib.formtools.wizard.views import StepsHelper
-from django.utils.datastructures import SortedDict
 from django.forms import ValidationError
 from django.forms.models import modelform_factory
+
 from xadmin.sites import site
 from xadmin.views import BaseAdminPlugin, ModelFormAdminView
+from xadmin.core.structs import SortedDict
 
 
 def normalize_name(name):

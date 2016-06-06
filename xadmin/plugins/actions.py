@@ -5,7 +5,6 @@
 from django import forms
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
-from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_unicode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _, ungettext
@@ -20,6 +19,7 @@ from xadmin.views.action import BaseActionView
 from xadmin.views.action_delete import DeleteSelectedAction
 from xadmin.views.grid import BaseGrid
 from xadmin.views import UpdateAdminView
+from xadmin.core.structs import SortedDict
 
 checkbox_form_field = forms.CheckboxInput({'class': 'action-select'}, lambda value: False)
 

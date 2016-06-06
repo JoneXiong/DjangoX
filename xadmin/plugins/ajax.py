@@ -1,8 +1,9 @@
 from django import forms
-from django.utils.datastructures import SortedDict
 from django.utils.html import escape
 from django.utils.encoding import force_unicode
+
 from xadmin.sites import site
+from xadmin.core.structs import SortedDict
 from xadmin.views import BaseAdminPlugin, ListAdminView, ModelFormAdminView, DetailAdminView
 
 
@@ -59,6 +60,27 @@ class AjaxFormPlugin(BaseAjaxPlugin):
             'obj_repr': str(new_obj),
             'change_url': self.admin_view.model_admin_url('change', new_obj.pk),
             'detail_url': self.admin_view.model_admin_url('detail', new_obj.pk)
+        })
+
+    def get_response(self, __):
+        if self.request.method.lower() != 'post':
+            return __()
+
+        result = {}
+        form = self.admin_view.form_obj
+        if form.is_valid():
+            result['result'] = 'success'
+        else:
+            result['result'] = 'error'
+            result['errors'] = JsonErrorDict(form.errors, form).as_json()
+
+        return self.render_response(result)
+    
+class AjaxFormPagePlugin(BaseAjaxPlugin):
+
+    def post_response(self, __):
+        return self.render_response({
+            'result': 'success',
         })
 
     def get_response(self, __):
