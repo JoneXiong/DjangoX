@@ -11,7 +11,7 @@ class MyForm(forms.Form):
     account = forms.IntegerField(label=u'选择账户', required=True)
     charge_time = forms.DateField(label=u'支付时间', required=True, widget=xadmin.widgets.DateWidget)
     test = forms.MultipleChoiceField(choices=[('a','a'),('b','b')],help_text='按住Ctrl键多选')
-    test2 = MultiSelectFormField(choices=[('a','aaaa'),('b','bbbb'),('c','cccc'),('d','dddd')])
+    #test2 = MultiSelectFormField(choices=[('a','aaaa'),('b','bbbb'),('c','cccc'),('d','dddd')])
 
 
 class FormPage1(FormPage):
