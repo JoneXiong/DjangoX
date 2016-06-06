@@ -14,7 +14,7 @@ from django.utils.encoding import force_text,force_unicode
 try:
     from django.forms.util import flatatt
 except:
-    from django.forms.utisl import flatatt
+    from django.forms.utils import flatatt
 from django.template import loader
 
 from ..util import vendor
