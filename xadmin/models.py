@@ -34,7 +34,10 @@ def add_view_permissions(sender, **kwargs):
             #print "Added view permission for %s" % content_type.name
 
 # check for all our view permissions after a syncdb
-post_syncdb.connect(add_view_permissions)
+try:
+    post_syncdb.connect(add_view_permissions)
+except:
+    pass
 
 
 class Bookmark(models.Model):
