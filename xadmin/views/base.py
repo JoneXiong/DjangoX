@@ -368,20 +368,6 @@ class CommAdminView(BaseAdminView):
 
     base_template = 'xadmin/base_site.html'    #: View模板继承的基础模板
 
-    def get_site_menu(self):
-        """不建议使用
-        用于给子类复写的方法，开发者可以在子类或 OptionClass 中复写该方法，返回自己定义的网站菜单。菜单的格式为::
-
-            ({
-                "title": "菜单标题", 
-                "perm": "权限标示", 
-                "icon": "图标的 css class", 
-                "url": "菜单url", 
-                "menus": [...]    # 子菜单项
-            })
-        """
-        return None
-    
     def _check_menu_permission(self, item):
         need_perm = item.pop('perm', None)
         if need_perm is None:

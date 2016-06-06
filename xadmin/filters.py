@@ -37,7 +37,6 @@ class FieldFilterManager(object):
         for list_filter_class in self._field_list_filters:
             if not list_filter_class.test(field, request, params, model, admin_view, field_path):
                 continue
-            print 'use filter: ',field, list_filter_class
             return list_filter_class(field, request, params, model, admin_view, field_path=field_path)
 
 manager = FieldFilterManager()

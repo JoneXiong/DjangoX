@@ -60,8 +60,8 @@ class ThemePlugin(BaseAdminPlugin):
             else:
                 ex_themes = []
                 try:
-                    watch_themes = json.loads(urllib.urlopen(
-                        'http://api.bootswatch.com/3/').read())['themes']
+                    import requests
+                    watch_themes = json.loads( requests.get('http://api.bootswatch.com/3/').text )['themes']
                     ex_themes.extend([
                         {'name': t['name'], 'description': t['description'],
                             'css': t['cssMin'], 'thumbnail': t['thumbnail']}
