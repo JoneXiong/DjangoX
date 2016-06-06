@@ -13,7 +13,7 @@ A web GUI suite for Django ORM data or API data management
 1.安装 django 和 crispy_forms 模块
 ```
 easy_install django
-easy_install django-crispy_forms
+easy_install django-crispy_forms==1.4
 ```
 2.运行
 ```
