@@ -6,7 +6,6 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
-from django.db.models.signals import post_syncdb
 from django.contrib.auth.models import Permission
 
 from dutils import JSONEncoder
@@ -35,6 +34,7 @@ def add_view_permissions(sender, **kwargs):
 
 # check for all our view permissions after a syncdb
 try:
+    from django.db.models.signals import post_syncdb
     post_syncdb.connect(add_view_permissions)
 except:
     pass
