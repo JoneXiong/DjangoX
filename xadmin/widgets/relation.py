@@ -11,7 +11,10 @@ from django.utils.translation import ugettext as _
 from django.utils import six
 from django.utils import formats
 from django.utils.encoding import force_text,force_unicode
-from django.forms.util import flatatt
+try:
+    from django.forms.util import flatatt
+except:
+    from django.forms.utisl import flatatt
 from django.template import loader
 
 from ..util import vendor
