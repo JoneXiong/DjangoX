@@ -4,12 +4,12 @@ from django.utils.encoding import force_unicode
 from django.utils.encoding import smart_str
 from django.utils.safestring import mark_safe
 from django.db.models.sql.query import LOOKUP_SEP
-from django.db.models.related import RelatedObject
 from django.utils.translation import ugettext as _
 from django.db import models
 
 from xadmin.sites import site
 from xadmin.views import BaseAdminPlugin, ListAdminView, CreateAdminView, UpdateAdminView, DeleteAdminView
+from xadmin.dutils import RelatedObject
 
 RELATE_PREFIX = '_rel_'
 

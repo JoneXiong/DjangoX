@@ -3,9 +3,11 @@
 import datetime
 import decimal
 
+import django
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.encoding import smart_unicode
 from django.db.models.base import ModelBase
+from django.db.models.fields.related import RelatedField
 
 
 class JSONEncoder(DjangoJSONEncoder):
@@ -23,3 +25,9 @@ class JSONEncoder(DjangoJSONEncoder):
                 return super(JSONEncoder, self).default(o)
             except Exception:
                 return smart_unicode(o)
+            
+if django.VERSION[1] > 8:
+    RelatedObject = RelatedField
+else:
+    from django.db.models.related import RelatedObject
+    RelatedObject = RelatedObject

@@ -3,7 +3,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.db import models
 from django.db.models.query import QuerySet
-from django.db.models.related import RelatedObject
 from django.forms.models import model_to_dict
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
@@ -24,6 +23,7 @@ from xadmin.views.detail import DetailAdminUtil
 from reversion.models import Revision, Version
 from reversion.revisions import default_revision_manager, RegistrationError
 from functools import partial
+from xadmin.dutils import RelatedObject
 
 
 def _autoregister(admin, model, follow=None):

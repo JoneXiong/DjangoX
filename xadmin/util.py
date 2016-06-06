@@ -6,7 +6,6 @@ import decimal
 from django.db import models
 from django.db.models.sql.query import LOOKUP_SEP
 from django.db.models.deletion import Collector
-from django.db.models.related import RelatedObject
 from django.forms.forms import pretty_name
 from django.utils import formats
 from django.utils.html import escape
@@ -18,6 +17,8 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.forms import Media
 from django.utils.translation import get_language
+
+from xadmin.dutils import RelatedObject
 
 
 if 'django.contrib.staticfiles' in settings.INSTALLED_APPS:
