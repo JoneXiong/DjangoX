@@ -37,3 +37,19 @@ try:
 except:
     from django.apps import apps
     get_model = apps.get_model
+
+
+try:
+    from django.forms.util import flatatt
+except:
+    from django.forms.utils import flatatt
+    
+try:
+    from django.forms.util import ErrorDict
+except:
+    from django.forms.utils import ErrorDict
+    
+try:
+    from django.forms.util import ErrorList
+except:
+    from django.forms.utils import ErrorList

@@ -7,7 +7,6 @@ from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db import models
 from django.db.models.base import ModelBase
 from django.forms.forms import DeclarativeFieldsMetaclass
-from django.forms.util import flatatt
 from django.template import loader
 from django.http import Http404
 from django.template.context import RequestContext
@@ -42,7 +41,7 @@ class WidgetTypeSelect(forms.Widget):
             value = ''
         final_attrs = self.build_attrs(attrs, name=name)
         final_attrs['class'] = 'nav nav-pills nav-stacked'
-        output = [u'<ul%s>' % flatatt(final_attrs)]
+        output = [u'<ul%s>' % dutils.flatatt(final_attrs)]
         options = self.render_options(force_unicode(value), final_attrs['id'])
         if options:
             output.append(options)

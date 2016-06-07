@@ -20,6 +20,7 @@ from xadmin import widgets
 from xadmin.layout import FormHelper, Layout, Fieldset, TabHolder, Container, Column, Col, Field
 from xadmin.util import unquote
 from xadmin.views.detail import DetailAdminUtil
+from xadmin import dutils
 
 from base import filter_hook, csrf_protect_m
 from model_page import ModelAdminView
@@ -498,7 +499,7 @@ class ModelFormAdminView(ModelAdminView):
         """
         获取表单的错误信息列表。
         """
-        errors = forms.util.ErrorList()
+        errors = dutils.ErrorList()
         if self.form_obj.is_bound:
             errors.extend(self.form_obj.errors.values())
         return errors

@@ -5,6 +5,7 @@ from django.utils.encoding import force_unicode
 from xadmin.sites import site
 from xadmin.core.structs import SortedDict
 from xadmin.views import BaseAdminPlugin, ListAdminView, ModelFormAdminView, DetailAdminView
+from xadmin import dutils
 
 
 NON_FIELD_ERRORS = '__all__'
@@ -38,7 +39,7 @@ class AjaxListPlugin(BaseAjaxPlugin):
         return self.render_response({'headers': headers, 'objects': objects, 'total_count': av.result_count, 'has_more': av.has_more})
 
 
-class JsonErrorDict(forms.util.ErrorDict):
+class JsonErrorDict(dutils.ErrorDict):
 
     def __init__(self, errors, form):
         super(JsonErrorDict, self).__init__(errors)

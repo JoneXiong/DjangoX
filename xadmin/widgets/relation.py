@@ -11,12 +11,9 @@ from django.utils.translation import ugettext as _
 from django.utils import six
 from django.utils import formats
 from django.utils.encoding import force_text,force_unicode
-try:
-    from django.forms.util import flatatt
-except:
-    from django.forms.utils import flatatt
 from django.template import loader
 
+from xadmin import dutils
 from ..util import vendor
 from .. import defs
 
@@ -349,7 +346,7 @@ class SelectMultipleTransfer(forms.SelectMultiple):
             'verbose_name': self.verbose_name,
             'attrs': attrs,
             'field_id': attrs['id'],
-            'flatatts': flatatt(final_attrs),
+            'flatatts': dutils.flatatt(final_attrs),
             'available_options': u'\n'.join(available_output),
             'chosen_options': u'\n'.join(chosen_output),
         }
