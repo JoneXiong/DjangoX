@@ -1,6 +1,7 @@
 #coding:utf-8
 from django.template import Library
 from xadmin.util import static, vendor as util_vendor
+from django.utils.safestring import mark_safe
 
 register = Library()
 
@@ -24,7 +25,7 @@ def view_block(context, block_name, *args, **kwargs):
             if result and type(result) in (str, unicode):
                 nodes.append(result)
     if nodes:
-        return ''.join(nodes)
+        return mark_safe( ''.join(nodes) )
     else:
         return ""
 
