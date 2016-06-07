@@ -59,6 +59,7 @@ from xadmin.views.list import COL_LIST_VAR, ORDER_VAR
 from xadmin.views.dashboard import widget_manager, BaseWidget, PartialBaseWidget
 from xadmin.defs import FILTER_PREFIX, SEARCH_VAR
 from xadmin.plugins.relate import RELATE_PREFIX
+from xadmin import dutils
 
 from xadmin.models import Bookmark
 
@@ -168,7 +169,7 @@ class BookmarkPlugin(BaseAdminPlugin):
 class BookmarkView(ModelAdminView):
 
     @csrf_protect_m
-    @transaction.commit_on_success
+    @dutils.commit_on_success
     def post(self, request):
         model_info = (self.opts.app_label, self.opts.module_name)
         url_name = 'xadmin:%s_%s_changelist' % model_info

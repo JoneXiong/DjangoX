@@ -387,7 +387,7 @@ class ModelFormAdminView(ModelAdminView):
         return self.get_response()
 
     @csrf_protect_m
-    @transaction.commit_on_success
+    @dutils.commit_on_success
     @filter_hook
     def post(self, request, *args, **kwargs):
         """

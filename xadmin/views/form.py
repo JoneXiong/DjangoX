@@ -21,6 +21,7 @@ from xadmin.layout import FormHelper, Layout, Fieldset, TabHolder, Container, Co
 from xadmin.util import unquote
 from xadmin.views.detail import DetailAdminUtil
 from xadmin.plugins.ajax import JsonErrorDict
+from xadmin import dutils
 
 from base import CommAdminView, filter_hook, csrf_protect_m
 
@@ -124,7 +125,7 @@ class FormView(CommAdminView):
         return self.get_response()
 
     @csrf_protect_m
-    @transaction.commit_on_success
+    @dutils.commit_on_success
     @filter_hook
     def post(self, request, *args, **kwargs):
         self.instance_forms()

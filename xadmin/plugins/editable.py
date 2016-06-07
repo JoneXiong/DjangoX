@@ -41,6 +41,7 @@ from xadmin.views.base import csrf_protect_m, filter_hook
 from xadmin.views.edit import ModelFormAdminUtil
 from xadmin.defs import EMPTY_CHANGELIST_VALUE
 from xadmin.layout import FormHelper
+from xadmin import dutils
 
 
 class EditablePlugin(BaseAdminPlugin):
@@ -153,7 +154,7 @@ class EditPatchView(ModelFormAdminView, ListAdminView):
 
     @filter_hook
     @csrf_protect_m
-    @transaction.commit_on_success
+    @dutils.commit_on_success
     def post(self, request, object_id):
         model_fields = [f.name for f in self.opts.fields]
         fields = [f for f in request.POST.keys() if f in model_fields]

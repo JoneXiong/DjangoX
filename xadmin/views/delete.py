@@ -14,6 +14,7 @@ from xadmin.views.edit import UpdateAdminView
 from xadmin.views.detail import DetailAdminView
 from xadmin.views.base import filter_hook, csrf_protect_m
 from xadmin.views.model_page import ModelAdminView
+from xadmin import dutils
 
 class DeleteAdminView(ModelAdminView):
     """
@@ -49,7 +50,7 @@ class DeleteAdminView(ModelAdminView):
                                 self.get_template_list("views/model_delete_confirm.html"), context, current_app=self.admin_site.name)
 
     @csrf_protect_m
-    @transaction.commit_on_success
+    @dutils.commit_on_success
     @filter_hook
     def post(self, request, object_id):
         if self.perms_needed:

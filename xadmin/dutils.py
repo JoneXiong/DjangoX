@@ -53,3 +53,10 @@ try:
     from django.forms.util import ErrorList
 except:
     from django.forms.utils import ErrorList
+    
+try:
+    from django.db import transaction
+    commit_on_success = transaction.commit_on_success
+except:
+    from django.db import transaction
+    commit_on_success = transaction.atomic
