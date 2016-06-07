@@ -128,11 +128,17 @@ class BaseRelateDisplayPlugin(BaseAdminPlugin):
 
     def init_request(self, *args, **kwargs):
         self.relate_obj = None
-        for k, v in self.request.REQUEST.items():
+        for k, v in self.request.GET.items():
             if smart_str(k).startswith(RELATE_PREFIX):
                 self.relate_obj = RelateObject(
                     self.admin_view, smart_str(k)[len(RELATE_PREFIX):], v)
                 break
+        if self.relate_obj==None:
+            for k, v in self.request.POST.items():
+                if smart_str(k).startswith(RELATE_PREFIX):
+                    self.relate_obj = RelateObject(
+                        self.admin_view, smart_str(k)[len(RELATE_PREFIX):], v)
+                    break
         return bool(self.relate_obj)
 
     def _get_relate_params(self):

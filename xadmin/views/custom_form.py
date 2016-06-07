@@ -35,7 +35,7 @@ class FormAction(FormPage):
     @filter_hook
     def get_response(self):
         response = super(FormAction, self).get_response()
-        if "_continue" not in self.request.REQUEST:
+        if "_continue" not in self.param_list():
             action_return_url = self.request.META['HTTP_REFERER']
             response.set_cookie("_action_return_url", action_return_url)
         return response

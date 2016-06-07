@@ -590,14 +590,15 @@ class CreateAdminView(ModelFormAdminView):
         msg = _(
             'The %(name)s "%(obj)s" was added successfully.') % {'name': force_unicode(self.opts.verbose_name),
                                                                  'obj': "<a class='alert-link' href='%s'>%s</a>" % (self.model_admin_url('change', self.new_obj._get_pk_val()), force_unicode(self.new_obj))}
-
-        if "_continue" in request.REQUEST:
+        
+        param_list = self.param_list()
+        if "_continue" in param_list:
             self.message_user(
                 msg + ' ' + _("You may edit it again below."), 'success')
             # 继续编辑
             return self.model_admin_url('change', self.new_obj._get_pk_val())
 
-        if "_addanother" in request.REQUEST:
+        if "_addanother" in param_list:
             self.message_user(msg + ' ' + (_("You may add another %s below.") % force_unicode(self.opts.verbose_name)), 'success')
             # 返回添加页面添加另外一个
             return request.path
@@ -605,8 +606,8 @@ class CreateAdminView(ModelFormAdminView):
             self.message_user(msg, 'success')
 
             # 如果没有查看列表的权限就跳转到主页
-            if "_redirect" in request.REQUEST:
-                return request.REQUEST["_redirect"]
+            if "_redirect" in param_list:
+                return self.get_param('_redirect')
             elif self.has_view_permission():
                 if self.add_redirect_url:
                     return self.add_redirect_url%self.new_obj._get_pk_val()
@@ -714,7 +715,7 @@ class UpdateAdminView(ModelFormAdminView):
             context, current_app=self.admin_site.name)
 
     def post(self, request, *args, **kwargs):
-        if "_saveasnew" in self.request.REQUEST:
+        if "_saveasnew" in self.param_list():
             return self.get_model_view(CreateAdminView, self.model).post(request)
         return super(UpdateAdminView, self).post(request, *args, **kwargs)
 
@@ -732,20 +733,21 @@ class UpdateAdminView(ModelFormAdminView):
 
         msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name':
                                                                        force_unicode(verbose_name), 'obj': force_unicode(obj)}
-        if "_continue" in request.REQUEST:
+        param_list = self.param_list()
+        if "_continue" in param_list:
             self.message_user(
                 msg + ' ' + _("You may edit it again below."), 'success')
             # 返回原页面继续编辑
             return request.path
-        elif "_addanother" in request.REQUEST:
+        elif "_addanother" in param_list:
             self.message_user(msg + ' ' + (_("You may add another %s below.")
                               % force_unicode(verbose_name)), 'success')
             return self.model_admin_url('add')
         else:
             self.message_user(msg, 'success')
             # 如果没有查看列表的权限就跳转到主页
-            if "_redirect" in request.REQUEST:
-                return request.REQUEST["_redirect"]
+            if "_redirect" in param_list:
+                return self.get_param('_redirect')
             elif self.has_view_permission():
                 change_list_url = self.model_admin_url('changelist')
                 return change_list_url

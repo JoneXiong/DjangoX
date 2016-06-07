@@ -233,6 +233,16 @@ class BaseCommon(object):
             action_flag     = aciton_id,
             change_message  = msg
         )
+        
+    def get_param(self, k):
+        ret = self.request.GET.get('_ajax',None)
+        if ret:
+            return ret
+        else:
+            return self.request.POST.get('_ajax',None)
+        
+    def param_list(self):
+        return self.request.GET.keys() + self.request.POST.keys()
 
 
 class BaseAdminPlugin(BaseCommon):
@@ -259,7 +269,7 @@ class BaseAdminPlugin(BaseCommon):
         同时判断当前请求是否需要加载该插件，例如 Ajax插件的实现方式::
 
             def init_request(self, *args, **kwargs):
-                return bool(self.request.is_ajax() or self.request.REQUEST.get('_ajax'))
+                return bool(self.request.is_ajax() or '_ajax' in self.param_list() )
 
         当返回值为 ``False`` 时，所属的 AdminView 实例不会加载该插件
         """

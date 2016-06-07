@@ -201,18 +201,18 @@ class FormView(CommAdminView):
 
     @filter_hook
     def post_response(self):
-        request = self.request
 
         msg = _('操作成功')
         self.message_user(msg, 'success')
+        param_list = self.param_list()
         
-        if "_continue" in request.REQUEST:
+        if "_continue" in param_list:
             if self._has_file_field:
                 return self.request.get_full_path()
             return self.get_response()
-        elif "_redirect" in request.REQUEST:
-            return request.REQUEST["_redirect"]
-        elif '_pop' in request.REQUEST:
+        elif "_redirect" in param_list:
+            return self.get_param('_redirect')
+        elif '_pop' in param_list:
             js_str='''<!DOCTYPE html>
 <html lang="zh_CN">
 <head>
