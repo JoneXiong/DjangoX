@@ -265,7 +265,7 @@ class ModelFormAdminView(ModelAdminView):
             # 则使用 form 的 Meta.exclude
             exclude.extend(self.form._meta.exclude)
         # 如果 exclude 是空列表，那么就设为 None
-        exclude = exclude or None
+        #exclude = exclude or None
         defaults = {
             "form": self.form,
             "fields": self.fields and list(self.fields) or None,
