@@ -31,3 +31,9 @@ if django.VERSION[1] > 8:
 else:
     from django.db.models.related import RelatedObject
     RelatedObject = RelatedObject
+    
+try:
+    from django.db.models import get_model
+except:
+    from django.apps import apps
+    get_model = apps.get_model

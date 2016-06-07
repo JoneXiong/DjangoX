@@ -1,3 +1,6 @@
+# coding=utf-8
+import copy
+
 from django import forms
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse, NoReverseMatch
@@ -15,6 +18,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.utils.http import urlencode, urlquote
 from django.views.decorators.cache import never_cache
+
 from xadmin import widgets as exwidgets
 from xadmin.layout import FormHelper
 from xadmin.models import UserSettings, UserWidget
@@ -24,7 +28,7 @@ from xadmin.views.model_page import ModelAdminView
 from xadmin.views.edit import CreateAdminView
 from xadmin.views.list import ListAdminView
 from xadmin.util import unquote
-import copy
+from xadmin import dutils
 
 
 class WidgetTypeSelect(forms.Widget):
@@ -293,7 +297,7 @@ class ModelChoiceField(forms.ChoiceField):
         if isinstance(value, ModelBase):
             return value
         app_label, model_name = value.lower().split('.')
-        return models.get_model(app_label, model_name)
+        return dutils.get_model(app_label, model_name)
 
     def prepare_value(self, value):
         if isinstance(value, ModelBase):
@@ -376,7 +380,7 @@ class QuickBtnWidget(BaseWidget):
         if isinstance(model_or_label, ModelBase):
             return model_or_label
         else:
-            return models.get_model(*model_or_label.lower().split('.'))
+            return dutils.get_model(*model_or_label.lower().split('.'))
 
     def context(self, context):
         btns = []
