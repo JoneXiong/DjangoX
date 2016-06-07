@@ -15,4 +15,13 @@ menus = (
          ('auth_group', u'权限',  'auth_icon'),
          )
 
+# django patch
+import django
+if django.VERSION[1] > 7:
+    from django.db.models.options import Options
+    @property
+    def monkeypatch__options__model_name(self):
+        return self.model_name
+    Options.module_name = monkeypatch__options__model_name
+
 from .initialize import autodiscover
