@@ -217,7 +217,7 @@ class ListAdminView(BaseGrid,ModelPage):
         获取所有可供显示的列的信息
         '''
         model_fields = [(f, f.name in self.list_display, self.get_check_field_url(f))
-                        for f in (self.opts.fields + self.get_model_method_fields()) if f.name not in self.list_exclude]
+                        for f in (list(self.opts.fields) + self.get_model_method_fields()) if f.name not in self.list_exclude]
         return model_fields
 
     @filter_hook
@@ -238,7 +238,7 @@ class ListAdminView(BaseGrid,ModelPage):
 
         # 获取所有可供显示的列的信息
         model_fields = [(f, f.name in self.list_display, self.get_check_field_url(f))
-                        for f in (self.opts.fields + self.get_model_method_fields()) if f.name not in self.list_exclude]
+                        for f in (list(self.opts.fields) + self.get_model_method_fields()) if f.name not in self.list_exclude]
 
         new_context = {
             'module_name': force_unicode(self.opts.verbose_name_plural),
