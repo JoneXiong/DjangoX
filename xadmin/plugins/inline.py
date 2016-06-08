@@ -270,7 +270,7 @@ class InlineModelAdmin(ModelFormAdminView):
         if self.opts.auto_created:
             return self.has_change_permission()
         return self.user.has_perm(
-            self.opts.app_label + '.' + self.opts.get_add_permission())
+            self.opts.app_label + '.add_' + self.opts.object_name.lower())
 
     def has_change_permission(self):
         opts = self.opts
@@ -280,13 +280,13 @@ class InlineModelAdmin(ModelFormAdminView):
                     opts = field.rel.to._meta
                     break
         return self.user.has_perm(
-            opts.app_label + '.' + opts.get_change_permission())
+            opts.app_label + '.change_' + opts.object_name.lower())
 
     def has_delete_permission(self):
         if self.opts.auto_created:
             return self.has_change_permission()
         return self.user.has_perm(
-            self.opts.app_label + '.' + self.opts.get_delete_permission())
+            self.opts.app_label + '.delete_' + self.opts.object_name.lower())
 
 
 class GenericInlineModelAdmin(InlineModelAdmin):
