@@ -1,10 +1,14 @@
+import django 
 from django.conf.urls import patterns, include, url
 from django.conf import settings
 
 # Uncomment the next two lines to enable the admin:
 import xadmin
 xadmin.ROOT_PATH_NAME = 'xadmin'
-settings.XADMIN_EXCLUDE_PLUGINS = ('bookmark',)
+settings.XADMIN_EXCLUDE_PLUGINS = ['bookmark']
+if django.VERSION[1] > 8:
+    settings.XADMIN_EXCLUDE_PLUGINS.append('wizard')
+
 xadmin.autodiscover()
 
 # from xadmin.plugins import xversion
