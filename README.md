@@ -16,9 +16,9 @@ easy_install django
 easy_install django-crispy_forms
 ```
 推荐组合
-django1.7及以下 + django-crispy_forms==1.4
-django==1.8 + django-crispy_forms==1.5
-django==1.9 + django-crispy_forms==1.6
+- django1.7及以下 + django-crispy_forms==1.4
+- django==1.8 + django-crispy_forms==1.5
+- django==1.9 + django-crispy_forms==1.6
 
 2.运行
 ```
