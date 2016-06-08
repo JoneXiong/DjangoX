@@ -1,17 +1,23 @@
+# -*- coding: utf-8 -*-
 import copy
 import inspect
+
 from django import forms
 from django.forms.formsets import all_valid, DELETION_FIELD_NAME
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
-from django.contrib.contenttypes.generic import BaseGenericInlineFormSet, generic_inlineformset_factory
 from django.template import loader
 from django.template.loader import render_to_string
+
 from xadmin.layout import FormHelper, Layout, flatatt, Container, Column, Field, Fieldset
 from xadmin.sites import site
 from xadmin.views import BaseAdminPlugin, ModelFormAdminView, DetailAdminView, filter_hook
+from xadmin import dutils
 
 
 class ShowField(Field):
+    u'''
+    只读显示字段
+    '''
     template = "xadmin/layout/field_value.html"
 
     def __init__(self, admin_view, *args, **kwargs):
@@ -32,7 +38,9 @@ class ShowField(Field):
 
 
 class DeleteField(Field):
-
+    u'''
+    用于删除控制的字段
+    '''
     def render(self, form, form_style, context):
         if form.instance.pk:
             self.attrs['type'] = 'hidden'
@@ -42,6 +50,9 @@ class DeleteField(Field):
 
 
 class TDField(Field):
+    u'''
+    用于以表格显示的字段
+    '''
     template = "xadmin/layout/td-field.html"
 
 
@@ -108,6 +119,9 @@ style_manager.register_style("table", TableInlineStyle)
 
 
 def replace_field_to_value(layout, av):
+    u'''
+    用于将字段显示为只读值
+    '''
     if layout:
         for i, lo in enumerate(layout.fields):
             if isinstance(lo, Field) or issubclass(lo.__class__, Field):
@@ -119,7 +133,9 @@ def replace_field_to_value(layout, av):
 
 
 class InlineModelAdmin(ModelFormAdminView):
-
+    u'''
+    Inline表单页基类
+    '''
     fk_name = None
     formset = BaseInlineFormSet
     extra = 3
@@ -139,7 +155,7 @@ class InlineModelAdmin(ModelFormAdminView):
 
     @filter_hook
     def get_formset(self, **kwargs):
-        """Returns a BaseInlineFormSet class for use in admin add/change views."""
+        """返回 BaseInlineFormSet 类"""
         if self.exclude is None:
             exclude = []
         else:
@@ -151,7 +167,7 @@ class InlineModelAdmin(ModelFormAdminView):
             exclude.extend(self.form._meta.exclude)
         # if exclude is an empty list we use None, since that's the actual
         # default
-        exclude = exclude or None
+        #exclude = exclude or None
         can_delete = self.can_delete and self.has_delete_permission()
         defaults = {
             "form": self.form,
@@ -168,6 +184,9 @@ class InlineModelAdmin(ModelFormAdminView):
 
     @filter_hook
     def instance_form(self, **kwargs):
+        u'''
+        返回formset对象实例
+        '''
         formset = self.get_formset(**kwargs)
         attrs = {
             'instance': self.model_instance,
@@ -274,7 +293,7 @@ class GenericInlineModelAdmin(InlineModelAdmin):
     ct_field = "content_type"
     ct_fk_field = "object_id"
 
-    formset = BaseGenericInlineFormSet
+    formset = dutils.BaseGenericInlineFormSet
 
     def get_formset(self, **kwargs):
         if self.exclude is None:
@@ -286,7 +305,7 @@ class GenericInlineModelAdmin(InlineModelAdmin):
             # Take the custom ModelForm's Meta.exclude into account only if the
             # GenericInlineModelAdmin doesn't define its own.
             exclude.extend(self.form._meta.exclude)
-        exclude = exclude or None
+        #exclude = exclude or None
         can_delete = self.can_delete and self.has_delete_permission()
         defaults = {
             "ct_field": self.ct_field,
@@ -301,7 +320,7 @@ class GenericInlineModelAdmin(InlineModelAdmin):
             "exclude": exclude
         }
         defaults.update(kwargs)
-        return generic_inlineformset_factory(self.model, **defaults)
+        return dutils.generic_inlineformset_factory(self.model, **defaults)
 
 
 class InlineFormset(Fieldset):
@@ -362,6 +381,9 @@ class InlineFormsetPlugin(BaseAdminPlugin):
 
     @property
     def inline_instances(self):
+        u'''
+        得到 所有inline实例
+        '''
         if not hasattr(self, '_inline_instances'):
             inline_instances = []
             for inline_class in self.inlines:
@@ -380,6 +402,9 @@ class InlineFormsetPlugin(BaseAdminPlugin):
         return self._inline_instances
 
     def instance_forms(self, ret):
+        u'''
+        得到 所有 formsets 实例    ################### 入口
+        '''
         self.formsets = []
         for inline in self.inline_instances:
             if inline.has_change_permission():

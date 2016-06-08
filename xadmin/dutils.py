@@ -67,3 +67,8 @@ except:
     def get_cache(k):
         from django.core.cache import caches
         return caches[k]
+    
+try:
+    from django.contrib.contenttypes.generic import BaseGenericInlineFormSet, generic_inlineformset_factory
+except:
+    from django.contrib.contenttypes.forms import BaseGenericInlineFormSet, generic_inlineformset_factory
