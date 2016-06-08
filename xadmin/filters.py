@@ -11,11 +11,10 @@ from django.template.context import Context
 from django.utils.safestring import mark_safe
 from django.utils.html import escape,format_html
 from django.utils.text import Truncator
-from django.core.cache import cache, get_cache
 
 from xadmin.defs import EMPTY_CHANGELIST_VALUE
 from xadmin.defs import FILTER_PREFIX, SEARCH_VAR
-from xadmin.dutils import RelatedObject
+from xadmin.dutils import RelatedObject, get_cache
 
 from util import get_model_from_relation, reverse_field_path, get_limit_choices_to_from_path, prepare_lookup_value
 

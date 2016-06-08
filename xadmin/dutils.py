@@ -60,3 +60,10 @@ try:
 except:
     from django.db import transaction
     commit_on_success = transaction.atomic
+    
+try:
+    from django.core.cache import get_cache
+except:
+    def get_cache(k):
+        from django.core.cache import caches
+        return caches[k]
