@@ -107,10 +107,14 @@ def lookup_needs_distinct(opts, lookup_path):
     """
     field_name = lookup_path.split('__', 1)[0]
     field = opts.get_field_by_name(field_name)[0]
+    if hasattr(field,'field'):
+        _field = field.field
+    else:
+        _field = field
     if ((hasattr(field, 'rel') and
          isinstance(field.rel, models.ManyToManyRel)) or
         (isinstance(field, RelatedObject) and
-         not field.field.unique)):
+         not _field.unique)):
         return True
     return False
 

@@ -516,11 +516,19 @@ class RelatedFieldListFilter(ListFieldFilter):
         else:
             self.lookup_title = other_model._meta.verbose_name
         self.title = self.lookup_title
+        
+    def check_null(self):
+        if hasattr(self.field,'field'):
+            _field = self.field.field
+        else:
+            _field = self.field
+        ret = (isinstance(self.field, RelatedObject)
+                and self.field.field.null or hasattr(self.field, 'rel')
+                and self.field.null)
+        return ret
 
     def has_output(self):
-        if (isinstance(self.field, RelatedObject)
-                and self.field.field.null or hasattr(self.field, 'rel')
-                and self.field.null):
+        if self.check_null():
             extra = 1
         else:
             extra = 0
@@ -544,9 +552,7 @@ class RelatedFieldListFilter(ListFieldFilter):
                 }, [self.lookup_isnull_name]),
                 'display': val,
             }
-        if (isinstance(self.field, RelatedObject)
-                and self.field.field.null or hasattr(self.field, 'rel')
-                and self.field.null):
+        if self.check_null():
             yield {
                 'selected': bool(self.lookup_isnull_val),
                 'query_string': self.query_string({
