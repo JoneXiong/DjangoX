@@ -46,7 +46,9 @@ class RelatedFieldWidgetWrapper(forms.Widget):
     admin interface.
     """
     def __init__(self, widget, rel, add_url, rel_add_url):
-        self.is_hidden = widget.is_hidden
+        try:
+            self.is_hidden = widget.is_hidden
+        except:pass
         self.needs_multipart_form = widget.needs_multipart_form
         self.attrs = widget.attrs
         self.choices = widget.choices
