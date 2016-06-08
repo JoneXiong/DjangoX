@@ -107,7 +107,11 @@ class RelateObject(object):
             self.rel_name = self.to_model._meta.pk.name
             self.is_m2m = False
 
-        to_qs = self.to_model._default_manager.get_query_set()
+        _manager = self.to_model._default_manager
+        if hasattr(_manager, 'get_query_set'):
+            to_qs = _manager.get_query_set()
+        else:
+            to_qs = _manager.get_queryset()
         self.to_objs = to_qs.filter(**{self.rel_name: value}).all()
 
         self.field = field

@@ -112,7 +112,11 @@ class ModelPage(CommAdminView):
         u"""
         模型的默认数据集
         """
-        return self.model._default_manager.get_query_set()
+        _manager = self.model._default_manager
+        if hasattr(_manager, 'get_query_set'):
+            return _manager.get_query_set()
+        else:
+            return _manager.get_queryset()
 
     def has_view_permission(self, obj=None):
         return ('view' not in self.remove_permissions) and (self.user.has_perm('%s.view_%s' % self.model_info) or self.user.has_perm('%s.change_%s' % self.model_info))
