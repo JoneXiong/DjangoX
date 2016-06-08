@@ -3,11 +3,11 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.html import format_html
-from django.forms.util import flatatt
 from django.utils.encoding import force_text
 
 import xadmin
 from xadmin.widgets import AjaxSearchWidget
+from xadmin import dutils
 
 class MyField(forms.CharField):
     u'''
@@ -47,7 +47,7 @@ class TextInputCounter(forms.TextInput):
             }
         </script>
         """
-        html = format_html(templ, flatatt(final_attrs))
+        html = format_html(templ, dutils.flatatt(final_attrs))
         return '%s%s' % (html, script)
  
 

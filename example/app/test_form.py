@@ -4,10 +4,10 @@ import re
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.html import format_html
-from django.forms.util import flatatt
 
 import xadmin
 from xadmin.widgets import AjaxSearchWidget
+from xadmin import dutils
 
 # 自定义Field 
 class MembersField(forms.CharField):
@@ -57,7 +57,7 @@ class TextInputCounter(forms.TextInput):
             }
         </script>
         """
-        html = format_html(templ, flatatt(final_attrs))
+        html = format_html(templ, dutils.flatatt(final_attrs))
         return '%s%s' % (html, script)
  
  # 自定义Form 
