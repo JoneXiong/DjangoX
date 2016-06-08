@@ -523,7 +523,7 @@ class RelatedFieldListFilter(ListFieldFilter):
         else:
             _field = self.field
         ret = (isinstance(self.field, RelatedObject)
-                and self.field.field.null or hasattr(self.field, 'rel')
+                and _field.null or hasattr(self.field, 'rel')
                 and self.field.null)
         return ret
 
