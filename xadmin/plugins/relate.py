@@ -42,31 +42,44 @@ class RelateMenuPlugin(BaseAdminPlugin):
     def related_link(self, instance):
         links = []
         for r, view_perm, add_perm in self.get_related_list():
-            label = r.opts.app_label
-            model_name = r.opts.module_name
+            if hasattr(r, 'opts'):
+                opts = r.opts
+            else:
+                opts = r.related_model._meta
+            label = opts.app_label
+            model_name = opts.module_name
             f = r.field
             rel_name = f.rel.get_related_field().name
 
-            verbose_name = force_unicode(r.opts.verbose_name)
+            verbose_name = force_unicode(opts.verbose_name)
             lookup_name = '%s__%s__exact' % (f.name, rel_name)
 
-            link = ''.join(('<li class="with_menu_btn">',
+            _tojoin = [ '<li class="with_menu_btn">' ]
+            
+            if view_perm:
+                list_url = reverse('%s:%s_%s_changelist' % (self.admin_site.app_name, label, model_name) )
+                str1 = '<a href="%s?%s=%s" title="%s"><i class="icon fa fa-th-list"></i> %s</a>' %(
+                                                                                                  list_url,
+                                                                                                  RELATE_PREFIX + lookup_name, str(instance.pk),
+                                                                                                  verbose_name,
+                                                                                                  verbose_name
+                                                                                                  )
+            else:
+                str1 = '<a><span class="text-muted"><i class="icon fa fa-blank"></i> %s</span></a>' % verbose_name
+            _tojoin.append(str1)
+            
+            if add_perm:
+                add_url = reverse('%s:%s_%s_add' % (self.admin_site.app_name, label, model_name) )
+                str2 = '<a class="add_link dropdown-menu-btn" href="%s?%s=%s"><i class="icon fa fa-plus pull-right"></i></a>' %(
+                                                                                                  add_url,
+                                                                                                  RELATE_PREFIX + lookup_name,
+                                                                                                  str(instance.pk)
+                                                                                                  )
+            else:
+                str2 = ''
+            _tojoin.append(str2)
 
-                            '<a href="%s?%s=%s" title="%s"><i class="icon fa fa-th-list"></i> %s</a>' %
-                          (
-                            reverse('%s:%s_%s_changelist' % (
-                                    self.admin_site.app_name, label, model_name)),
-                            RELATE_PREFIX + lookup_name, str(instance.pk), verbose_name, verbose_name) if view_perm else
-                            '<a><span class="text-muted"><i class="icon fa fa-blank"></i> %s</span></a>' % verbose_name,
-
-                            '<a class="add_link dropdown-menu-btn" href="%s?%s=%s"><i class="icon fa fa-plus pull-right"></i></a>' %
-                          (
-                            reverse('%s:%s_%s_add' % (
-                                    self.admin_site.app_name, label, model_name)),
-                            RELATE_PREFIX + lookup_name, str(
-                instance.pk)) if add_perm else "",
-
-                '</li>'))
+            link = ''.join(_tojoin)
             links.append(link)
         ul_html = '<ul class="dropdown-menu" role="menu">%s</ul>' % ''.join(
             links)
