@@ -74,7 +74,8 @@ class AdminAuthenticationForm(AuthenticationForm):
                 raise forms.ValidationError(message)
             elif not self.user_cache.is_active or not self.user_cache.is_staff:
                 raise forms.ValidationError(message)
-        self.check_for_test_cookie()
+        if hasattr(self, 'check_for_test_cookie'):
+            self.check_for_test_cookie()
         return self.cleaned_data
 
 class LoginView(BaseAdminView):
