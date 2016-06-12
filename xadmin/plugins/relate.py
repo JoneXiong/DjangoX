@@ -27,10 +27,14 @@ class RelateMenuPlugin(BaseAdminPlugin):
         for r in self.opts.get_all_related_objects() + self.opts.get_all_related_many_to_many_objects():
             if self.related_list and (r.get_accessor_name() not in self.related_list):
                 continue
-            if r.model not in self.admin_site._registry.keys():
+            if hasattr(r, 'opts'):
+                _model = r.model
+            else:
+                _model = r.related_model
+            if _model not in self.admin_site._registry.keys():
                 continue
-            has_view_perm = self.has_model_perm(r.model, 'view')
-            has_add_perm = self.has_model_perm(r.model, 'add')
+            has_view_perm = self.has_model_perm(_model, 'view')
+            has_add_perm = self.has_model_perm(_model, 'add')
             if not (has_view_perm or has_add_perm):
                 continue
 
