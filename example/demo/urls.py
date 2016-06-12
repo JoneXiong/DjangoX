@@ -6,8 +6,6 @@ from django.conf import settings
 import xadmin
 xadmin.ROOT_PATH_NAME = 'xadmin'
 settings.XADMIN_EXCLUDE_PLUGINS = ['bookmark']
-if django.VERSION[1] > 8:
-    settings.XADMIN_EXCLUDE_PLUGINS.append('wizard')
 
 xadmin.autodiscover()
 
