@@ -5,10 +5,10 @@ from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
 from django.forms import formsets, ValidationError
 from django.views.generic import TemplateView
-from django.utils.datastructures import SortedDict
 from django.utils.decorators import classonlymethod
 from django.utils import six
 
+from xadmin.core.structs import SortedDict
 from .storage import get_storage
 from .storage.exceptions import NoFileStorageConfigured
 from .forms import ManagementForm
