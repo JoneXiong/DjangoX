@@ -1,4 +1,7 @@
-from django.utils.importlib import import_module
+try:
+    from django.utils.importlib import import_module
+except:
+    from importlib import import_module
 
 from .base import BaseStorage
 from .exceptions import (
