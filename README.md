@@ -40,4 +40,5 @@ http://127.0.0.1:81/xadmin/
 
 # Document
 [示例启动脚本简析](http://www.oejia.net/blog/2016/01/25/djangox_start_py.html)
+
 [菜单控制与配置](http://www.oejia.net/blog/2016/06/13/djangox_menu.html)
