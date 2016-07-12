@@ -1,4 +1,5 @@
 import json
+import logging
 
 import django
 from django.db import models
@@ -7,12 +8,41 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import Permission
+from django.db.models.base import ModelBase
+from django.utils import six
 
 from dutils import JSONEncoder
+from manager import ModelManager
 
 
 AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
+class NewBase(ModelBase):
+    def __new__(cls, name, bases, attrs):
+        ret = ModelBase.__new__(cls, name, bases, attrs)
+        if hasattr(ret, 'init_related_lookup'):
+            ret.init_related_lookup()
+        return ret
+    
+    
+class ExtModel(object):
+    @classmethod
+    def merge_class(cls, target_cls):
+        for k, v in target_cls.__dict__.items():
+            if k.startswith('__'):
+                continue
+            if hasattr(cls, k):
+                logging.warning("class %s has attr %s, but only warning", cls.__name__, k)
+            setattr(cls, k, v)
+    
+class BaseModel(six.with_metaclass(NewBase), models.Model, ExtModel):
+    objects = ModelManager()
+    had_init_related_lookup = False
+
+    class Meta:
+        abstract = True
+        
+models.Model = BaseModel
 
 def add_view_permissions(sender, **kwargs):
     """
