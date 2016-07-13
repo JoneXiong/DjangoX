@@ -235,11 +235,11 @@ class BaseCommon(object):
         )
         
     def get_param(self, k):
-        ret = self.request.GET.get('_ajax',None)
+        ret = self.request.GET.get(k, None)
         if ret:
             return ret
         else:
-            return self.request.POST.get('_ajax',None)
+            return self.request.POST.get(k, None)
         
     def param_list(self):
         return self.request.GET.keys() + self.request.POST.keys()
