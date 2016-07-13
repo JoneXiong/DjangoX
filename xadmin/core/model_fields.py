@@ -74,3 +74,11 @@ class CloudImageField(models.ImageField):
         from .storage_qiniu import QiniuStorage
         kwargs['storage'] = QiniuStorage()
         super(CloudImageField, self).__init__(verbose_name, name, width_field, height_field, **kwargs)
+   
+# Fix south problems     
+try:
+    from south.modelsinspector import add_introspection_rules
+except ImportError:
+    pass
+else:
+    add_introspection_rules([], ["^xadmin\.model_fields\.CloudImageField"])
