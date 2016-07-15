@@ -16,11 +16,11 @@ xadmin.site.site_footer = 'My Footer'
 class BaseSetting(object):
     enable_themes = True
     use_bootswatch = False
-xadmin.site.register(views.BaseAdminView, BaseSetting)
+xadmin.site.register(views.BaseView, BaseSetting)
 
 class GlobalSetting(object):
     global_search_models = [models.Host, models.IDC]
-xadmin.site.register(views.CommAdminView, GlobalSetting)
+xadmin.site.register(views.SiteView, GlobalSetting)
 
 
 ### 站点首页设置 ### 

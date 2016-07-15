@@ -8,7 +8,7 @@ from django.forms.formsets import formset_factory
 
 import xadmin
 from xadmin import site
-from xadmin.views.base import CommAdminView, BaseAdminView
+from xadmin.views.base import SiteView, BaseView
 from xadmin.views.form import FormAdminView
 
 from xadmin.views.page import PageView,FormPage,GridPage
