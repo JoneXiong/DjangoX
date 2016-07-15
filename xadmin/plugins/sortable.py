@@ -1,11 +1,11 @@
 #coding:utf-8
 from xadmin.sites import site
-from xadmin.views import BaseAdminPlugin, ListAdminView
+from xadmin.views import BasePlugin, ListAdminView
 
 SORTBY_VAR = '_sort_by'
 
 
-class SortablePlugin(BaseAdminPlugin):
+class SortablePlugin(BasePlugin):
 
     sortable_fields = ['sort']
 

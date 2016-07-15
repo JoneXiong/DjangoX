@@ -59,7 +59,7 @@ from django.utils.http import urlencode
 from django.utils.translation import ugettext_lazy as _, ugettext
 
 from xadmin.sites import site
-from xadmin.views import BaseAdminPlugin, ListAdminView
+from xadmin.views import BasePlugin, ListAdminView
 from xadmin.views.dashboard import ModelBaseWidget, widget_manager
 from xadmin.util import lookup_field, label_for_field, force_unicode, json
 
@@ -125,7 +125,7 @@ class JSONEncoder(DjangoJSONEncoder):
                 return smart_unicode(o)
 
 
-class ChartsPlugin(BaseAdminPlugin):
+class ChartsPlugin(BasePlugin):
 
     data_charts = {}
 

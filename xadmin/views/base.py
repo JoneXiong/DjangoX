@@ -250,7 +250,7 @@ class Common(object):
         )
 
 
-class BaseAdminPlugin(Common):
+class BasePlugin(Common):
     """
     所有 Plugin 的基类。继承于 :class:`Common` 。插件的注册和使用可以参看 :meth:`xadmin.sites.AdminSite.register_plugin` ，
     插件的原理可以参看 :func:`filter_hook` :
@@ -279,7 +279,6 @@ class BaseAdminPlugin(Common):
         当返回值为 ``False`` 时，所属的 AdminView 实例不会加载该插件
         """
         pass
-BasePlugin = BaseAdminPlugin
 
 
 class BaseAdminView(Common, View):
@@ -344,7 +343,7 @@ class BaseAdminView(Common, View):
     def init_plugin(self, *args, **kwargs):
         """
         AdminView 实例中插件的初始化方法，在 :meth:`BaseAdminView.init_request` 后调用。根据 AdminView 中
-        的 base_plugins 属性将插件逐一初始化，既调用 :meth:`BaseAdminPlugin.init_request` 方法，并根据返回结果判断是否加载该插件。
+        的 base_plugins 属性将插件逐一初始化，既调用 :meth:`BasePlugin.init_request` 方法，并根据返回结果判断是否加载该插件。
         最后该方法会将初始化后的插件设置为 plugins 属性。
         """
         plugins = []

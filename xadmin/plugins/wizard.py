@@ -6,7 +6,7 @@ from django.forms import ValidationError
 from django.forms.models import modelform_factory
 
 from xadmin.sites import site
-from xadmin.views import BaseAdminPlugin, ModelFormAdminView
+from xadmin.views import BasePlugin, ModelFormAdminView
 from xadmin.core.structs import SortedDict
 from xadmin.wizard.storage import get_storage
 from xadmin.wizard.forms import ManagementForm
@@ -18,7 +18,7 @@ def normalize_name(name):
     return new.lower().strip('_')
 
 
-class WizardFormPlugin(BaseAdminPlugin):
+class WizardFormPlugin(BasePlugin):
 
     wizard_form_list = None
     wizard_for_update = False

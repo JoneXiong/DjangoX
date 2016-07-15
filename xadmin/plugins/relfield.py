@@ -1,10 +1,10 @@
 from django.db import models
 
 from xadmin.sites import site
-from xadmin.views import BaseAdminPlugin, ModelFormAdminView
+from xadmin.views import BasePlugin, ModelFormAdminView
 from xadmin import widgets
 
-class RelateFieldPlugin(BaseAdminPlugin):
+class RelateFieldPlugin(BasePlugin):
 
     def get_field_style(self, attrs, db_field, style, **kwargs):
         if (style == 'fk_ajax' or style == 'fk-ajax') and isinstance(db_field, models.ForeignKey):

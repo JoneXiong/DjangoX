@@ -19,7 +19,7 @@ from django.db.models import BooleanField, NullBooleanField
 
 import xadmin
 from xadmin.sites import site
-from xadmin.views import BaseAdminPlugin, ListAdminView
+from xadmin.views import BasePlugin, ListAdminView
 from xadmin.util import json
 from xadmin.views.list import ALL_VAR
 
@@ -36,7 +36,7 @@ except:
     has_xlsxwriter = False
 
 
-class ExportMenuPlugin(BaseAdminPlugin):
+class ExportMenuPlugin(BasePlugin):
 
     list_export = ('xlsx', 'xls', 'csv', 'xml', 'json')
     export_names = {'xlsx': 'Excel 2007', 'xls': 'Excel', 'csv': 'CSV',
@@ -57,7 +57,7 @@ class ExportMenuPlugin(BaseAdminPlugin):
             nodes.append(loader.render_to_string('xadmin/blocks/model_list.top_toolbar.exports.html', context_instance=context))
 
 
-class ExportPlugin(BaseAdminPlugin):
+class ExportPlugin(BasePlugin):
 
     export_mimes = {'xlsx': 'application/vnd.ms-excel',
                     'xls': 'application/vnd.ms-excel', 'csv': 'text/csv',

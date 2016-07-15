@@ -36,7 +36,7 @@ from django.utils.translation import ugettext as _
 from xadmin.plugins.ajax import JsonErrorDict
 from xadmin.sites import site
 from xadmin.util import lookup_field, display_for_field, label_for_field, unquote, boolean_icon
-from xadmin.views import BaseAdminPlugin, ModelFormAdminView, ListAdminView
+from xadmin.views import BasePlugin, ModelFormAdminView, ListAdminView
 from xadmin.views.base import csrf_protect_m, filter_hook
 from xadmin.views.edit import ModelFormAdminUtil
 from xadmin.defs import EMPTY_CHANGELIST_VALUE
@@ -44,7 +44,7 @@ from xadmin.layout import FormHelper
 from xadmin import dutils
 
 
-class EditablePlugin(BaseAdminPlugin):
+class EditablePlugin(BasePlugin):
 
     list_editable = []
 

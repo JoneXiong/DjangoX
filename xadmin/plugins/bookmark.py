@@ -54,7 +54,7 @@ from django.forms import ModelChoiceField
 from django.http import QueryDict
 
 from xadmin.sites import site
-from xadmin.views import ModelAdminView, BaseAdminPlugin, ListAdminView
+from xadmin.views import ModelAdminView, BasePlugin, ListAdminView
 from xadmin.views.list import COL_LIST_VAR, ORDER_VAR
 from xadmin.views.dashboard import widget_manager, BaseWidget, PartialBaseWidget
 from xadmin.defs import FILTER_PREFIX, SEARCH_VAR
@@ -66,7 +66,7 @@ from xadmin.models import Bookmark
 csrf_protect_m = method_decorator(csrf_protect)
 
 
-class BookmarkPlugin(BaseAdminPlugin):
+class BookmarkPlugin(BasePlugin):
 
     # [{'title': "Female", 'query': {'gender': True}, 'order': ('-age'), 'cols': ('first_name', 'age', 'phones'), 'search': 'Tom'}]
     list_bookmarks = []

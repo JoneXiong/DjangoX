@@ -6,11 +6,11 @@ from django.forms.models import modelform_factory
 import copy
 from xadmin.sites import site
 from xadmin.util import get_model_from_relation, vendor
-from xadmin.views import BaseAdminPlugin, ModelFormAdminView, FormView
+from xadmin.views import BasePlugin, ModelFormAdminView, FormView
 from xadmin.layout import Layout
 
 
-class QuickFormPlugin(BaseAdminPlugin):
+class QuickFormPlugin(BasePlugin):
 
     def init_request(self, *args, **kwargs):
         if self.request.method == 'GET' and self.request.is_ajax() or self.request.GET.get('_ajax'):
@@ -96,7 +96,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         return self.widget.id_for_label(id_)
 
 
-class QuickAddBtnPlugin(BaseAdminPlugin):
+class QuickAddBtnPlugin(BasePlugin):
 
     def formfield_for_dbfield(self, formfield, db_field, **kwargs):
         if formfield and self.model in self.admin_site._registry and isinstance(db_field, (models.ForeignKey, models.ManyToManyField)):

@@ -164,12 +164,12 @@ class AdminSite(object):
         :param plugin_class: 插件类
         :param admin_view_class: 该 plugin 绑定的 AdminView 类
         """
-        from xadmin.views.base import BaseAdminPlugin
-        if issubclass(plugin_class, BaseAdminPlugin):
+        from xadmin.views.base import BasePlugin
+        if issubclass(plugin_class, BasePlugin):
             self._registry_plugins.setdefault(
                 admin_view_class, []).append(plugin_class)
         else:
-            raise ImproperlyConfigured(u'The registered plugin class %s isn\'t subclass of %s' %(plugin_class.__name__, BaseAdminPlugin.__name__))
+            raise ImproperlyConfigured(u'The registered plugin class %s isn\'t subclass of %s' %(plugin_class.__name__, BasePlugin.__name__))
 
 #    def register_settings(self, name, admin_class):
 #        self._registry_settings[name.lower()] = admin_class

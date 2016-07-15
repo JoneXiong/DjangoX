@@ -1,9 +1,9 @@
 #coding:utf-8
 from xadmin.sites import site
-from xadmin.views import BaseAdminPlugin, CommAdminView
+from xadmin.views import BasePlugin, CommAdminView
 
 
-class MobilePlugin(BaseAdminPlugin):
+class MobilePlugin(BasePlugin):
 
     def _test_mobile(self):
         try:
@@ -27,4 +27,4 @@ class MobilePlugin(BaseAdminPlugin):
     def block_extrahead(self, context, nodes):
         nodes.append('<script>window.__admin_ismobile__ = true;</script>')
 
-site.register_plugin(MobilePlugin, CommAdminView)
+# site.register_plugin(MobilePlugin, CommAdminView)

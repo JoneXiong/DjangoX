@@ -4,14 +4,14 @@ from django.utils.encoding import force_unicode
 
 from xadmin.sites import site
 from xadmin.core.structs import SortedDict
-from xadmin.views import BaseAdminPlugin, ListAdminView, ModelFormAdminView, DetailAdminView
+from xadmin.views import BasePlugin, ListAdminView, ModelFormAdminView, DetailAdminView
 from xadmin import dutils
 
 
 NON_FIELD_ERRORS = '__all__'
 
 
-class BaseAjaxPlugin(BaseAdminPlugin):
+class BaseAjaxPlugin(BasePlugin):
 
     def init_request(self, *args, **kwargs):
         return bool(self.request.is_ajax() or '_ajax' in self.param_list() )

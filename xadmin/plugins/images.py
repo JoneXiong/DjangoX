@@ -6,7 +6,7 @@ from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
 from django.conf import settings
 from xadmin.sites import site
-from xadmin.views import BaseAdminPlugin, ModelFormAdminView, DetailAdminView, ListAdminView
+from xadmin.views import BasePlugin, ModelFormAdminView, DetailAdminView, ListAdminView
 
 
 def get_gallery_modal():
@@ -62,7 +62,7 @@ class AdminImageWidget(forms.FileInput):
         return mark_safe(u''.join(output))
 
 
-class ModelDetailPlugin(BaseAdminPlugin):
+class ModelDetailPlugin(BasePlugin):
 
     def __init__(self, admin_view):
         super(ModelDetailPlugin, self).__init__(admin_view)
@@ -108,7 +108,7 @@ class ModelDetailPlugin(BaseAdminPlugin):
             return get_gallery_modal()
 
 
-class ModelListPlugin(BaseAdminPlugin):
+class ModelListPlugin(BasePlugin):
 
     list_gallery = False
 

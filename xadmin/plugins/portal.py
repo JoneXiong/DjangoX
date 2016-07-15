@@ -1,11 +1,11 @@
 #coding:utf-8
 from xadmin.sites import site
 from xadmin.models import UserSettings
-from xadmin.views import BaseAdminPlugin, ModelFormAdminView, DetailAdminView
+from xadmin.views import BasePlugin, ModelFormAdminView, DetailAdminView
 from xadmin.layout import Fieldset, Column
 
 
-class BasePortalPlugin(BaseAdminPlugin):
+class BasePortalPlugin(BasePlugin):
 
     # Media
     def get_media(self, media):

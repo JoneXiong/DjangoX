@@ -3,10 +3,10 @@ from django.conf import settings
 from django.template import loader, RequestContext
 
 from xadmin.sites import site
-from xadmin.views import BaseAdminPlugin, CommAdminView
+from xadmin.views import BasePlugin, CommAdminView
 
 
-class SetLangNavPlugin(BaseAdminPlugin):
+class SetLangNavPlugin(BasePlugin):
 
     def block_top_navmenu(self, context, nodes):
         nodes.append(

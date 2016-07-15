@@ -14,7 +14,7 @@ from django.forms import ModelMultipleChoiceField
 from xadmin.layout import Fieldset, Main, Side, Row, FormHelper
 from xadmin.sites import site
 from xadmin.util import unquote, User
-from xadmin.views import BaseAdminPlugin, ModelFormAdminView, ModelAdminView, CommAdminView, csrf_protect_m
+from xadmin.views import BasePlugin, ModelFormAdminView, ModelAdminView, CommAdminView, csrf_protect_m
 from xadmin.views.action import FormAction
 from xadmin import widgets
 
@@ -157,7 +157,7 @@ site.register(User, UserAdmin)
 site.register(Permission, PermissionAdmin)
 
 
-class UserFieldPlugin(BaseAdminPlugin):
+class UserFieldPlugin(BasePlugin):
 
     user_fields = []
 
@@ -177,7 +177,7 @@ class UserFieldPlugin(BaseAdminPlugin):
 site.register_plugin(UserFieldPlugin, ModelFormAdminView)
 
 
-class ModelPermissionPlugin(BaseAdminPlugin):
+class ModelPermissionPlugin(BasePlugin):
 
     user_can_access_owned_objects_only = False
     user_owned_objects_field = 'user'

@@ -3,7 +3,7 @@ from django.template import loader
 from django.utils.translation import ugettext_lazy as _
 
 from xadmin.sites import site
-from xadmin.views import BaseAdminPlugin, ListAdminView
+from xadmin.views import BasePlugin, ListAdminView
 from xadmin.util import label_for_field
 
 LAYOUT_VAR = '_layout'
@@ -24,7 +24,7 @@ DEFAULT_LAYOUTS = {
 }
 
 
-class GridLayoutPlugin(BaseAdminPlugin):
+class GridLayoutPlugin(BasePlugin):
 
     grid_layouts = []
 

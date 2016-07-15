@@ -29,10 +29,10 @@ from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db import models
 
 from xadmin.sites import site
-from xadmin.views import BaseAdminPlugin, ListAdminView
+from xadmin.views import BasePlugin, ListAdminView
 
 
-class DetailsPlugin(BaseAdminPlugin):
+class DetailsPlugin(BasePlugin):
 
     show_detail_fields = []
     show_all_rel_details = True

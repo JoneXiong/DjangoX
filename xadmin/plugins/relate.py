@@ -8,13 +8,13 @@ from django.utils.translation import ugettext as _
 from django.db import models
 
 from xadmin.sites import site
-from xadmin.views import BaseAdminPlugin, ListAdminView, CreateAdminView, UpdateAdminView, DeleteAdminView
+from xadmin.views import BasePlugin, ListAdminView, CreateAdminView, UpdateAdminView, DeleteAdminView
 from xadmin.dutils import RelatedObject
 
 RELATE_PREFIX = '_rel_'
 
 
-class RelateMenuPlugin(BaseAdminPlugin):
+class RelateMenuPlugin(BasePlugin):
 
     related_list = []
     use_related_menu = True
@@ -145,7 +145,7 @@ class RelateObject(object):
         return mark_safe(u"<span class='rel-brand'>%s <i class='fa fa-caret-right'></i></span> %s" % (to_model_name, force_unicode(self.opts.verbose_name_plural)))
 
 
-class BaseRelateDisplayPlugin(BaseAdminPlugin):
+class BaseRelateDisplayPlugin(BasePlugin):
 
     def init_request(self, *args, **kwargs):
         self.relate_obj = None

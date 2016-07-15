@@ -3,10 +3,10 @@
 import xadmin
 from django.db.models import ManyToManyField
 
-from xadmin.views import BaseAdminPlugin, ModelFormAdminView
+from xadmin.views import BasePlugin, ModelFormAdminView
 from xadmin import widgets
 
-class M2MSelectPlugin(BaseAdminPlugin):
+class M2MSelectPlugin(BasePlugin):
 
     def get_field_style(self, attrs, db_field, style, **kwargs):
         if style == 'm2m_transfer' and isinstance(db_field, ManyToManyField):

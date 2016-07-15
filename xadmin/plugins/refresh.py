@@ -28,12 +28,12 @@
 from django.template import loader
 
 from xadmin.sites import site
-from xadmin.views import BaseAdminPlugin, ListAdminView
+from xadmin.views import BasePlugin, ListAdminView
 
 REFRESH_VAR = '_refresh'
 
 
-class RefreshPlugin(BaseAdminPlugin):
+class RefreshPlugin(BasePlugin):
 
     refresh_times = []
 

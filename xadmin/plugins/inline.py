@@ -10,7 +10,7 @@ from django.template.loader import render_to_string
 
 from xadmin.layout import FormHelper, Layout, flatatt, Container, Column, Field, Fieldset
 from xadmin.sites import site
-from xadmin.views import BaseAdminPlugin, ModelFormAdminView, DetailAdminView, filter_hook
+from xadmin.views import BasePlugin, ModelFormAdminView, DetailAdminView, filter_hook
 from xadmin import dutils
 
 
@@ -376,7 +376,7 @@ def replace_inline_objects(layout, fs):
             replace_inline_objects(layout_object, fs)
 
 
-class InlineFormsetPlugin(BaseAdminPlugin):
+class InlineFormsetPlugin(BasePlugin):
     inlines = []
 
     @property

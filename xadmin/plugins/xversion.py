@@ -17,7 +17,7 @@ from xadmin.views.action import BaseActionView
 from xadmin.plugins.inline import InlineModelAdmin
 from xadmin.sites import site
 from xadmin.util import unquote, quote, model_format_dict
-from xadmin.views import BaseAdminPlugin, ModelAdminView, CreateAdminView, UpdateAdminView, DetailAdminView, ModelFormAdminView, DeleteAdminView, ListAdminView
+from xadmin.views import BasePlugin, ModelAdminView, CreateAdminView, UpdateAdminView, DetailAdminView, ModelFormAdminView, DeleteAdminView, ListAdminView
 from xadmin.views.base import csrf_protect_m, filter_hook
 from xadmin.views.detail import DetailAdminUtil
 from reversion.models import Revision, Version
@@ -79,7 +79,7 @@ def register_models(admin_site=None):
             _register_model(admin, model)
 
 
-class ReversionPlugin(BaseAdminPlugin):
+class ReversionPlugin(BasePlugin):
 
     # The revision manager instance used to manage revisions.
     revision_manager = default_revision_manager
@@ -521,7 +521,7 @@ class InlineDiffField(Field):
 # inline hack plugin
 
 
-class InlineRevisionPlugin(BaseAdminPlugin):
+class InlineRevisionPlugin(BasePlugin):
 
     def get_related_versions(self, obj, version, formset):
         """Retreives all the related Version objects for the given FormSet."""
@@ -596,7 +596,7 @@ class InlineRevisionPlugin(BaseAdminPlugin):
 # action revision
 
 
-class ActionRevisionPlugin(BaseAdminPlugin):
+class ActionRevisionPlugin(BasePlugin):
 
     revision_manager = default_revision_manager
     reversion_enable = False

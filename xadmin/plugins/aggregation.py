@@ -2,7 +2,7 @@ from django.db.models import FieldDoesNotExist, Avg, Max, Min, Count, Sum
 from django.utils.translation import ugettext as _
 
 from xadmin.sites import site
-from xadmin.views import BaseAdminPlugin, ListAdminView
+from xadmin.views import BasePlugin, ListAdminView
 
 from xadmin.views.common import ResultRow, ResultItem
 from xadmin.util import display_for_field
@@ -15,7 +15,7 @@ AGGREGATE_TITLE = {
 }
 
 
-class AggregationPlugin(BaseAdminPlugin):
+class AggregationPlugin(BasePlugin):
 
     aggregate_fields = {}
 

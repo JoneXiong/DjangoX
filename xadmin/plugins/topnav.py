@@ -6,10 +6,10 @@ from django.utils.translation import ugettext as _
 
 from xadmin.sites import site
 from xadmin.defs import SEARCH_VAR
-from xadmin.views import BaseAdminPlugin, CommAdminView
+from xadmin.views import BasePlugin, CommAdminView
 
 
-class TopNavPlugin(BaseAdminPlugin):
+class TopNavPlugin(BasePlugin):
 
     global_search_models = None
     global_add_models = None

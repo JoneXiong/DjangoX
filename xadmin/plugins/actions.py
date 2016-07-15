@@ -12,7 +12,7 @@ from django.utils.text import capfirst
 
 from xadmin.sites import site
 from xadmin.util import model_format_dict
-from xadmin.views import BaseAdminPlugin, ListAdminView
+from xadmin.views import BasePlugin, ListAdminView
 from xadmin.views.page import GridPage
 from xadmin.defs import ACTION_CHECKBOX_NAME
 from xadmin.views.action import BaseActionView
@@ -37,7 +37,7 @@ action_checkbox.allow_export = False
 action_checkbox.is_column = False
 
 
-class ActionPlugin(BaseAdminPlugin):
+class ActionPlugin(BasePlugin):
 
     # 配置项目
     actions = []

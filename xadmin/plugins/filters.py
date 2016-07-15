@@ -21,7 +21,7 @@ from django.utils.translation import ugettext as _
 
 from xadmin.filters import manager as filter_manager, DateFieldListFilter, RelatedFieldSearchFilter, MultiSelectFieldListFilter
 from xadmin.sites import site
-from xadmin.views import BaseAdminPlugin, ListAdminView
+from xadmin.views import BasePlugin, ListAdminView
 from xadmin.views.page import GridPage
 from xadmin.defs import FILTER_PREFIX, SEARCH_VAR
 from xadmin.dutils import RelatedObject
@@ -30,7 +30,7 @@ class IncorrectLookupParameters(Exception):
     pass
 
 
-class FilterPlugin(BaseAdminPlugin):
+class FilterPlugin(BasePlugin):
     list_filter = ()
     search_fields = ()
     free_query_filter = True
@@ -244,7 +244,7 @@ class QuickFilterMultiSelectFieldListFilter(MultiSelectFieldListFilter):
     """
     template = 'xadmin/filters/quickfilter.html'
 
-class QuickFilterPlugin(BaseAdminPlugin):
+class QuickFilterPlugin(BasePlugin):
     """
     Add a filter menu to the left column of the page
     """
