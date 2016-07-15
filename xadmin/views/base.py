@@ -281,7 +281,7 @@ class BasePlugin(Common):
         pass
 
 
-class BaseAdminView(Common, View):
+class BaseView(Common, View):
     """
     所有 View 的基类。继承于 :Common 和 django.views.generic.View
 
@@ -313,7 +313,7 @@ class BaseAdminView(Common, View):
     def as_view(cls):
         """
         复写了 django View 的as_view 方法，主要是将 :meth:`View.dispatch` 的也写到了本方法中，并且去掉了一些初始化操作，
-        因为这些初始化操作在 AdminView 的初始化方法中已经完成了，可以参看 :meth:`BaseAdminView.init_request`
+        因为这些初始化操作在 AdminView 的初始化方法中已经完成了，可以参看 :meth:`BaseView.init_request`
         """
         def view(request, *args, **kwargs):
             self = cls(request, *args, **kwargs)    #真正实例化的地方
@@ -336,13 +336,13 @@ class BaseAdminView(Common, View):
 
     def init_request(self, *args, **kwargs):
         """
-        一般用于子类复写的初始化方法，在 AdminView 实例化时调用，:class:`BaseAdminView` 的该方法不做任何操作。
+        一般用于子类复写的初始化方法，在 AdminView 实例化时调用，:class:`BaseView` 的该方法不做任何操作。
         """
         pass
 
     def init_plugin(self, *args, **kwargs):
         """
-        AdminView 实例中插件的初始化方法，在 :meth:`BaseAdminView.init_request` 后调用。根据 AdminView 中
+        AdminView 实例中插件的初始化方法，在 :meth:`BaseView.init_request` 后调用。根据 AdminView 中
         的 base_plugins 属性将插件逐一初始化，既调用 :meth:`BasePlugin.init_request` 方法，并根据返回结果判断是否加载该插件。
         最后该方法会将初始化后的插件设置为 plugins 属性。
         """
@@ -375,10 +375,9 @@ class BaseAdminView(Common, View):
         取得页面所需的 Media 对象，用于生成 css 和 js 文件
         """
         return forms.Media()
-BaseView = BaseAdminView
 
 
-class CommAdminView(BaseAdminView):
+class CommAdminView(BaseView):
 
     base_template = 'xadmin/base_site.html'    #: View模板继承的基础模板
 
@@ -500,4 +499,5 @@ class CommAdminView(BaseAdminView):
         return base
 SiteView = CommAdminView
 
-
+BaseAdminPlugin = BasePlugin
+BaseAdminView = BaseView

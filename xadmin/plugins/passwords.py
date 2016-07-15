@@ -6,11 +6,11 @@ from django.template.response import TemplateResponse
 from django.utils.translation import ugettext as _
 
 from xadmin.sites import site
-from xadmin.views.base import BasePlugin, BaseAdminView, csrf_protect_m
+from xadmin.views.base import BasePlugin, BaseView, csrf_protect_m
 from xadmin.views.website import LoginView
 
 
-class ResetPasswordSendView(BaseAdminView):
+class ResetPasswordSendView(BaseView):
 
     need_site_permission = False
 
@@ -66,7 +66,7 @@ class ResetLinkPlugin(BasePlugin):
 site.register_plugin(ResetLinkPlugin, LoginView)
 
 
-class ResetPasswordComfirmView(BaseAdminView):
+class ResetPasswordComfirmView(BaseView):
 
     need_site_permission = False
 
@@ -97,7 +97,7 @@ site.register_view(r'^xadmin/password_reset/(?P<uidb36>[0-9A-Za-z]{1,13})-(?P<to
     ResetPasswordComfirmView, name='xadmin_password_reset_confirm')
 
 
-class ResetPasswordCompleteView(BaseAdminView):
+class ResetPasswordCompleteView(BaseView):
 
     need_site_permission = False
 

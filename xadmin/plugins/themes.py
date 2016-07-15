@@ -5,7 +5,7 @@ from django.core.cache import cache
 from django.utils.translation import ugettext as _
 from xadmin.sites import site
 from xadmin.models import UserSettings
-from xadmin.views import BasePlugin, BaseAdminView
+from xadmin.views import BasePlugin, BaseView
 from xadmin.util import static, json
 
 THEME_CACHE_KEY = 'xadmin_themes'
@@ -75,4 +75,4 @@ class ThemePlugin(BasePlugin):
         nodes.append(loader.render_to_string('xadmin/blocks/comm.top.theme.html', {'themes': themes, 'select_css': select_css}))
 
 
-site.register_plugin(ThemePlugin, BaseAdminView)
+site.register_plugin(ThemePlugin, BaseView)

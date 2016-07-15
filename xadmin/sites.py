@@ -130,11 +130,11 @@ class AdminSite(object):
         注册 Model Base Admin View 可以为每一个在xadmin注册的 Model 生成一个 Admin View，并且包含相关的 Model 信息。
         """
         # 内部引用，避免循环引用
-        from xadmin.views.base import BaseAdminView
-        if issubclass(admin_view_class, BaseAdminView):
+        from xadmin.views.base import BaseView
+        if issubclass(admin_view_class, BaseView):
             self._registry_modelviews.append((path, admin_view_class, name))
         else:
-            raise ImproperlyConfigured(u'The registered view class %s isn\'t subclass of %s' %(admin_view_class.__name__, BaseAdminView.__name__))
+            raise ImproperlyConfigured(u'The registered view class %s isn\'t subclass of %s' %(admin_view_class.__name__, BaseView.__name__))
 
     def register_view(self, path, admin_view_class, name):
         """
@@ -178,13 +178,13 @@ class AdminSite(object):
         """
         注册需要管理的 Model， 或是为某 AdminView 添加 OptionClass
 
-        :param model_or_iterable: 传入 model 或 BaseAdminView子类
+        :param model_or_iterable: 传入 model 或 BaseView子类
         :param admin_class: 
                         model_or_iterable 为 Model 时，该参数为 ModelAdmin；
-                        model_or_iterable 为 BaseAdminView 时 ，该参数为 OptionClass
+                        model_or_iterable 为 BaseView 时 ，该参数为 OptionClass
         """
-        from xadmin.views.base import BaseAdminView
-        if isinstance(model_or_iterable, ModelBase) or issubclass(model_or_iterable, BaseAdminView):
+        from xadmin.views.base import BaseView
+        if isinstance(model_or_iterable, ModelBase) or issubclass(model_or_iterable, BaseView):
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
             if isinstance(model, ModelBase):    #当为模型Model时
@@ -206,7 +206,7 @@ class AdminSite(object):
                     admin_class.order = self.model_admins_order
                     self.model_admins_order += 1
                 self._registry[model] = admin_class
-            else:   # 当为BaseAdminView子类时
+            else:   # 当为BaseView子类时
                 if model in self._registry_avs:
                     raise AlreadyRegistered('The admin_view_class %s is already registered' % model.__name__)
                 if options:
@@ -224,8 +224,8 @@ class AdminSite(object):
 
         如果 Model 或 OptionClass 并未注册过，会抛出 :exc:`xadmin.sites.NotRegistered` 异常
         """
-        from xadmin.views.base import BaseAdminView
-        if isinstance(model_or_iterable, (ModelBase, BaseAdminView)):
+        from xadmin.views.base import BaseView
+        if isinstance(model_or_iterable, (ModelBase, BaseView)):
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
             if isinstance(model, ModelBase):
@@ -331,13 +331,13 @@ class AdminSite(object):
 
         获取 plugins 首先根据该 AdminViewClass 及其所有的继承类在已经注册的插件中找到相应的插件类。然后再使用第二个参数的 OptionClass 拼成插件类。
         """
-        from xadmin.views import BaseAdminView
+        from xadmin.views import BaseView
         from xadmin.views.page import GridPage
         plugins = []
         opts = [oc for oc in option_classes if oc]
         for klass in admin_view_class.mro():
             # 列出 AdminViewClass 所有的继承类，包括本身类
-            if klass == BaseAdminView or issubclass(klass, BaseAdminView):
+            if klass == BaseView or issubclass(klass, BaseView):
                 merge_opts = []
                 
                 reg_class = self._registry_avs.get(klass)
@@ -409,7 +409,7 @@ class AdminSite(object):
 
     def get_urls(self):
         from django.conf.urls import patterns, url, include
-        from xadmin.views.base import BaseAdminView
+        from xadmin.views.base import BaseView
 
         if settings.DEBUG:
             # 如果是DEBUG模式，检查依赖
@@ -433,7 +433,7 @@ class AdminSite(object):
         # 添加注册的所有 AdminViewClass
         urlpatterns += patterns('',
                                 *[url(
-                                  path, wrap(self.create_admin_view(clz_or_func)) if type(clz_or_func) == type and issubclass(clz_or_func, BaseAdminView) else include(clz_or_func(self)),
+                                  path, wrap(self.create_admin_view(clz_or_func)) if type(clz_or_func) == type and issubclass(clz_or_func, BaseView) else include(clz_or_func(self)),
                                   name=name) for path, clz_or_func, name in self._registry_views]
                                 )
 

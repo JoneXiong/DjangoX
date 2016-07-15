@@ -12,7 +12,7 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate
 
-from base import BaseAdminView, filter_hook
+from base import BaseView, filter_hook
 from dashboard import Dashboard
 from xadmin.models import UserSettings
 from xadmin.layout import FormHelper
@@ -26,7 +26,7 @@ class IndexView(Dashboard):
         return 'home'
 
 
-class UserSettingView(BaseAdminView):
+class UserSettingView(BaseView):
 
     @never_cache
     def post(self, request):
@@ -78,7 +78,7 @@ class AdminAuthenticationForm(AuthenticationForm):
             self.check_for_test_cookie()
         return self.cleaned_data
 
-class LoginView(BaseAdminView):
+class LoginView(BaseView):
 
     title = _(u"登陆")
     login_form = None
@@ -113,7 +113,7 @@ class LoginView(BaseAdminView):
         return self.get(request)
 
 
-class LogoutView(BaseAdminView):
+class LogoutView(BaseView):
 
     logout_template = None
     need_site_permission = False
