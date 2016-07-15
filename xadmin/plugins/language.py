@@ -3,7 +3,7 @@ from django.conf import settings
 from django.template import loader, RequestContext
 
 from xadmin.sites import site
-from xadmin.views import BasePlugin, CommAdminView
+from xadmin.views import BasePlugin, SiteView
 
 
 class SetLangNavPlugin(BasePlugin):
@@ -15,5 +15,5 @@ class SetLangNavPlugin(BasePlugin):
             }, context_instance=RequestContext(self.request)))
 
 if settings.LANGUAGES and 'django.middleware.locale.LocaleMiddleware' in settings.MIDDLEWARE_CLASSES:
-    site.register_plugin(SetLangNavPlugin, CommAdminView)
+    site.register_plugin(SetLangNavPlugin, SiteView)
     site.register_view(r'^i18n/', lambda site: 'django.conf.urls.i18n', 'i18n')

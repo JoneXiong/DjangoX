@@ -3,10 +3,10 @@
 from django.core.exceptions import PermissionDenied
 
 import xadmin
-from base import CommAdminView, filter_hook
+from base import SiteView, filter_hook
 
 
-class PageView(CommAdminView):
+class PageView(SiteView):
     verbose_name = None
     template = 'xadmin/views/page.html'
     

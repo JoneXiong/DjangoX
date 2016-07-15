@@ -377,7 +377,7 @@ class BaseView(Common, View):
         return forms.Media()
 
 
-class CommAdminView(BaseView):
+class SiteView(BaseView):
 
     base_template = 'xadmin/base_site.html'    #: View模板继承的基础模板
 
@@ -448,7 +448,7 @@ class CommAdminView(BaseView):
         **Context Params** :
             ``nav_menu`` : 权限过滤后的系统菜单项，如果在非 DEBUG 模式，该项会缓存在 SESSION 中
         """
-        context = super(CommAdminView, self).get_context()
+        context = super(SiteView, self).get_context()
 
         nav_menu = []
         if '_pop' not in self.request.GET:
@@ -497,7 +497,8 @@ class CommAdminView(BaseView):
                          'title':  hasattr(app_mod,'verbose_name') and app_mod.verbose_name or self.app_label
                          })
         return base
-SiteView = CommAdminView
+
 
 BaseAdminPlugin = BasePlugin
 BaseAdminView = BaseView
+CommAdminView = SiteView

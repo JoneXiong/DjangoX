@@ -6,7 +6,7 @@ from django.utils.translation import ugettext as _
 
 from xadmin.sites import site
 from xadmin.defs import SEARCH_VAR
-from xadmin.views import BasePlugin, CommAdminView
+from xadmin.views import BasePlugin, SiteView
 
 
 class TopNavPlugin(BasePlugin):
@@ -71,4 +71,4 @@ class TopNavPlugin(BasePlugin):
             loader.render_to_string('xadmin/blocks/comm.top.topnav.html', {'add_models': add_models}))
 
 
-site.register_plugin(TopNavPlugin, CommAdminView)
+site.register_plugin(TopNavPlugin, SiteView)

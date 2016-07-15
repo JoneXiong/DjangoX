@@ -23,9 +23,9 @@ from xadmin.views.detail import DetailAdminUtil
 from xadmin.plugins.ajax import JsonErrorDict
 from xadmin import dutils
 
-from base import CommAdminView, filter_hook, csrf_protect_m
+from base import SiteView, filter_hook, csrf_protect_m
 
-class FormView(CommAdminView):
+class FormView(SiteView):
     form = forms.Form
     verbose_name = None
     readonly_fields = ()

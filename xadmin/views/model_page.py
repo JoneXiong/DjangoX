@@ -5,9 +5,9 @@ from django.utils.encoding import force_unicode
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 
-from base import CommAdminView, filter_hook
+from base import SiteView, filter_hook
 
-class ModelPage(CommAdminView):
+class ModelPage(SiteView):
     """
     基于 Model 的 页面
     注册后，用户可以通过访问 ``/%(app_label)s/%(module_name)s/123/test`` 访问到该view
