@@ -1,5 +1,5 @@
 
-from base import BaseAdminPlugin, BaseAdminView, CommAdminView, filter_hook, csrf_protect_m, BaseCommon
+from base import BaseAdminPlugin, BaseAdminView, CommAdminView, filter_hook, csrf_protect_m, Common
 
 from model_page import ModelAdminView
 from list import ListAdminView
@@ -14,7 +14,7 @@ from dashboard import Dashboard, BaseWidget, widget_manager, ModelDashboard
 from website import IndexView, LoginView, LogoutView, UserSettingView
 
 __all__ = (
-    'BaseCommon',
+    'Common',
     'BaseAdminPlugin', 'BaseAdminView', 'CommAdminView', 'ModelAdminView', 'ListAdminView',
     'ModelFormAdminView', 'CreateAdminView', 'UpdateAdminView', 'DeleteAdminView', 'DetailAdminView', 'FormView', 'Action'
     'Dashboard', 'BaseWidget',

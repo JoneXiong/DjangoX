@@ -62,7 +62,7 @@ def inclusion_tag(file_name, context_class=Context, takes_context=False):
     return wrap
 
 
-class BaseCommon(object):
+class Common(object):
 
     def get_view(self, view_class, option_class=None, *args, **kwargs):
         """
@@ -108,6 +108,7 @@ class BaseCommon(object):
         user = user or self.user
         return user.has_perm(self.get_model_perm(model, name)) or (name == 'view' and self.has_model_perm(model, 'change', user))
 
+    ########################################## HTTP 相关的函数 ##########################################
     def get_query_string(self, new_params=None, remove=None):
         """
         URL 参数控制
@@ -158,7 +159,19 @@ class BaseCommon(object):
                 p[k] = v
         return mark_safe(''.join(
             '<input type="hidden" name="%s" value="%s"/>' % (k, v) for k, v in p.items() if v))
+        
+        
+    def get_param(self, k):
+        ret = self.request.GET.get(k, None)
+        if ret:
+            return ret
+        else:
+            return self.request.POST.get(k, None)
+        
+    def param_list(self):
+        return self.request.GET.keys() + self.request.POST.keys()
 
+    ########################################## 页面Page 相关的函数 ##########################################
     def render_response(self, content, response_type='json'):
         """
         请求返回API
@@ -210,6 +223,8 @@ class BaseCommon(object):
     def vendor(self, *tags):
         return vendor(*tags)
     
+    
+    ########################################## 日志操作相关的函数 ##########################################
     def log_change(self, obj, message):
         """
         写对象日志
@@ -233,21 +248,11 @@ class BaseCommon(object):
             action_flag     = aciton_id,
             change_message  = msg
         )
-        
-    def get_param(self, k):
-        ret = self.request.GET.get(k, None)
-        if ret:
-            return ret
-        else:
-            return self.request.POST.get(k, None)
-        
-    def param_list(self):
-        return self.request.GET.keys() + self.request.POST.keys()
 
 
-class BaseAdminPlugin(BaseCommon):
+class BaseAdminPlugin(Common):
     """
-    所有 Plugin 的基类。继承于 :class:`BaseCommon` 。插件的注册和使用可以参看 :meth:`xadmin.sites.AdminSite.register_plugin` ，
+    所有 Plugin 的基类。继承于 :class:`Common` 。插件的注册和使用可以参看 :meth:`xadmin.sites.AdminSite.register_plugin` ，
     插件的原理可以参看 :func:`filter_hook` :
 
     .. autofunction:: xadmin.views.base.filter_hook
@@ -277,9 +282,9 @@ class BaseAdminPlugin(BaseCommon):
 BasePlugin = BaseAdminPlugin
 
 
-class BaseAdminView(BaseCommon, View):
+class BaseAdminView(Common, View):
     """
-    所有 View 的基类。继承于 :BaseCommon 和 django.views.generic.View
+    所有 View 的基类。继承于 :Common 和 django.views.generic.View
 
     xadmin 每次请求会产生一个 ViewClass 的实例，也就是基于 Class 的 view 方式。该方式在 Django 1.3 被实现，可以参看 Django 的官方文档
 
