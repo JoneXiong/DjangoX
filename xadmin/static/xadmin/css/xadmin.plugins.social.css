@@ -1,0 +1,54 @@
+.ds-login-buttons {
+  width: 100%;
+  position: relative;
+  padding: 10px 0 6px;
+}
+
+.ds-login-buttons p {
+  float: left;
+  line-height: 24px;
+  margin: 0;
+}
+
+.ds-social-links {
+    float: left;
+    width: 220px;
+}
+
+.ds-social-links a {
+  cursor: pointer;
+  text-decoration: none;
+  color: #777;
+  background-color: transparent;
+  vertical-align: middle;
+  padding-right: 3px;
+}
+
+ .ds-service-link {
+  height: 16px !important;
+  line-height: 16px;
+  padding-left: 20px;
+  display: block;
+  background: url("../img/social-icons.png") no-repeat;
+  overflow: hidden;
+}
+
+.ds-weixin {
+  background-position: 0 -272px;
+}
+
+.ds-weibo {
+  background-position: 0 0;
+}
+
+.ds-qq {
+  background-position: 0 -192px;
+}
+
+ .ds-service-list li {
+  float: left;
+  height: 16px;
+  width: 54px;
+  padding: 4px 0;
+  margin: 0 0 0 6px;
+ }

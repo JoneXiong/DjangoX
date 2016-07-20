@@ -393,7 +393,7 @@ msgstr "图标"
 
 #: plugins/passwords.py:64
 msgid "Forgotten your password or username?"
-msgstr "忘记了您的密码或用户名？"
+msgstr "忘记密码或用户名？"
 
 #: plugins/quickform.py:77
 #, python-format
