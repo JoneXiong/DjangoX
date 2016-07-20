@@ -21,7 +21,7 @@ class ResetPasswordSendView(BaseView):
 
     password_reset_from_email = None
     password_reset_email_template = 'xadmin/auth/password_reset/email.html'
-    password_reset_subject_template = None
+    password_reset_subject_template = 'xadmin/auth/password_reset/email_subject.html'
 
     def get(self, request, *args, **kwargs):
         context = super(ResetPasswordSendView, self).get_context()
