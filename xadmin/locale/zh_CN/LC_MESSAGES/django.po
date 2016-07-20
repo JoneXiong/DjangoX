@@ -599,19 +599,19 @@ msgstr "我们已经按你所提交的电子邮箱地址发送了密码设置说
 #: templates/xadmin/auth/password_reset/email.html:2
 #, python-format
 msgid "You're receiving this e-mail because you requested a password reset for your user account at %(site_name)s."
-msgstr "因为你要求重置 %(site_name)s 上的账户密码, 所以收到了这封邮件."
+msgstr "您要求重置 %(site_name)s 上的账户密码, 所以收到了这封邮件."
 
 #: templates/xadmin/auth/password_reset/email.html:4
 msgid "Please go to the following page and choose a new password:"
-msgstr "请访问该页面并选择一个新密码："
+msgstr "请访问该页面并设置一个新密码："
 
 #: templates/xadmin/auth/password_reset/email.html:8
 msgid "Your username, in case you've forgotten:"
-msgstr "你的用户名，如果已忘记的话："
+msgstr "您的用户名："
 
 #: templates/xadmin/auth/password_reset/email.html:10
 msgid "Thanks for using our site!"
-msgstr "感谢使用我们的站点！"
+msgstr "感谢使用！"
 
 #: templates/xadmin/auth/password_reset/email.html:12
 #, python-format
