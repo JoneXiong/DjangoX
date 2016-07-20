@@ -22,7 +22,7 @@ from xadmin import widgets as exwidgets
 from xadmin.layout import FormHelper
 from xadmin.models import UserSettings, UserWidget
 from xadmin.sites import site
-from xadmin.views.base import CommAdminView, filter_hook, csrf_protect_m
+from xadmin.views.base import SiteView, filter_hook, csrf_protect_m
 from xadmin.views.model_page import ModelAdminView
 from xadmin.views.edit import CreateAdminView
 from xadmin.views.list import ListAdminView
@@ -485,7 +485,7 @@ class AddFormWidget(ModelBaseWidget, PartialBaseWidget):
         return self.add_view.media + self.add_view.form_obj.media + self.vendor('xadmin.plugin.quick-form.js')
 
 
-class Dashboard(CommAdminView):
+class Dashboard(SiteView):
 
     widget_customiz = True
     widgets = []
@@ -521,6 +521,10 @@ class Dashboard(CommAdminView):
 
     @filter_hook
     def get_init_widget(self):
+        u'''
+        初始化获取要显示的 widgets
+        注: widget_customiz=True 时才会 save
+        '''
         portal = []
         widgets = self.widgets
         for col in widgets:
@@ -548,7 +552,9 @@ class Dashboard(CommAdminView):
 
     @filter_hook
     def get_widgets(self):
-
+        u'''
+        构造要显示的 widgets
+        '''
         if self.widget_customiz:
             portal_pos = UserSettings.objects.filter(
                 user=self.user, key=self.get_portal_key())
@@ -572,8 +578,12 @@ class Dashboard(CommAdminView):
                         widgets.append(ws)
 
                 return widgets
-
-        return self.get_init_widget()
+            else:
+                # 查不到则初始化获取
+                return self.get_init_widget()
+        else:
+            # 不允许自定义则每次都初始化获取
+            return self.get_init_widget()
 
     @filter_hook
     def get_title(self):
@@ -686,9 +696,8 @@ class AppDashboard(Dashboard):
         mod = self.admin_site.app_dict[self.app_label]
         return self.title % force_unicode(getattr(mod, 'verbose_name', self.app_label))
     
-    @filter_hook
-    def get_context(self):
-        context = super(Dashboard, self).get_context()
+    def set_widgets(self, context):
+        # 设置 self.widgets 
         nav_menu = context['nav_menu']
         widgets = [
             [ ],
@@ -702,6 +711,11 @@ class AppDashboard(Dashboard):
             widgets[int(flag)].append(widget)
             flag = not flag
         self.widgets = widgets
+    
+    @filter_hook
+    def get_context(self):
+        context = super(Dashboard, self).get_context()
+        self.set_widgets(context)
         self.widgets = self.get_widgets()
         new_context = {
             'title': self.get_title(),
