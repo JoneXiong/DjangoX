@@ -72,3 +72,5 @@ try:
     from django.contrib.contenttypes.generic import BaseGenericInlineFormSet, generic_inlineformset_factory
 except:
     from django.contrib.contenttypes.forms import BaseGenericInlineFormSet, generic_inlineformset_factory
+    
+from django.core.mail import send_mail # use: send_mail(subject, email, from_email, [user.email])
