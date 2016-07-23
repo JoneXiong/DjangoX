@@ -53,7 +53,10 @@ def autodiscover():
     for app in settings.INSTALLED_APPS:
         # 加载app
         mod = import_module(app)
-        app_label = app.split('.')[-1]
+        if hasattr(mod,'app_label'):
+            app_label = mod.app_label
+        else:
+            app_label = app.split('.')[-1]
         site.app_dict[app_label] = mod
         
         # app级菜单初始化
