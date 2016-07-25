@@ -10,6 +10,7 @@ from app import models
 ### 全局变量设置 ###
 xadmin.site.site_title = 'DjangoX'
 xadmin.site.site_footer = 'My Footer'
+#xadmin.site.menu_style = 'default'
 
 
 ### 公共类默认值设置 ###
