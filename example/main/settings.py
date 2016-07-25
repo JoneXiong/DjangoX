@@ -195,3 +195,5 @@ QINIU_CONF = {
               'secret_key': 'nn7-tSEdEGKpo07GK0xuDI6TkgL3-PoUIEIboMx9',
               'bucket': 'meilatest'
               }
+
+XADMIN_SOCIAL_ENABLE = False
