@@ -22,6 +22,7 @@ from xadmin.sites import site
 from xadmin.views import BasePlugin, ListAdminView
 from xadmin.util import json
 from xadmin.views.list import ALL_VAR
+from xadmin.views.page import GridPage
 
 try:
     import xlwt
@@ -144,7 +145,7 @@ class ExportPlugin(BasePlugin):
         export_header = (
             self.request.GET.get('export_xls_header', 'off') == 'on')
 
-        model_name = self.opts.verbose_name
+        model_name = self.opts.verbose_name if self.opts else self.admin_view.verbose_name
         book = xlwt.Workbook(encoding='utf8')
         sheet = book.add_sheet(
             u"%s %s" % (_(u'Sheet'), force_unicode(model_name)))
@@ -235,7 +236,7 @@ class ExportPlugin(BasePlugin):
         response = HttpResponse(
             mimetype="%s; charset=UTF-8" % self.export_mimes[file_type])
 
-        file_name = self.opts.verbose_name.replace(' ', '_')
+        file_name = self.opts.verbose_name.replace(' ', '_') if self.opts else self.admin_view.verbose_name
         response['Content-Disposition'] = ('attachment; filename=%s.%s' % (
             file_name, file_type)).encode('utf-8')
 
@@ -256,12 +257,18 @@ class ExportPlugin(BasePlugin):
         控制是否导出
         '''
         item.export = not item.attr or field_name == '__str__' or getattr(item.attr, 'allow_export', True)
+        if field_name=='action_checkbox':
+            item.export = False
         return item
 
     def result_item(self, item, obj, field_name, row):
         item.export = item.field or field_name == '__str__' or getattr(item.attr, 'allow_export', True)
+        if field_name=='action_checkbox':
+            item.export = False
         return item
 
 
 site.register_plugin(ExportMenuPlugin, ListAdminView)
 site.register_plugin(ExportPlugin, ListAdminView)
+site.register_plugin(ExportMenuPlugin, GridPage)
+site.register_plugin(ExportPlugin, GridPage)

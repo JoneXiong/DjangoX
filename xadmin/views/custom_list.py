@@ -9,7 +9,7 @@ from django.template import loader
 
 import xadmin
 from base import filter_hook
-from list import ResultRow, ResultHeader, COL_LIST_VAR
+from list import ResultRow, ResultHeader, COL_LIST_VAR, ResultItem
 from xadmin.db.query import Collection
 from grid import BaseGrid
 
@@ -108,6 +108,11 @@ class GridPage(BaseGrid,PageView):
 #         if self.check_box:
 #             media += self.vendor('xadmin.plugin.actions.js', 'xadmin.plugins.css', 'xadmin.form.css')
 #         return media
+
+    @filter_hook
+    def result_header(self, field_name, row):
+        item = ResultHeader(field_name, row)
+        return item
     
     @filter_hook
     def result_headers(self):
@@ -122,7 +127,7 @@ class GridPage(BaseGrid,PageView):
                 text = _dict[field_name]
             else:
                 text = self.action_checkbox.short_description
-            m_rh = ResultHeader(field_name, row)
+            m_rh = self.result_header(field_name, row)
             m_rh.text = text
             row.cells.append(m_rh)
 #         if self.check_box:
@@ -147,7 +152,31 @@ class GridPage(BaseGrid,PageView):
         m_data = {}
         for e in self.val_list:
             m_data[e] = data[e]
-        return urllib.quote( json.dumps(m_data) ) 
+        return urllib.quote( json.dumps(m_data) )
+    
+    @filter_hook
+    def result_item(self, obj, field_name, row):
+        data = obj
+        key = field_name
+        
+        item = ResultItem(field_name, row)
+        if data.has_key(key):
+            text = data[key]
+        else:
+            text = getattr(self, key)(data)
+        item.text = text
+        return item
+    
+    @filter_hook
+    def result_row(self, obj):
+        data = obj
+        row = ResultRow()
+        data['_pk'] = self.pk(data)
+#             row.add_cell('_data', data['_pk'])
+        for key in self.list_display:
+#                 if key!='action_checkbox':
+            row.cells.append(self.result_item(obj, key, row))
+        return row
     
     @filter_hook
     def results(self):
@@ -156,16 +185,7 @@ class GridPage(BaseGrid,PageView):
         """
         results = []
         for data in self.result_list:
-            row = ResultRow()
-            data['_pk'] = self.pk(data)
-#             row.add_cell('_data', data['_pk'])
-            for key in self.list_display:
-#                 if key!='action_checkbox':
-                if data.has_key(key):
-                    row.add_cell(key, data[key])
-                else:
-                    row.add_cell(key, getattr(self, key)(data) )
-            results.append(row)
+            results.append(self.result_row(data))
         return results
         #return self.result_list
         
