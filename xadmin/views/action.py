@@ -50,6 +50,7 @@ class FormAction(Action):
     form = forms.Form
     form_layout = None
     form_template = 'xadmin/views/model_form_action.html'
+    action_url = ''
     
     def get_form_datas(self):
         data = {'initial': self.get_initial_data()}
@@ -154,7 +155,8 @@ class FormAction(Action):
             "app_label": self.app_label,
             'action_checkbox_name': ACTION_CHECKBOX_NAME,
             'action_name': 'act_'+ self.__class__.__bases__ [1].__name__,
-            'return_url': self.request.POST.get('_action_return_url') if '_action_return_url' in self.request.POST else self.request.META['HTTP_REFERER']
+            'return_url': self.request.POST.get('_action_return_url') if '_action_return_url' in self.request.POST else self.request.META['HTTP_REFERER'],
+            'action_url': self.action_url
         })
         
         return TemplateResponse(self.request, self.form_template, context, current_app=self.admin_site.name)
