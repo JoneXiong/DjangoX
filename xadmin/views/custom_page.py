@@ -26,7 +26,7 @@ class PageView(SiteView):
         #if not self.perm:
         #   self.perm = self.__class__.__name__
         perm_code = self.perm or 'not_setting_perm'
-        if not self.user.has_perm('auth.'+perm_code):
+        if self.need_site_permission and not self.user.has_perm('auth.'+perm_code):
             raise PermissionDenied
         if '_pop' in self.request.GET or 'pop' in self.request.GET:
             self.pop = True
