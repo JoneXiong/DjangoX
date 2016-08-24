@@ -90,6 +90,15 @@ select.selectmultiple {
   .int-field {
     max-width: 100px;
   }
+  .fk-field {
+    max-width: 300px;
+  }
+   .m2m-field {
+    max-width: 10px;
+  }
+  .vertical-top {
+    vertical-align: top
+  }
   .datetime > .input-group {
     float: left;
     margin-right: 5px;

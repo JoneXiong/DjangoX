@@ -83,7 +83,7 @@ class ForeignKeySearchWidget(forms.TextInput):
     
 class RawIdWidget(forms.TextInput):
     
-    label_format = '<span style="display: inline-block; width:300px"><input type="text" id="id_%s_show" class="form-control" value="%s" readonly="readonly" /></span>'
+    label_format = '<input type="text" id="id_%s_show" class="form-control" value="%s" readonly="readonly" />'
     
     def render(self, name, value, attrs=None):
         to_opts = self.r_model._meta
@@ -109,20 +109,24 @@ class RawIdWidget(forms.TextInput):
 
             if value:
                 if attrs['class'] == 'vManyToManyRawIdAdminField':
-                    self.label_format = '<span style="display: inline-block;"><div class="obj-show " id="id_%s_show">%s</div></span>'
-                extra.append( self.label_for_value(value, name=name) )
+                    self.label_format = '<div class="obj-show " id="id_%s_show">%s</div>'
+                input_html = self.label_for_value(value, name=name)
             else:
                 if attrs['class'] == 'vManyToManyRawIdAdminField':
                     input_html = '<div class="obj-show " id="id_%s_show"></div>'%name
                 else:
                     input_html = '<input type="text" id="id_%s_show" class="form-control" value="" readonly="readonly" />'%name
-                extra.append('<span style="display: inline-block;">%s</span>'%input_html)
-            
-            extra.append('&nbsp;&nbsp;<a class="related-lookup" id="remove_id_%s" href="javascript://" onclick="return removeRelatedObject(this);" >x</a>&nbsp;&nbsp;'%name)
-            extra.append('<a href="%s%s" class="related-lookup" id="lookup_id_%s" onclick="return showRelatedObjectLookupPopup(this);"> '
-                            % (related_url, url, name))
-            extra.append('<img src="%s" width="16" height="16" alt="%s" /></a>'
-                            % (static('admin/img/selector-search.gif'), _('Lookup')))
+            _css = attrs['class'] == 'vManyToManyRawIdAdminField' and 'm2m-field' or 'fk-field'
+            all_html = '''
+            <div class="input-group %s">
+                %s
+                <span class="input-group-btn vertical-top">
+                    <a href="%s%s" class="btn btn-primary related-lookup" id="lookup_id_%s" onclick="return showRelatedObjectLookupPopup(this);"><i class="fa fa-search"></i></a>
+                    <a href="javascript://" class="btn btn-default related-lookup" id="remove_id_%s"  onclick="return removeRelatedObject(this);" ><i class="fa fa-remove"></i></a>
+                </span>
+            </div>
+            '''%(_css, input_html, related_url, url, name, name)
+            extra.append(all_html)
 
         attrs['type'] = 'hidden'
         output = [super(RawIdWidget, self).render(name, value, attrs)] + extra
