@@ -295,6 +295,7 @@ class BaseView(Common, View):
 
     base_template = 'xadmin/base.html'
     need_site_permission = True
+    csrf = True
 
     def __init__(self, request, *args, **kwargs):
         self.request = request
@@ -331,7 +332,8 @@ class BaseView(Common, View):
 
         update_wrapper(view, cls, updated=())
         view.need_site_permission = cls.need_site_permission
-
+        if not cls.csrf:
+            view.csrf_exempt = True
         return view
 
     def init_request(self, *args, **kwargs):
