@@ -2,4 +2,4 @@
 
 from custom_page import PageView
 from custom_list import GridPage
-from custom_form import FormPage, FormAction
+from custom_form import FormPage, FormAction, ConfigFormPage
