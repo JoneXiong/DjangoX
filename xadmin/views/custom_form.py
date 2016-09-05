@@ -75,10 +75,9 @@ class ConfigFormPage(FormPage):
 
     @filter_hook
     def save_forms(self):
-        _key = 'key:%s'%self.__class__.__name__
         forn_data = self.form_obj.cleaned_data
         db_data = json.dumps(forn_data, cls=JSONEncoder, ensure_ascii=False)
-        options.options[_key] = db_data
+        options.options[self.key] = db_data
 
     @classmethod
     def options(cls, name):
