@@ -81,7 +81,7 @@ class ConfigFormPage(FormPage):
 
     @classmethod
     def options(cls, name):
-        _db_data = options.options[cls._key]
+        _db_data = options.options[cls.key]
         if _db_data:
             _dict =  json.loads(_db_data)
             return _dict.get(name, None)
