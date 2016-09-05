@@ -64,14 +64,16 @@ class FormAction(FormPage):
         
 class ConfigFormPage(FormPage):
     
+    key = None
+    
     def get_initial_data(self):
-        _key = 'key:%s'%self.__class__.__name__
-        _db_data = options.options[_key]
+        _db_data = options.options[self.key]
         if _db_data:
             return json.loads(_db_data)
         else:
             return {}
 
+    @filter_hook
     def save_forms(self):
         _key = 'key:%s'%self.__class__.__name__
         forn_data = self.form_obj.cleaned_data
@@ -80,8 +82,7 @@ class ConfigFormPage(FormPage):
 
     @classmethod
     def options(cls, name):
-        _key = 'key:%s'%cls.__name__
-        _db_data = options.options[_key]
+        _db_data = options.options[cls._key]
         if _db_data:
             _dict =  json.loads(_db_data)
             return _dict.get(name, None)
