@@ -110,6 +110,20 @@ class UserSettings(models.Model):
     class Meta:
         verbose_name = _(u'User Setting')
         verbose_name_plural = _('User Settings')
+        
+        
+class SystemSettings(models.Model):
+    key = models.CharField(_('Settings Key'), max_length=256)
+    value = models.TextField(_('Settings Content'))
+    create_time = models.DateTimeField('创建时间', auto_now_add=True)
+    update_time = models.DateTimeField('更新时间', auto_now=True)
+    
+    def __unicode__(self):
+        return self.key
+
+    class Meta:
+        verbose_name = _(u'System Setting')
+        verbose_name_plural = _('System Settings')
 
 
 class UserWidget(models.Model):
