@@ -56,7 +56,7 @@ from django.http import QueryDict
 from xadmin.sites import site
 from xadmin.views import ModelAdminView, BasePlugin, ListAdminView
 from xadmin.views.list import COL_LIST_VAR, ORDER_VAR
-from xadmin.views.dashboard import widget_manager, BaseWidget, PartialBaseWidget
+from xadmin.views.dashwidget import widget_manager, BaseWidget, PartialBaseWidget
 from xadmin.defs import FILTER_PREFIX, SEARCH_VAR
 from xadmin.plugins.relate import RELATE_PREFIX
 from xadmin import dutils

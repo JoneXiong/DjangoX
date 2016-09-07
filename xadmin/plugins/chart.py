@@ -60,7 +60,7 @@ from django.utils.translation import ugettext_lazy as _, ugettext
 
 from xadmin.sites import site
 from xadmin.views import BasePlugin, ListAdminView
-from xadmin.views.dashboard import ModelBaseWidget, widget_manager
+from xadmin.views.dashwidget import ModelBaseWidget, widget_manager
 from xadmin.util import lookup_field, label_for_field, force_unicode, json
 
 

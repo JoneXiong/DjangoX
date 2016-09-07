@@ -9,7 +9,8 @@ from detail import DetailAdminView
 
 from form import FormView
 from action import Action
-from dashboard import Dashboard, BaseWidget, widget_manager, ModelDashboard
+from dashwidget import BaseWidget, widget_manager
+from dashboard import Dashboard, ModelDashboard
 
 from website import IndexView, LoginView, LogoutView, UserSettingView
 
