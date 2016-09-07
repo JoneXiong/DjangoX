@@ -23,16 +23,19 @@ class DeleteSelectedAction(Action):
 
     model_perm = 'delete'
     icon = 'fa fa-times'
+    
+    def do_deletes(self, queryset):
+        if self.log:
+            for obj in queryset:
+                self.log_deletion(self.request, obj)
+        queryset.delete()
 
     @filter_hook
     def delete_models(self, queryset):
         u'''orm删除对象'''
         n = queryset.count()
         if n:
-            if self.log:
-                for obj in queryset:
-                    self.log_deletion(self.request, obj)
-            queryset.delete()
+            self.do_deletes(queryset)
             self.message_user(_("Successfully deleted %(count)d %(items)s.") % {"count": n, "items": model_ngettext(self.opts, n) }, 'success')
 
     @filter_hook
