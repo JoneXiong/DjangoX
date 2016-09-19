@@ -332,6 +332,7 @@ class BaseView(Common, View):
 
         update_wrapper(view, cls, updated=())
         view.need_site_permission = cls.need_site_permission
+        view.login_view = getattr(cls, 'login_view', None)
         if not cls.csrf:
             view.csrf_exempt = True
         return view

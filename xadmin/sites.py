@@ -92,7 +92,7 @@ class AdminSite(object):
 
         self.check_dependencies()
 
-        self.model_admins_order = 0
+        self.model_admins_order = 0 # 当前系统分配菜单的索引值
 
     def copy_registry(self):
         """
@@ -273,7 +273,8 @@ class AdminSite(object):
         def inner(request, *args, **kwargs):
             if not self.has_permission(request) and getattr(view, 'need_site_permission', True):
                 # 没有权限则跳转到登录页
-                return self.create_admin_view(self.login_view)(request, *args, **kwargs)
+                _login_view = getattr(view, 'login_view', self.login_view) or self.login_view
+                return self.create_admin_view(_login_view)(request, *args, **kwargs)
             return view(request, *args, **kwargs)
 
         if not cacheable:
@@ -406,6 +407,28 @@ class AdminSite(object):
         :param option_class: Model 的 OptionClass，保存对该 Model 的相关定制
         """
         return self.get_view_class(admin_view_class, option_class).as_view()
+    
+    def gen_view(self, clz):
+        def wrap(view, cacheable=False):
+            '''
+            url请求处理的起点，默认不做view缓存
+            '''
+            def wrapper(*args, **kwargs):
+                return self.site_view_decor(view, cacheable)(*args, **kwargs)
+            return update_wrapper(wrapper, view)
+        return wrap(self.create_admin_view(clz))
+    
+    def gen_model_view(self, clz):
+        model = getattr(clz, 'model')
+        admin_class = self._registry[model]
+        def wrap(view, cacheable=False):
+            '''
+            url请求处理的起点，默认不做view缓存
+            '''
+            def wrapper(*args, **kwargs):
+                return self.site_view_decor(view, cacheable)(*args, **kwargs)
+            return update_wrapper(wrapper, view)
+        return wrap(self.create_model_admin_view(clz, model, admin_class))
 
     def get_urls(self):
         from django.conf.urls import patterns, url, include
