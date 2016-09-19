@@ -144,7 +144,7 @@ class PermissionAdmin(object):
     show_name.is_column = True
 
     model_icon = 'fa fa-lock'
-    list_display = ('show_name', )
+    list_display = ('show_name', 'codename')
     list_filter = ('name', 'codename', 'content_type')
     app_label = 'xadmin'
     menu_group = 'auth_group'
