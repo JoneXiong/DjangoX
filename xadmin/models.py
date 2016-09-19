@@ -124,8 +124,8 @@ class SystemSettings(models.Model):
         return self.key
 
     class Meta:
-        verbose_name = _(u'System Setting')
-        verbose_name_plural = _('System Settings')
+        verbose_name = u'系统设置'
+        verbose_name_plural = u'系统设置'
 
 
 class UserWidget(models.Model):
