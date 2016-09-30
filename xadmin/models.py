@@ -20,11 +20,7 @@ from manager import ModelManager
 AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
 class NewBase(ModelBase):
-    def __new__(cls, name, bases, attrs):
-        ret = ModelBase.__new__(cls, name, bases, attrs)
-        if hasattr(ret, 'init_related_lookup'):
-            ret.init_related_lookup()
-        return ret
+    pass
     
     
 class ExtModel(object):
@@ -37,7 +33,7 @@ class ExtModel(object):
                 logging.warning("class %s has attr %s, but only warning", cls.__name__, k)
             setattr(cls, k, v)
     
-class BaseModel(six.with_metaclass(NewBase), models.Model, ExtModel):
+class BaseModel(models.Model, ExtModel):
     objects = ModelManager()
     had_init_related_lookup = False
 

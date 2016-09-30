@@ -213,13 +213,13 @@ class Dashboard(SiteView):
         '''
         if self.widget_customiz:
             portal_pos = UserSettings.objects.filter(
-                user=self.user, key=self.get_portal_key())
+                user__id=self.user.id, key=self.get_portal_key())
             if len(portal_pos):
                 portal_pos = portal_pos[0].value
                 widgets = []
 
                 if portal_pos:
-                    user_widgets = dict([(uw.id, uw) for uw in UserWidget.objects.filter(user=self.user, page_id=self.get_page_id())])
+                    user_widgets = dict([(uw.id, uw) for uw in UserWidget.objects.filter(user__id=self.user.id, page_id=self.get_page_id())])
                     for col in portal_pos.split('|'):
                         ws = []
                         for wid in col.split(','):
