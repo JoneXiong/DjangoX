@@ -26,8 +26,8 @@ class JSONEncoder(DjangoJSONEncoder):
                 return smart_unicode(o)
             
 if django.VERSION[1] >= 8:
-    from django.db.models.fields.related import RelatedField
-    RelatedObject = RelatedField
+    from django.db.models.fields.related import ForeignObjectRel
+    RelatedObject = ForeignObjectRel
 else:
     from django.db.models.related import RelatedObject
     RelatedObject = RelatedObject
