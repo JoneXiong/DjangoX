@@ -25,10 +25,10 @@ class JSONEncoder(DjangoJSONEncoder):
             except Exception:
                 return smart_unicode(o)
             
-try:
+if django.VERSION[1] >= 8:
     from django.db.models.fields.related import RelatedField
     RelatedObject = RelatedField
-except:
+else:
     from django.db.models.related import RelatedObject
     RelatedObject = RelatedObject
     
