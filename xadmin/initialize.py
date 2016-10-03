@@ -11,6 +11,7 @@ from django.utils.module_loading import module_has_submodule
 def register_builtin_views(site):
     from xadmin import views
     site.register_view(r'^$', views.IndexView, name='index')
+    site.register_view(r'^main.html$', views.MainView, name='main')
     site.register_view(r'^login/$', views.LoginView, name='login')
     site.register_view(r'^logout/$', views.LogoutView, name='logout')
     site.register_view(r'^settings/user$', views.UserSettingView, name='user_settings')

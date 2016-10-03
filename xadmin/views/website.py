@@ -12,7 +12,7 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate
 
-from base import BaseView, filter_hook
+from base import BaseView, filter_hook, SiteView
 from dashboard import Dashboard
 from xadmin.models import UserSettings
 from xadmin.layout import FormHelper
@@ -24,6 +24,21 @@ class IndexView(Dashboard):
 
     def get_page_id(self):
         return 'home'
+
+class MainView(Dashboard):
+    title = _("Main Dashboard")
+    icon = "fa fa-dashboard"
+    base_template = 'xadmin/base_site_noleft.html'
+    template = 'xadmin/main.html'
+
+    @filter_hook
+    def get_context(self):
+        context = super(Dashboard, self).get_context()
+        context['head_fix'] = False
+        return context
+
+    def get_page_id(self):
+        return 'main'
 
 
 class UserSettingView(BaseView):

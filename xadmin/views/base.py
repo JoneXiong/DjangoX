@@ -465,7 +465,8 @@ class SiteView(BaseView):
             'site_menu': hasattr(self, 'app_label') and m_site.get_site_menu(self.app_label) or [],
             'site_title': m_site.site_title or defs.DEFAULT_SITE_TITLE,
             'site_footer': m_site.site_footer or defs.DEFAULT_SITE_FOOTER,
-            'breadcrumbs': self.get_breadcrumb()
+            'breadcrumbs': self.get_breadcrumb(),
+            'head_fix': m_site.head_fix
         })
 
         return context

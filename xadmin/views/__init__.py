@@ -12,13 +12,13 @@ from action import Action
 from dashwidget import BaseWidget, widget_manager
 from dashboard import Dashboard, ModelDashboard
 
-from website import IndexView, LoginView, LogoutView, UserSettingView
+from website import IndexView, MainView, LoginView, LogoutView, UserSettingView
 
 __all__ = (
     'Common',
     'BasePlugin', 'BaseView', 'SiteView', 'ModelAdminView', 'ListAdminView',
     'ModelFormAdminView', 'CreateAdminView', 'UpdateAdminView', 'DeleteAdminView', 'DetailAdminView', 'FormView', 'Action'
     'Dashboard', 'BaseWidget',
-    'IndexView', 'LoginView', 'LogoutView',
+    'IndexView', 'MainView', 'LoginView', 'LogoutView',
     'filter_hook', 'csrf_protect_m'
 )
