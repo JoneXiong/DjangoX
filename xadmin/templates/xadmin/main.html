@@ -1,0 +1,26 @@
+{% extends base_template %}
+{% load i18n xadmin_tags %}
+
+{% block extrastyle %}
+<style style="text/css">
+body,html{margin: 0;padding 0;height: 100%;}
+#sap-container{position: relative;width: 100%;height: 100%;background: #aaa;}
+#sap-container iframe{display: block;width: 100%;height: 100%;border: none;}
+</style>
+{% endblock %} 
+
+{% block content-nav %}
+{% endblock %}
+
+{% block body %}
+
+<div id="sap-container"></div>
+<script type="text/javascript" src="{% static "xadmin/js/iframer.js" %}"></script>
+<script type="text/javascript">
+	iframer.init({
+	        //存放iframe的容器
+		default_url:'',
+		container : document.getElementById('sap-container'),
+	});
+</script>
+{% endblock %}
