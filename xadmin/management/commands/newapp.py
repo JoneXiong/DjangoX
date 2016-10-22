@@ -10,7 +10,13 @@ from django.utils.importlib import import_module
 class Command(BaseCommand):
     help = (u"Creates a new Django app.")
 
-    def handle(self, app_name=None, *args, **options):
+    def add_arguments(self, parser):
+                parser.add_argument('name', nargs='+', type=int)
+
+    def handle(self, *args, **options):
+        app_name = options.get('name',None)
+        if app_name:
+            app_name = app_name[0]
         if app_name is None:
             raise CommandError(u"you must provide an app name")
 
