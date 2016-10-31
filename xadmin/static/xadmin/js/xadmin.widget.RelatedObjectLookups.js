@@ -28,6 +28,8 @@ function windowname_to_id(text) {
 }
 // 打开选择对象的列表页窗口
 function showRelatedObjectLookupPopup(triggeringLink) {
+    $scope = $(triggeringLink).parent().parent().parent();
+
     var name = triggeringLink.id.replace(/^lookup_/, '');
     name = id_to_windowname(name);
     var href;
@@ -36,16 +38,19 @@ function showRelatedObjectLookupPopup(triggeringLink) {
     } else {
         href = triggeringLink.href + '?pop=1';
     }
-    var win = window.open(href, name, 'height=600,width=1000,resizable=yes,scrollbars=yes');
+    href += '&scope='+ $scope.attr("id");
+    var win = window.open(href, name+'@'+$scope.attr("id"), 'height=600,width=1000,resizable=yes,scrollbars=yes');
     win.focus();
     return false;
 }
 
 // 清空所有选择
 function removeRelatedObject(triggeringLink) {
+    $scope = $(triggeringLink).parent().parent().parent();
+
     var id = triggeringLink.id.replace(/^remove_/, '');
-    var elem = document.getElementById(id);
-    var show = document.getElementById(id+'_show');
+    var elem = $scope.find('#'+id).get(0); //document.getElementById(id);
+    var show = $scope.find('#'+id+'_show').get(0);//document.getElementById(id+'_show');
     elem.value = "";
     try{
     	show.innerHTML = "";
@@ -74,9 +79,13 @@ function addObject(elem, show, chosenId, desc){
 
 // 设置所选的对象
 function dismissRelatedLookupPopup(win, chosenId, desc) {
-    var name = windowname_to_id(win.name);
-    var elem = document.getElementById(name);
-    var show = document.getElementById(name+'_show');
+    var li = windowname_to_id(win.name).split('@');
+    var name = li[0];
+    var scope = li[1];
+    //var elem = document.getElementById(name);
+    //var show = document.getElementById(name+'_show');
+    var elem = $('#'+scope+' #'+name).get(0);
+    var show = $('#'+scope+' #'+name+'_show').get(0);
     if (elem.className.indexOf('vManyToManyRawIdAdminField') != -1) {
     	if ( elem.value.split(",").indexOf(''+chosenId)<0 ){
     		if (elem.value){
