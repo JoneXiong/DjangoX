@@ -1,0 +1,33 @@
+{% load i18n xadmin_tags %}
+  <div id="top-nav" class="navbar navbar-xs navbar-inverse navbar-fixed-top">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">{% block branding %}{{ site_title }}{% endblock %}</a>
+    </div>
+   <div>
+      <ul class="nav navbar-nav">
+	      {% for sitem in site_menu %}
+	      <li{% if sitem.selected %} class="active"{% endif %}>
+	        <a href="{{ sitem.url }}">{% if sitem.icon %}<i class="fa-fw {{sitem.icon}}"></i>{% endif %} {{ sitem.title }}</a>
+	      </li>
+	      {% endfor %}
+      </ul>
+   </div>
+    <div class="navbar-collapse collapse">
+      <ul class="nav navbar-nav navbar-right">
+        {% view_block 'top_navmenu' %}
+        {% if user.is_active and user.is_staff %}
+          <li class="dropdown">
+            <a class="dropdown-toggle" role="button" data-toggle="dropdown" href="#">
+                <i class="fa fa-user"></i>
+            <strong>{% filter force_escape %}{% firstof user.first_name user.username %}{% endfilter %}</strong> <span class="caret"></span></a>
+            <ul id="g-account-menu" class="dropdown-menu" role="menu">
+              {% view_block 'top_account_menu' %}
+            </ul>
+          </li>
+        {% endif %}
+        <li><a href="{% url 'xadmin:logout' %}"><i class="fa fa-sign-out"></i><span class="hide-sm">{% trans 'Log out' %}</span></a></li>
+      </ul>
+      {% view_block 'top_navbar' %}
+    </div>
+  </div>
+
