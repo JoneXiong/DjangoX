@@ -12,7 +12,7 @@
 
   <div id="body-content" class="clearfix row">
 
-    <div id="content-block" class="col-sm-12 col-md-12">
+    <div id="content-block" class="col-sm-12 col-md-12" {% if head_fix %}style="padding-left: 15px"{% endif %}>
       {% block breadcrumbs %}
       <ul class="breadcrumb">
       {% if breadcrumbs %}

@@ -72,7 +72,7 @@ class ThemePlugin(BasePlugin):
                 cache.set(THEME_CACHE_KEY, json.dumps(ex_themes), 24 * 3600)
                 themes.extend(ex_themes)
 
-        nodes.append(loader.render_to_string('xadmin/blocks/comm.top.theme.html', {'themes': themes, 'select_css': select_css}))
+        nodes.append(loader.render_to_string('xadmin/blocks/comm.top.theme.html', {'themes': themes, 'select_css': select_css,'head_fix':self.admin_site.head_fix}))
 
 
 site.register_plugin(ThemePlugin, BaseView)

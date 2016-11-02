@@ -11,6 +11,8 @@
     {% endif %}
 
   <div id="body-content" class="clearfix row">
+
+    {% if not head_fix %}
     <div id="left-side" class="col-sm-1 col-md-2">
         {% block navbar %}
         {% if nav_menu %}
@@ -21,8 +23,9 @@
       {% endblock %}
       {% view_block 'left_navbar' %}
     </div>
+    {% endif %}
 
-    <div id="content-block" class="col-sm-11 col-md-10">
+    <div id="content-block" class="{% if not head_fix %}col-sm-10 col-md-10{% else %}col-sm-12 col-md-12 main-content{% endif %}" {% if head_fix %}style="padding-left: 15px"{% endif %}>
       {% block breadcrumbs %}
       <ul class="breadcrumb">
 	      {% if breadcrumbs %}
@@ -84,6 +87,7 @@
     </div>
   </div>
 
+  {% if not head_fix %}
   {% block footer %}
   <div id="footer">
     <hr/>
@@ -92,5 +96,9 @@
     </footer>
   </div>
   {% endblock %}
+  {% else %}
+  <br/>
+  <br/>
+  {% endif %}
 
 {% endblock body %}
