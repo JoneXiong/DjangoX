@@ -12,7 +12,7 @@ DEFAULT_RELFIELD_STYLE = {
 verbose_name = u'系统'
 
 menus = (
-         ('auth_group', u'权限',  'auth_icon'),
+         ('auth_group', u'权限',  'fa-user-plus'),
          )
 
 # django patch
