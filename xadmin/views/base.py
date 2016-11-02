@@ -396,15 +396,15 @@ class SiteView(BaseView):
             return self.user.has_perm(need_perm)
         
     def get_nav_menu(self):
-        # DEBUG模式会首先尝试从SESSION中取得缓存的 app 菜单项
-        menu_session_key = 'nav_menu_%s'%self.app_label
+        # 非DEBUG模式会首先尝试从SESSION中取得缓存的 app 菜单项
+        menu_session_key = self.app_label and 'nav_menu_%s'%self.app_label or 'nav_menu'
         if not settings.DEBUG and menu_session_key in self.request.session:
             nav_menu = json.loads(self.request.session[menu_session_key])
         else:
             if hasattr(self, 'app_label') and self.app_label:
                 menus = copy.deepcopy(self.admin_site.get_app_menu(self.app_label)) #copy.copy(self.get_nav_menu())
             else:
-                menus = []
+                menus = copy.deepcopy(self.admin_site.get_menu())
 
             def filter_item(item):
                 if 'menus' in item:
@@ -481,7 +481,8 @@ class SiteView(BaseView):
         return icon
     
     def block_top_account_menu(self, context, nodes):
-        return '<li><a href="%s"><i class="fa fa-key"></i> %s</a></li>' % (self.get_admin_url('account_password'), _('Change Password'))
+        a_class = self.admin_site.head_fix and 'class="J_menuItem"' or '' 
+        return '<li><a %s href="%s"><i class="fa fa-key"></i> %s</a></li>' % (a_class, self.get_admin_url('account_password'), _('Change Password'))
 
     @filter_hook
     def get_breadcrumb(self):
@@ -489,6 +490,8 @@ class SiteView(BaseView):
         导航链接基础部分
         '''
         import xadmin
+        if self.admin_site.head_fix:
+            return []
         base = [{
             'url': self.get_admin_url('index'),
             'title': _('Home')
