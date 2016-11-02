@@ -11,8 +11,8 @@
         <span class="badge badge-info">{{ item.menus|length }}</span>
         <a class="accordion-toggle" >
           {% if item.url %}<a href="{{ item.url }}" class="section">{% endif %}
-          {% if item.icon %}<i class="fa-fw {{item.icon}}"></i>
-          {% elif item.first_icon %}<i class="fa-fw {{item.first_icon}}"></i>
+          {% if item.icon %}<i class="fa fa-fw {{item.icon}}"></i>
+          {% elif item.first_icon %}<i class="fa fa-fw {{item.first_icon}}"></i>
           {%else%}<i class="fa-fw fa fa-circle-o"></i>{% endif %}
           <strong>{% trans item.title %}</strong>
           {% if item.url %}</a>{% endif %}

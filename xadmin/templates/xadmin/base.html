@@ -23,7 +23,7 @@
     window.__admin_path_prefix__ = "{% filter escapejs %}{{ indexurl }}{% endfilter %}";
   </script>
   {% if head_fix %}
-  <script type="text/javascript" src="{% static "xadmin/js/site_config.js" %}"></script>
+    <script type="text/javascript" src="{% static "xadmin/js/site_config.js" %}"></script>
   {% endif %} 
   <script type="text/javascript" src="{% url 'xadmin:jsi18n' %}"></script>
   {% block extrahead %}{% endblock %}

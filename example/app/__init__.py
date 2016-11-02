@@ -3,5 +3,5 @@
 verbose_name = u'示例App'
 
 menus = (
-         ('test_group', u'Pages', 'test_icon'),
+         ('test_group', u'Pages', 'fa-file-o'),
          )

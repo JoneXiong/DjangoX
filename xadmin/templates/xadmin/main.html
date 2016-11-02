@@ -1,26 +1,210 @@
-{% extends base_template %}
 {% load i18n xadmin_tags %}
 
-{% block extrastyle %}
-<style style="text/css">
-body,html{margin: 0;padding 0;height: 100%;}
-#sap-container{position: relative;width: 100%;height: 100%;background: #aaa;}
-#sap-container iframe{display: block;width: 100%;height: 100%;border: none;}
-</style>
-{% endblock %} 
+<!DOCTYPE html>
+<html lang="zh_CN">
+<head>
 
-{% block content-nav %}
-{% endblock %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-{% block body %}
+    <title>主页 | {{ site_title }}</title>
 
-<div id="sap-container"></div>
-<script type="text/javascript" src="{% static "xadmin/js/iframer.js" %}"></script>
-<script type="text/javascript">
-	iframer.init({
-	        //存放iframe的容器
-		default_url:'',
-		container : document.getElementById('sap-container'),
-	});
-</script>
-{% endblock %}
+    <link href="/static/inspinia/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/inspinia/font-awesome/css/font-awesome.css" rel="stylesheet">
+
+    <!-- 通知插件 Toastr style -->
+    <link href="/static/inspinia/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+
+    <link href="/static/inspinia/css/animate.css" rel="stylesheet">
+    <link href="/static/inspinia/css/style.css" rel="stylesheet">
+    <link href="/static/xadmin/css/xadmin.frame.css" rel="stylesheet">
+
+
+</head>
+
+<body class="full-height-layout" style="overflow:hidden">
+    <div id="wrapper">
+        <!--左侧导航开始-->
+        <nav class="navbar-default navbar-static-side" role="navigation">
+            <div class="sidebar-collapse">
+                <ul class="nav metismenu" id="side-menu">
+                    <li class="nav-header">
+                        <div class="dropdown profile-element"> 
+                        <span>
+                            <A href="https://github.com/JoneXiong/DjangoX" target="_blank"><h1>DjangoX</h1></A>
+                            <!--<img alt="image" class="img-circle"
+                            src="img/profile_small.jpg" />-->
+                        </span>
+
+                        </div>
+                        <div class="logo-element">
+                            DjX
+                        </div>
+                    </li>
+                    <li>
+                        <a class="J_menuItem" href="{% url 'xadmin:index' %}" data-index="0"><i class="fa fa-home"></i>
+                            <span class="nav-label">主页</span></a>
+                    </li>
+                    
+    {% block navbar %}
+        {% if nav_menu %}
+          {% include menu_template %}
+        {% else %}
+          <p></p>
+        {% endif %}
+    {% endblock %}
+
+
+                </ul>
+
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="gray-bg dashbard-1">
+
+        <div class="row border-bottom">
+        <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
+
+
+    <div class="navbar-header">
+
+
+      <ul class="nav navbar-top-links">
+
+
+        <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
+            
+
+
+        {% view_block 'top_navbar' %}
+
+      </ul>
+
+    </div>
+
+
+
+
+
+            <ul class="nav navbar-top-links navbar-right">
+
+                <li class="dropdown">
+                    <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
+                        <i class="fa fa-bell"></i>  <span class="label label-primary"></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-alerts">
+                        <li>
+                            <div class="text-center link-block">
+                                <a href="#">
+                                    <strong>查看更多通知</strong>
+                                    <i class="fa fa-angle-right"></i>
+                                </a>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+
+        {% view_block 'top_navmenu' %}
+        {% if user.is_active and user.is_staff %}
+          <li class="dropdown">
+            <a class="dropdown-toggle" role="button" data-toggle="dropdown" href="#">
+                <i class="fa fa-user"></i>
+            <strong>{% filter force_escape %}{% firstof user.first_name user.username %}{% endfilter %}</strong> <span class="caret"></span></a>
+            <ul id="g-account-menu" class="dropdown-menu" role="menu">
+              {% view_block 'top_account_menu' %}
+            </ul>
+          </li>
+        {% endif %}
+        <li><a href="{% url 'xadmin:logout' %}"><i class="fa fa-sign-out"></i><span class="hide-sm">{% trans 'Log out' %}</span></a></li>
+
+            </ul>
+
+        </nav>
+        </div>
+
+
+            <div class="row content-tabs">
+                <button class="roll-nav roll-left navbar-minimalize"><i class="fa fa-bars"></i></button>
+                <button class="roll-nav roll-left J_tabLeft"><i class="fa fa-backward"></i>
+                </button>                
+                <nav class="page-tabs J_menuTabs">
+                    <div class="page-tabs-content">
+                        <a href="javascript:;" class="active J_menuTab"
+                            data-id="{% url 'xadmin:index' %}">主页</a>
+                    </div>
+                </nav>
+                <button class="roll-nav roll-right J_tabRight"><i class="fa fa-forward"></i>
+                </button>
+                <div class="btn-group roll-nav roll-right">
+                    <button class="dropdown J_tabClose" data-toggle="dropdown">关闭操作<span class="caret"></span></button>
+                    <ul role="menu" class="dropdown-menu dropdown-menu-right">
+                        <!--<li class="J_tabShowActive"><a>定位当前选项卡</a></li>-->
+                        <li class="J_tabCloseCurr"><a>关闭当前选项卡</a></li>
+                        <li class="J_tabRefresh"><a>刷新当前选项卡</a></li>
+                        <li class="divider"></li>
+                        <li class="J_tabCloseLeft"><a>关闭左侧选项卡</a></li>
+                        <li class="J_tabCloseRight"><a>关闭右侧选项卡</a></li>
+                        <li class="J_tabCloseOther"><a>关闭其他选项卡</a></li>
+                        <li class="J_tabCloseAll"><a>关闭全部选项卡</a></li>
+                    </ul>
+                </div>
+            </div>
+            <!-- 右侧iframe展示区域  -->
+            <div class="row J_mainContent" id="content-main">
+                <iframe class="J_iframe" name="iframe0" width="100%"
+                    height="100%" src="{% url 'xadmin:index' %}" frameborder="0" data-id="{% url 'xadmin:index' %}" seamless></iframe>
+            </div>
+            
+            <!-- 底部footer展示区域  -->
+            <div class="footer">
+                <div class="pull-right">&copy; 2015-2016 <a
+                        href="https://github.com/JoneXiong/DjangoX" target="_blank">{{ site_footer }}</a>
+                </div>
+            </div>
+
+        </div>
+        
+        
+    </div>
+
+    <!-- 遮罩层start -->
+    <div class="top-sild-mask" id="top-sild-mask"></div>
+    <div class="left-sild-mask" id="left-sild-mask"></div>
+    <div class="bottom-sild-mask" id="bottom-sild-mask"></div>
+    <!-- 遮罩层end -->
+
+    <!-- Mainly scripts -->
+    <script src="/static/inspinia/js/jquery-2.1.1.js"></script>
+    <script src="/static/inspinia/js/bootstrap.min.js"></script>
+    <script src="/static/inspinia/js/plugins/metisMenu/jquery.metisMenu.js"></script>
+    <script src="/static/inspinia/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+
+    <!-- Custom and plugin javascript -->
+    <script src="/static/inspinia/js/inspinia.js"></script>
+    <script src="/static/inspinia/js/plugins/pace/pace.min.js"></script>
+
+    <!-- Toastr -->
+    <script src="/static/inspinia/js/plugins/toastr/toastr.min.js"></script>
+
+    <script src="/static/inspinia/js/contabs.min.js" type="text/javascript"></script>
+
+
+
+    <script>
+        $(document).ready(function() {
+            setTimeout(function() {
+                toastr.options = {
+                    closeButton: true,
+                    progressBar: true,
+                    showMethod: 'slideDown',
+                    timeOut: 4000
+                };
+                toastr.success("Everything is ok, Let's go !", 'Welcome to DjangoX');
+
+            }, 1300);
+        });
+
+    </script>
+</body>
+</html>

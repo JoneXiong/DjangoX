@@ -6,7 +6,7 @@
     {% for item in nav_menu %}
       <li class="{% if item.menus %}nav-header{% endif %} {% if item.selected %} active{% endif %}">
         {% if item.url %}<a href="{{ item.url }}" class="section">{% endif %}
-        {% if item.icon %}<i class="fa-fw {{item.icon}}"></i>{% endif %}{{ item.title }}
+        {% if item.icon %}<i class="fa fa-fw {{item.icon}}"></i>{% endif %}{{ item.title }}
         {% if item.url %}</a>{% endif %}
       </li>
       {% for sitem in item.menus %}
@@ -29,8 +29,8 @@
     {% for item in nav_menu %}
       <li class="app_menu dropdown-submenu {% if item.selected %} active{% endif %}">
         <a href="#" class="section">
-          {% if item.icon %}<i class="icon fa-fw {{item.icon}}"></i>
-          {% elif item.first_icon %}<i class="icon fa-fw {{item.first_icon}}"></i>
+          {% if item.icon %}<i class="icon fa fa-fw {{item.icon}}"></i>
+          {% elif item.first_icon %}<i class="icon fa fa-fw {{item.first_icon}}"></i>
           {%else%}<i class="icon fa-fw fa fa-circle-o"></i>{% endif %}
         </a><hr/>
         <ul class="dropdown-menu">

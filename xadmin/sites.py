@@ -524,6 +524,9 @@ class AdminSite(object):
         return '%s.%s_%s' % (model._meta.app_label, name, model._meta.module_name)
     
     def get_sys_menu(self):
+        '''
+        加载系统所有菜单
+        '''
         for model, model_admin in self._registry.items():
             if getattr(model_admin, 'hidden_menu', False):
                 continue
@@ -574,6 +577,9 @@ class AdminSite(object):
         self.sys_menu_loaded = True
     
     def get_app_menu(self, app_label):
+        '''
+        获取某个APP的菜单
+        '''
         if not self.sys_menu_loaded:self.get_sys_menu()
         m_menu = self.sys_menu[app_label]
         m_app = self.app_dict[app_label]
@@ -585,8 +591,30 @@ class AdminSite(object):
         if len(m_menu['_default_group'])>0:
                 ret.append(m_menu['_default_group'])
         return ret
+
+    def get_menu(self):
+        '''
+        获取站点所有菜单
+        '''
+        if not self.sys_menu_loaded:self.get_sys_menu()
+        ret = []
+        for k,v in self.sys_menu.items():
+            app_label = k
+            m_menu = v
+            m_app = self.app_dict[app_label]
+
+            if hasattr(m_app,'menus'):
+                m_menus = m_app.menus
+                for e in m_menus:
+                    ret.append(m_menu[e[0]])
+            if len(m_menu['_default_group'])>0:
+                    ret.append(m_menu['_default_group'])
+        return ret
     
     def get_site_menu(self, select_app):
+        '''
+        获取APP列表菜单
+        '''
         if not self.sys_menu_loaded:self.get_sys_menu()
         ret = [{
                     'app_lavel': '',
