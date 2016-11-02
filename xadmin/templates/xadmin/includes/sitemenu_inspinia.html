@@ -1,0 +1,19 @@
+{% load i18n xadmin_tags %}
+
+
+{% block navbar_md %}
+  {% for item in nav_menu %}
+
+                    <li>
+                    <a {% if item.url %}href="{{ item.url }}"{% else
+                        %}href="#"{% endif %}>{% if item.icon %}<i class="fa fa-fw {{item.icon}}"></i>
+          {% elif item.first_icon %}<i class="fa-fw {{item.first_icon}}"></i>
+          {%else%}<i class="fa-fw fa fa-circle-o"></i>{% endif %} <span class="nav-label">{% trans item.title %}</span><span class="fa arrow"></span></a>
+                        <ul class="nav nav-second-level collapse">
+                            {% for sitem in item.menus %}
+                            <li><a class="J_menuItem" href="{{ sitem.url|default_if_none:'#' }}">{% if sitem.icon %}<i class="fa-fw {{sitem.icon}}"></i>{%else%}<i class="fa-fw fa fa-circle-o"></i>{% endif %}{{ sitem.title }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+    {% endfor %}
+{% endblock navbar_md %}

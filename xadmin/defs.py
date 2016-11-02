@@ -18,6 +18,7 @@ DEFAULT_SITE_FOOTER = u'my-company.inc 2013'
 BUILDIN_STYLES = {
     'default': 'xadmin/includes/sitemenu_default.html',
     'accordion': 'xadmin/includes/sitemenu_accordion.html',
+    'inspinia': 'xadmin/includes/sitemenu_inspinia.html'
 }
 
 TO_FIELD_VAR = 't'
