@@ -74,6 +74,7 @@
     </div>
   </div>
 
+  {% if not head_fix %}
   {% block footer %}
   <div id="footer">
     <hr/>
@@ -82,5 +83,9 @@
     </footer>
   </div>
   {% endblock %}
+  {% else %}
+  <br/>
+  <br/>
+  {% endif %}
 
 {% endblock body %}
