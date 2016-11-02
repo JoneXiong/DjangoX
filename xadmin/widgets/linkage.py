@@ -32,7 +32,7 @@ class SelectRelation(forms.TextInput):
         link_val = str(link_val)
         map_list = [( str(k),'%s-%s'%(self.link, id(v)) ) for k,v in self.map_dict.items()]
         _map = dict(map_list)
-        if link_val:
+        if link_val and link_val!='None':
             cur_obj = self.map_dict[link_val]
         else:
             cur_obj=None
