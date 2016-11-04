@@ -111,8 +111,12 @@ function dismissRelatedLookupPopup(win, chosenId, desc) {
 }
 // 判断是否可以多选
 function can_multi_select_check(win){
-	var name = windowname_to_id(win.name);
-	var elem = document.getElementById(name);
+	//var name = windowname_to_id(win.name);
+	//var elem = document.getElementById(name);
+    var li = windowname_to_id(win.name).split('@');
+    var name = li[0];
+    var scope = li[1];
+    var elem = $('#'+scope+' #'+name).get(0);
 	return elem.className.indexOf('vManyToManyRawIdAdminField') > -1;
 }
 

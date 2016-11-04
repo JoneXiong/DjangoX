@@ -1,7 +1,9 @@
 # coding=utf-8
+import re
 
 from django import forms
 from django.forms import Media
+from ..util import vendor
 
 
 class SelectRelation(forms.TextInput):
@@ -23,12 +25,13 @@ class SelectRelation(forms.TextInput):
         super(SelectRelation, self).__init__(attrs)
     
     def value_from_datadict(self, data, files, name):
+        return data.get(name)
         link_val = data.get(self.link)
         cur_obj = self.map_dict[link_val]
         return cur_obj.value_from_datadict(data, files, name)
     
-    def render(self, name, value, attrs=None):
-        link_val = self.get_value(self.link)
+    def render(self, name, value, attrs=None,form=None):
+        link_val = self.get_value(self.link, form)
         link_val = str(link_val)
         map_list = [( str(k),'%s-%s'%(self.link, id(v)) ) for k,v in self.map_dict.items()]
         _map = dict(map_list)
@@ -38,29 +41,30 @@ class SelectRelation(forms.TextInput):
             cur_obj=None
         _all = set(self.map_dict.values())
         output = []
+        if 'items-__prefix__-' in name:
+            _name = name.replace('items-__prefix__-','')
+        else:
+            _name = re.sub('items-\d+-','',name)
+        _link = name.replace(_name,self.link)#'id_items-__prefix__-'+self.link
         for obj in _all:
             if obj==cur_obj:
-                output.append( '''<div id="%s-%s">%s</div>'''%(self.link, id(obj), obj.render(name, value, attrs) ) )
+                output.append( '''<div id="id_%s-%s">%s</div>'''%(_link, id(obj), obj.render(name, value, attrs) ) )
             else:
-                output.append( '''<div id="%s-%s" style="display: none;">%s</div>'''%(self.link, id(obj), obj.render(name, value, attrs) ) )
+                output.append( '''<div id="id_%s-%s" style="display:none">%s</div>'''%(_link, id(obj), obj.render(name, None, attrs) ) )
+        opt_list = ['<li key="%s">%s</li>'%(k,v) for k,v in _map.items()]
         output.append('''
-        <script>
-            var _map = %s;
-            $("#id_%s").change(function(){
-                val = $(this).val();
-                id = _map[val];
-                $('#'+id).show();
-                $('#'+id).find("#id_%s").removeAttr("disabled");
-                $other = $('#'+id).siblings();
-                $other.hide();
-                $other.find("#id_%s").attr("disabled","disabled");
-            });
-        </script>
-        '''%(_map,self.link,name,name))
+                      <ul class="select-relation" name="%s" link="%s" style="display:none">%s</ul>
+        '''%(_name,self.link,''.join(opt_list)))
         return ''.join(output)
         
-    def get_value(self, key):
-        self.form = self.admin_view.form_obj
+    def get_value(self, key, form=None):
+        '''
+        得到关联字段的值
+        '''
+        if hasattr(self.admin_view,'form_obj'):
+            self.form = self.admin_view.form_obj
+        else:
+            self.form = form
         if not self.form.is_bound:
             return self.form.initial.get(key,None)
         else:
@@ -72,4 +76,4 @@ class SelectRelation(forms.TextInput):
         _all = set(self.map_dict.values())
         for obj in _all:
             media = media + obj.media
-        return media
+        return media + vendor('xadmin.widget.selectrelation.js')

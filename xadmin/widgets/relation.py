@@ -256,7 +256,7 @@ class ForeignKeyPopupWidget(RawIdWidget):
                     show_val = obj
                 return self._render_label(name, show_val)
             except (ValueError, self.r_model.DoesNotExist):
-                return ''
+                return self._render_label(name, '')
         
 
 class ManyToManyPopupWidget(ForeignKeyPopupWidget):
