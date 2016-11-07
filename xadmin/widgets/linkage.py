@@ -18,10 +18,11 @@ class SelectRelation(forms.TextInput):
 
     '''
     
-    def __init__(self, admin_view, link, map_dict, attrs=None, using=None):
+    def __init__(self, admin_view, link, map_dict, attrs=None, using=None,inline_ref=''):
         self.admin_view = admin_view
         self.link = link
         self.map_dict = map_dict
+        self.inline_ref = inline_ref
         super(SelectRelation, self).__init__(attrs)
     
     def value_from_datadict(self, data, files, name):
@@ -41,10 +42,10 @@ class SelectRelation(forms.TextInput):
             cur_obj=None
         _all = set(self.map_dict.values())
         output = []
-        if 'items-__prefix__-' in name:
-            _name = name.replace('items-__prefix__-','')
+        if self.inline_ref+'-__prefix__-' in name:
+            _name = name.replace(self.inline_ref+'-__prefix__-','')
         else:
-            _name = re.sub('items-\d+-','',name)
+            _name = re.sub(self.inline_ref+'-\d+-','',name)
         _link = name.replace(_name,self.link)#'id_items-__prefix__-'+self.link
         for obj in _all:
             if obj==cur_obj:
