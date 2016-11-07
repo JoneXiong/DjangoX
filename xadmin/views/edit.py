@@ -109,7 +109,7 @@ class ModelFormAdminView(ModelAdminView):
     change_form_template = None  #: 修改页面的模板
 
     form_layout = None
-    hidde_other_field = False
+    hide_other_field = False
     add_redirect_url = None
     edit_redirect_url = None
     
@@ -306,7 +306,7 @@ class ModelFormAdminView(ModelAdminView):
             other_fieldset = Fieldset(_(u'Other Fields'), *[f for f in fields if f not in rendered_fields])
 
             # 将所有没有显示的字段和在一个 Fieldset 里面显示
-            if len(other_fieldset.fields) and not self.hidde_other_field:
+            if len(other_fieldset.fields) and not self.hide_other_field:
                 if len(container) and isinstance(container[0], Column):
                     # 把其他字段放在第一列显示
                     container[0].fields.append(other_fieldset)

@@ -8,13 +8,13 @@ from models import UserSettings, SystemSettings
 
 class UserSettingsAdmin(object):
     model_icon = 'fa fa-cog'
-    hidden_menu = False
+    hide_menu = False
 xadmin.site.register(UserSettings, UserSettingsAdmin)
 
 
 class SystemSettingsAdmin(object):
     model_icon = 'fa fa-cog'
-    hidden_menu = False
+    hide_menu = False
 xadmin.site.register(SystemSettings, SystemSettingsAdmin)
 
 

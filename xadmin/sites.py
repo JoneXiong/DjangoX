@@ -67,6 +67,9 @@ class AdminSite(object):
     sys_menu_loaded = False  # 菜单是否加载过
     apps_icons = {'xadmin': 'fa fa-circle-o'}
 
+    login_view = None
+    main_view = None #frame框架main页试图
+
     
     def __init__(self, name='xadmin'):
         self.name = name
@@ -137,7 +140,7 @@ class AdminSite(object):
         else:
             raise ImproperlyConfigured(u'The registered view class %s isn\'t subclass of %s' %(admin_view_class.__name__, BaseView.__name__))
 
-    def register_view(self, path, admin_view_class, name):
+    def register_view(self, path, admin_view_class, name, update=False):
         """
         注册 AdminView 类，一般用于创建独立的 admin 页面，例如登陆，介绍页面，帮助页面等。
 
@@ -145,8 +148,11 @@ class AdminSite(object):
         :param admin_view_class: 注册的 AdminView 类
         :param name: view对应的url name
         """
-        self._registry_views.append((path, admin_view_class, name))
-        
+        if update==False:
+            self._registry_views.append((path, admin_view_class, name))
+        else:
+            self._registry_views.insert(0,(path, admin_view_class, name))
+
     def register_page(self, page_view_class):
         name = page_view_class.__name__
         self._registry_pages.append(page_view_class)
@@ -528,7 +534,7 @@ class AdminSite(object):
         加载系统所有菜单
         '''
         for model, model_admin in self._registry.items():
-            if getattr(model_admin, 'hidden_menu', False):
+            if getattr(model_admin, 'hiden_menu', False) or getattr(model_admin, 'hidden_menu', False):
                 continue
             if hasattr(model_admin, 'menu_group'):
                 m_menu_group = model_admin.menu_group or '_default_group'
@@ -551,7 +557,7 @@ class AdminSite(object):
                 m_menu['_default_group']['menus'].append(model_dict)
         
         for page in self._registry_pages:
-            if getattr(page, 'hidden_menu', False):
+            if getattr(page, 'hide_menu', False)or getattr(page, 'hidden_menu', False):
                 continue
             if hasattr(page, 'menu_group'):
                 m_menu_group = page.menu_group or '_default_group'
