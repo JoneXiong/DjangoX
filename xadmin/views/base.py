@@ -500,7 +500,7 @@ class SiteView(BaseView):
             app_mod = self.admin_site.app_dict[self.app_label]
             pref_url = xadmin.ROOT_PATH_NAME and '/'+xadmin.ROOT_PATH_NAME or ''
             base.append({
-                         'url': '%s/index/%s/'%(pref_url, self.app_label),
+                         'url': app_mod.index_url,#'%s/index/%s/'%(pref_url, self.app_label),
                          'title':  hasattr(app_mod,'verbose_name') and app_mod.verbose_name or self.app_label
                          })
         return base

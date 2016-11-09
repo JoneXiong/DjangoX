@@ -657,6 +657,7 @@ class AdminSite(object):
                             'icon': '',
                             'selected': app_label==select_app
                             })
+                mod.index_url = m_first_url
         return ret
         
 
