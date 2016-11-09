@@ -215,7 +215,7 @@ class AdminFileWidget(forms.ClearableFileInput):
 
 class AdminTextareaWidget(forms.Textarea):
     def __init__(self, attrs=None):
-        final_attrs = {'class': 'textarea-field'}
+        final_attrs = {'class': 'textarea-field','rows': 3}
         if attrs is not None:
             final_attrs.update(attrs)
         super(AdminTextareaWidget, self).__init__(attrs=final_attrs)
