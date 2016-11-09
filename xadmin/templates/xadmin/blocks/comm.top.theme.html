@@ -4,7 +4,7 @@
 <i class="fa fa-magic"></i> <span class="hide-sm">{% trans "Themes" %} <i class="caret"></i></span></a>
 <ul id="g-theme-menu" class="dropdown-menu" role="menu">
   {% for t in themes %}
-      <li{% if t.css == select_css %} class="active"{% endif %}><a data-css-href="{{t.css}}">{{t.name}}</a></li>
+      <li{% if t.css == select_css %} class="active"{% endif %}><a {% if head_fix %}class="J_menuItem"{% endif %} data-css-href="{{t.css}}">{{t.name}}</a></li>
   {% endfor %}
 </ul>
 </li>

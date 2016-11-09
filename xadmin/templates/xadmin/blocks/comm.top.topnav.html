@@ -22,7 +22,7 @@
   <i class="fa fa-plus"></i> <span class="hide-sm">{% trans "Add" %} <i class="caret"></i></span></a>
   <ul id="g-add-menu" class="dropdown-menu" role="menu">
     {% for m in add_models %}
-        <li><a href="{{m.url}}"><i class="fa fa-plus"></i> {{m.title}}</a></li>
+    <li><a {% if head_fix %}class="J_menuItem"{% endif %} href="{{m.url}}"><i class="fa fa-plus"></i> {{m.title}}</a></li>
     {% endfor %}
   </ul>
 </li>

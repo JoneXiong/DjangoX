@@ -190,7 +190,7 @@ class InlineModelAdmin(ModelFormAdminView):
         formset = self.get_formset(**kwargs)
         attrs = {
             'instance': self.model_instance,
-            'queryset': self.queryset()
+            'queryset': self.queryset()#关键点
         }
         if self.request_method == 'post':
             attrs.update({

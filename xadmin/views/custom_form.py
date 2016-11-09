@@ -31,7 +31,7 @@ class FormPage(FormView,PageView):
 class FormAction(FormPage):
     
     template = 'xadmin/views/form_action.html'
-    hidden_menu = True
+    hide_menu = True
     icon = 'fa fa-tasks'
     
     @filter_hook

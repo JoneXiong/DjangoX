@@ -15,7 +15,7 @@ class PageView(SiteView):
     icon = 'fa fa-cog'
     order = 0
     
-    hidden_menu = False
+    hide_menu = False
     perm = None#'comm_page_code'
     pop = False
     

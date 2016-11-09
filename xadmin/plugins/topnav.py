@@ -68,7 +68,7 @@ class TopNavPlugin(BasePlugin):
                     pass
 
         nodes.append(
-            loader.render_to_string('xadmin/blocks/comm.top.topnav.html', {'add_models': add_models}))
+                loader.render_to_string('xadmin/blocks/comm.top.topnav.html', {'add_models': add_models,'head_fix':self.admin_site.head_fix}))
 
 
 site.register_plugin(TopNavPlugin, SiteView)

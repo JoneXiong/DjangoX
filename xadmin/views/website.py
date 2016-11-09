@@ -16,6 +16,7 @@ from base import BaseView, filter_hook, SiteView
 from dashboard import Dashboard
 from xadmin.models import UserSettings
 from xadmin.layout import FormHelper
+from xadmin import defs
 
 
 class IndexView(Dashboard):
@@ -25,20 +26,35 @@ class IndexView(Dashboard):
     def get_page_id(self):
         return 'home'
 
-class MainView(Dashboard):
+class MainView(SiteView):
     title = _("Main Dashboard")
-    icon = "fa fa-dashboard"
-    base_template = 'xadmin/base_site_noleft.html'
     template = 'xadmin/main.html'
+    app_label = None
 
     @filter_hook
     def get_context(self):
-        context = super(Dashboard, self).get_context()
-        context['head_fix'] = False
+        context = {
+                'admin_view': self, 
+                'media': self.media, 
+                'base_template': self.base_template
+                }
+        
+        nav_menu = self.get_nav_menu()
+        m_site = self.admin_site
+        context.update({
+            'menu_template': defs.BUILDIN_STYLES['inspinia'], 
+            'nav_menu': nav_menu,
+            #'site_menu': hasattr(self, 'app_label') and m_site.get_site_menu(self.app_label) or [],
+            'site_title': m_site.site_title or defs.DEFAULT_SITE_TITLE,
+            'site_footer': m_site.site_footer or defs.DEFAULT_SITE_FOOTER,
+            #'breadcrumbs': self.get_breadcrumb(),
+            #'head_fix': m_site.head_fix
+        })
         return context
 
-    def get_page_id(self):
-        return 'main'
+    @never_cache
+    def get(self, request, *args, **kwargs):
+        return self.template_response(self.template, self.get_context())
 
 
 class UserSettingView(BaseView):
