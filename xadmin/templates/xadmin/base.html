@@ -14,6 +14,9 @@
   <link rel="stylesheet" type="text/css" href="{% static "xadmin/css/themes/bootstrap-xadmin.css" %}" />
   {% endif %}
   {% vendor 'font-awesome.css' 'xadmin.main.css' 'xadmin.plugins.css' 'xadmin.responsive.css' %}
+    {% if head_fix %}
+        <link href="{% static "xadmin/css/xadmin.main.frame.css" %}" rel="stylesheet">
+    {% endif %}
   {{ media.css }}
   {% block extrastyle %}{% endblock %}
   {% vendor 'jquery.js' %}
