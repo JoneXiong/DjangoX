@@ -159,6 +159,9 @@ class Dashboard(SiteView):
 
     @filter_hook
     def get_widget(self, widget_or_id, data=None):
+        '''
+        实例话widget
+        '''
         try:
             if isinstance(widget_or_id, UserWidget):
                 widget = widget_or_id
