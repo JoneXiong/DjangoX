@@ -21,8 +21,7 @@ AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
 class NewBase(ModelBase):
     pass
-    
-    
+
 class ExtModel(object):
     @classmethod
     def merge_class(cls, target_cls):
@@ -32,14 +31,14 @@ class ExtModel(object):
             if hasattr(cls, k):
                 logging.warning("class %s has attr %s, but only warning", cls.__name__, k)
             setattr(cls, k, v)
-    
+
 class BaseModel(models.Model, ExtModel):
     objects = ModelManager()
     had_init_related_lookup = False
 
     class Meta:
         abstract = True
-        
+
 models.Model = BaseModel
 
 def add_view_permissions(sender, **kwargs):
@@ -67,6 +66,7 @@ try:
 except:
     pass
 
+#################### 公共注入部分结束 ###################
 
 class Bookmark(models.Model):
     title = models.CharField(_(u'Title'), max_length=128)
@@ -108,14 +108,14 @@ class UserSettings(models.Model):
     class Meta:
         verbose_name = _(u'User Setting')
         verbose_name_plural = _('User Settings')
-        
-        
+
+
 class SystemSettings(models.Model):
     key = models.CharField(_('Settings Key'), max_length=256)
     value = models.TextField(_('Settings Content'))
     create_time = models.DateTimeField('创建时间', auto_now_add=True)
     update_time = models.DateTimeField('更新时间', auto_now=True)
-    
+
     def __unicode__(self):
         return self.key
 
