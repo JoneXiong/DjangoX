@@ -20,6 +20,9 @@ from xadmin import dutils
 
 
 class ModelChoiceIterator(object):
+    '''
+    注册模型迭代器
+    '''
     def __init__(self, field):
         self.field = field
 
@@ -31,6 +34,9 @@ class ModelChoiceIterator(object):
 
 
 class ModelChoiceField(forms.ChoiceField):
+    '''
+    模型选择表单字段
+    '''
 
     def __init__(self, required=True, widget=None, label=None, initial=None,
                  help_text=None, *args, **kwargs):

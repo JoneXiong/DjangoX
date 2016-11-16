@@ -87,6 +87,11 @@ class OneInlineStyle(InlineStyle):
     template = 'xadmin/edit_inline/one.html'
 style_manager.register_style("one", OneInlineStyle)
 
+class NewInlineStyle(InlineStyle):
+    template = 'xadmin/edit_inline/new.html'
+style_manager.register_style("new", NewInlineStyle)
+
+
 
 class AccInlineStyle(InlineStyle):
     template = 'xadmin/edit_inline/accordion.html'
@@ -190,7 +195,7 @@ class InlineModelAdmin(ModelFormAdminView):
         formset = self.get_formset(**kwargs)
         attrs = {
             'instance': self.model_instance,
-            'queryset': self.queryset()#关键点
+            'queryset': self.style=='new' and [] or self.queryset()#关键点
         }
         if self.request_method == 'post':
             attrs.update({
@@ -262,6 +267,8 @@ class InlineModelAdmin(ModelFormAdminView):
 
     def queryset(self):
         queryset = super(InlineModelAdmin, self).queryset()
+        if self.style=='new':
+            return queryset.none()
         if not self.has_change_permission() and not self.has_view_permission():
             queryset = queryset.none()
         return queryset
