@@ -45,7 +45,6 @@ class QuerySet(object):
         :rtype        : QuerySet
 
         """
-        print '777777777',args, kwargs
         return self.__class__(filter_items(self.data, *args, **kwargs))
 
     def select(self, *args, **kwargs):
