@@ -197,6 +197,7 @@ class ChangePasswordView(ModelAdminView):
     model = User
     change_password_form = AdminPasswordChangeForm
     change_user_password_template = None
+    app_label = 'xadmin'
 
     @csrf_protect_m
     def get(self, request, object_id):
