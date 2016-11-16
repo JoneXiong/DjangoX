@@ -4,6 +4,22 @@ from django.utils.safestring import mark_safe
 from django.utils.html import conditional_escape
 from django.utils.encoding import force_unicode
 
+from xadmin import dutils
+
+NON_FIELD_ERRORS = '__all__'
+
+
+class JsonErrorDict(dutils.ErrorDict):
+
+    def __init__(self, errors, form):
+        super(JsonErrorDict, self).__init__(errors)
+        self.form = form
+
+    def as_json(self):
+        if not self:
+            return u''
+        return [{'id': self.form[k].auto_id if k != NON_FIELD_ERRORS else NON_FIELD_ERRORS, 'name': k, 'errors': v} for k, v in self.items()]
+
 
 class FakeMethodField(object):
     u"""

@@ -20,7 +20,7 @@ from xadmin import widgets
 from xadmin.layout import FormHelper, Layout, Fieldset, TabHolder, Container, Column, Col, Field
 from xadmin.util import unquote
 from xadmin.views.detail import DetailAdminUtil
-from xadmin.plugins.ajax import JsonErrorDict
+from .common import JsonErrorDict
 from xadmin import dutils
 
 from base import SiteView, filter_hook, csrf_protect_m
