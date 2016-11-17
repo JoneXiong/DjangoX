@@ -1,12 +1,13 @@
 
 ;(function($){
 
+    //面板 widget表单的处理
   $('form.widget-form').on('post-success', function(e, data){
     $(this).data('ajaxform').clean()
     $('.alert-success #change-link').attr('href', data['change_url'])
     $('.alert-success').show()
   })
-
+    //定义ajaxform
   var AjaxForm = function(element, options) {
     var that = this
 
@@ -18,13 +19,14 @@
 
     constructor: AjaxForm
 
-    , ainit: function(){
+    , ainit: function(){//初始化
+        //加载状态条
       this.$mask = $('<div class="mask"><h1 style="text-align:center;"><i class="fa-spinner fa-spin fa fa-large"></i></h1></div>')
 
       this.$form.prepend(this.$mask)
       this.$form.submit($.proxy(this.submit, this))
 
-      this.$form.find('input, select, textarea').each(function(){
+      this.$form.find('input, select, textarea').each(function(){//自动设置表单字段init-value
         var el = $(this)
         if (el.is("[type=checkbox]")) {
           el.data('init-value', el.attr('checked'))
@@ -36,7 +38,7 @@
       })
     }
 
-    , clean: function(){
+    , clean: function(){//表单字段值清理
       this.$form.find('input, select, textarea').each(function(){
         var el = $(this)
         if (el.is("[type=checkbox]")) {
@@ -50,7 +52,7 @@
       })
     }
 
-    , submit: function(e) {
+    , submit: function(e) {//提交表单的处理
         e.stopPropagation();
         e.preventDefault();
 
@@ -61,7 +63,7 @@
           this.$form.find('submit, button[type=submit], input[type=submit]').removeClass('disabled');
           this.$form.find('.alert-success').hide()
 
-          if(data['result'] != 'success' && data['errors']){
+          if(data['result'] != 'success' && data['errors']){//异常的显示处理
             var non_fields_errors = []
             for (var i = data['errors'].length - 1; i >= 0; i--) {
               var e = data['errors'][i]
@@ -84,16 +86,16 @@
               }
               this.$form.prepend(err_html.join('\n'))
             }
-          } else {
+          } else {// 成功时的处理
             this.$form.trigger('post-success', data);
           }
         }, this))
-        .fail($.proxy(function(xhr) {
+        .fail($.proxy(function(xhr) {//失败时的处理
           this.$mask.hide();
           alert(typeof xhr === 'string' ? xhr : xhr.responseText || xhr.statusText || 'Unknown error!'); 
         }, this));
     }
-    , save: function(newValue) {
+    , save: function(newValue) {//真正提交保存请求的处理
 
       this.$form.find('.text-error, .help-inline.error').remove();
       this.$form.find('.control-group').removeClass('error');
@@ -133,30 +135,35 @@
     });
   };
 
-  $.fn.ajaxform.Constructor = AjaxForm
+  $.fn.ajaxform.Constructor = AjaxForm;
+    //-------------------- AjaxForm定义结束 ---------------------
 
+  // 处理 class=quick-form
   $.fn.exform.renders.push(function(f){
     if (f.is('.quick-form')) {
       f.ajaxform()
     }
   })
 
-  var QuickAddBtn = function(element, options) {
+  var ModalForm = function(element, options) {
     var that = this;
 
-    this.$btn = $(element)
-    this.add_url = this.$btn.attr('href')
-    this.$for_input = $('#' + this.$btn.data('for-id'))
-    this.$for_wrap = $('#' + this.$btn.data('for-id') + '_wrap_container')
-    this.refresh_url = this.$btn.data('refresh-url')
-    this.rendered_form = false
+    this.$btn = $(element);//触发点本身
+    this.add_url = this.$btn.attr('href');//要打开的url
+    // 用于外键选择的处理
+    this.$for_input = this.$btn.data('for-id') ? $('#' + this.$btn.data('for-id')) : null;
+    this.$for_wrap = this.$btn.data('for-id') ? $('#' + this.$btn.data('for-id') + '_wrap_container') : null;
+    this.refresh_url = this.$btn.data('refresh-url');//要刷新的url
 
-    this.binit(element, options);
+    this.rendered_form = false;//是否已经展示过
+    this.options = options;
+
+    this.binit(element, options);//初始化
   }
 
-  QuickAddBtn.prototype = {
+  ModalForm.prototype = {
 
-     constructor: QuickAddBtn
+     constructor: ModalForm
 
     , binit: function(element, options){
       this.$btn.click($.proxy(this.click, this))
@@ -165,7 +172,7 @@
       e.stopPropagation()
       e.preventDefault()
 
-      if(!this.modal){
+      if(!this.modal){ //---表单默认都为quick-form
         var modal = $('<div class="modal fade quick-form" role="dialog"><div class="modal-dialog"><div class="modal-content">'+
           '<div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h3>'+ 
           this.$btn.attr('title') +'</h3></div><div class="modal-body"></div>'+
@@ -176,10 +183,10 @@
         var self = this
         modal.find('.modal-body').html('<h2 style="text-align:center;"><i class="fa-spinner fa-spin fa fa-large"></i></h2>')
         modal.find('.modal-body').load(this.add_url, function(form_html, status, xhr){
-          var form = $(this).find('form')
+          var form = $(this).find('form');//找到打开的内容的表单对象
           form.addClass('quick-form')
           form.on('post-success', $.proxy(self.post, self))
-          form.exform()
+          form.exform();//实例化为扩展菜单
           
           modal.find('.modal-footer').show()
           modal.find('.btn-submit').click(function(){form.submit()})
@@ -194,42 +201,50 @@
     }
     , post: function(e, data){
       this.$form.data('ajaxform').clean();
-      var wrap = this.$for_wrap;
-      var input = this.$for_input;
-      var selected = [data['obj_id']];
-      if (input.attr('multiple')){
-          var opt = 'option';
-          if (input.hasClass('selectdropdown') || input.hasClass('select-multi')){
-              opt = 'option:selected';
+      if (this.$for_input){
+          var wrap = this.$for_wrap;
+          var input = this.$for_input;
+          var selected = [data['obj_id']];
+          if (input.attr('multiple')){
+              var opt = 'option';
+              if (input.hasClass('selectdropdown') || input.hasClass('select-multi')){
+                  opt = 'option:selected';
+              }
+              selected.push($.map(input.find(opt) ,function(opt) { return opt.value; }));
           }
-          selected.push($.map(input.find(opt) ,function(opt) { return opt.value; }));
+          $.get(this.refresh_url + selected.join() ,function(form_html, status, xhr){
+            addon = $('<body>' + form_html + '</body>').find('#' + wrap.attr('id')).html();
+            wrap.html(addon);
+            wrap.exform();
+          });
+      }else{
+        if (self.options && self.options.cb)self.options.cb(this) 
       }
-      $.get(this.refresh_url + selected.join() ,function(form_html, status, xhr){
-        wrap.html($('<body>' + form_html + '</body>').find('#' + wrap.attr('id')).html());
-        wrap.exform();
-      });
-      this.modal.modal('hide');
+
+      this.modal.modal('hide');//隐藏模式对话框
     }
 
   }
 
-  $.fn.ajax_addbtn = function ( option ) {
+  $.fn.ajax_form = function ( option ) {
     return this.each(function () {
-      var $this = $(this), data = $this.data('ajax_addbtn');
+      var $this = $(this), data = $this.data('ajax_form');
       if (!data) {
-          $this.data('ajax_addbtn', (data = new QuickAddBtn(this)));
+          $this.data('ajax_form', (data = new ModalForm(this,option)));
       }
     });
   };
 
-  $.fn.ajax_addbtn.Constructor = QuickAddBtn
+  $.fn.ajax_form.Constructor = ModalForm;
+
+  $.fn.ajax_addbtn = $.fn.ajax_form;
 
   $.fn.exform.renders.push(function(f){
     f.find('a.btn-ajax').ajax_addbtn()
   })
   
   $(function(){
-    $('.ajaxform-handler').ajax_addbtn();
+    $('.ajaxform-handler').ajax_form();
   });
   
 })(jQuery)
