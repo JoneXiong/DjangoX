@@ -43,4 +43,4 @@ http://127.0.0.1:81/xadmin/
 
 [菜单控制与配置](http://www.oejia.net/blog/2016/06/13/djangox_menu.html)
 
-[DjangoX 站点级配置介绍](http://oejia.net/blog/2016/11/21/djangox_site_config.html)
+[站点级配置介绍](http://oejia.net/blog/2016/11/21/djangox_site_config.html)
