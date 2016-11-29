@@ -9,6 +9,7 @@ from crispy_forms.utils import render_field, flatatt
 
 from crispy_forms import layout
 from crispy_forms import bootstrap
+from crispy_forms.layout import Field
 
 
 class Fieldset(layout.Fieldset):
