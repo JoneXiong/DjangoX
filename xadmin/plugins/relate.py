@@ -1,4 +1,7 @@
-# coding=UTF-8
+# coding=utf-8
+'''
+模型关联相关
+'''
 from django.core.urlresolvers import reverse
 from django.utils.encoding import force_unicode
 from django.utils.encoding import smart_str
@@ -15,11 +18,18 @@ RELATE_PREFIX = '_rel_'
 
 
 class RelateMenuPlugin(BasePlugin):
+    '''
+    外键相关菜单
+    '''
 
     related_list = []
     use_related_menu = True
+    use_op_menu = True
 
     def get_related_list(self):
+        '''
+        获取关联的对象
+        '''
         if hasattr(self, '_related_acts'):
             return self._related_acts
 
@@ -27,12 +37,14 @@ class RelateMenuPlugin(BasePlugin):
         for r in self.opts.get_all_related_objects() + self.opts.get_all_related_many_to_many_objects():
             if self.related_list and (r.get_accessor_name() not in self.related_list):
                 continue
+
             if hasattr(r, 'opts'):
                 _model = r.model
             else:
                 _model = r.related_model
             if _model not in self.admin_site._registry.keys():
                 continue
+
             has_view_perm = self.has_model_perm(_model, 'view')
             has_add_perm = self.has_model_perm(_model, 'add')
             if not (has_view_perm or has_add_perm):
@@ -44,6 +56,9 @@ class RelateMenuPlugin(BasePlugin):
         return self._related_acts
 
     def related_link(self, instance):
+        '''
+        外键关联菜单列
+        '''
         links = []
         for r, view_perm, add_perm in self.get_related_list():
             if hasattr(r, 'opts'):
@@ -59,10 +74,10 @@ class RelateMenuPlugin(BasePlugin):
             lookup_name = '%s__%s__exact' % (f.name, rel_name)
 
             _tojoin = [ '<li class="with_menu_btn">' ]
-            
+
             if view_perm:
                 list_url = reverse('%s:%s_%s_changelist' % (self.admin_site.app_name, label, model_name) )
-                str1 = '<a href="%s?%s=%s" title="%s"><i class="icon fa fa-th-list"></i> %s</a>' %(
+                str1 = '<a href="%s?%s=%s" title="查看%s"><i class="icon fa fa-th-list"></i> %s</a>' %(
                                                                                                   list_url,
                                                                                                   RELATE_PREFIX + lookup_name, str(instance.pk),
                                                                                                   verbose_name,
@@ -71,13 +86,14 @@ class RelateMenuPlugin(BasePlugin):
             else:
                 str1 = '<a><span class="text-muted"><i class="icon fa fa-blank"></i> %s</span></a>' % verbose_name
             _tojoin.append(str1)
-            
+
             if add_perm:
                 add_url = reverse('%s:%s_%s_add' % (self.admin_site.app_name, label, model_name) )
-                str2 = '<a class="add_link dropdown-menu-btn" href="%s?%s=%s"><i class="icon fa fa-plus pull-right"></i></a>' %(
+                str2 = '<a class="add_link dropdown-menu-btn" href="%s?%s=%s" title="添加%s"><i class="icon fa fa-plus pull-right"></i></a>' %(
                                                                                                   add_url,
                                                                                                   RELATE_PREFIX + lookup_name,
-                                                                                                  str(instance.pk)
+                                                                                                  str(instance.pk),
+                                                                                                  verbose_name
                                                                                                   )
             else:
                 str2 = ''
@@ -85,18 +101,41 @@ class RelateMenuPlugin(BasePlugin):
 
             link = ''.join(_tojoin)
             links.append(link)
-        ul_html = '<ul class="dropdown-menu" role="menu">%s</ul>' % ''.join(
-            links)
+        ul_html = '<ul class="dropdown-menu" role="menu">%s</ul>' % ''.join(links)
         return '<div class="dropdown related_menu pull-right"><a title="%s" class="relate_menu dropdown-toggle" data-toggle="dropdown"><i class="icon fa fa-list"></i></a>%s</div>' % (_('Related Objects'), ul_html)
     related_link.short_description = '&nbsp;'
     related_link.allow_tags = True
     related_link.allow_export = False
     related_link.is_column = False
 
+    def op_link(self, instance):
+        _model = self.admin_view.model
+        links = []
+        if self.has_view_perm:
+            links.append('''<a data-res-uri="%s" data-edit-uri="%s" rel="tooltip" class="btn btn-info btn-xs details-handler" ><i class="fa fa-search-plus"></i> 查看</a>'''%(self.admin_view.get_url('detail',instance.pk),self.admin_view.get_url('change',instance.pk)))
+        if self.has_change_perm:
+            links.append('''<a href="%s" class="btn btn-success btn-xs" ><i class="fa fa-edit"></i> 修改</a>'''%self.admin_view.get_url('change',instance.pk))
+        if self.has_delete_perm:
+            links.append('''<a href="%s" class="btn btn-danger btn-xs" ><i class="fa fa-trash"></i> 删除</a>'''%self.admin_view.get_url('delete',instance.pk))
+        return ' '.join(links)
+    op_link.short_description = '&nbsp;'
+    op_link.allow_tags = True
+    op_link.allow_export = False
+    op_link.is_column = False
+
     def get_list_display(self, list_display):
+        _model = self.admin_view.model
+        self.has_view_perm = self.has_model_perm(_model, 'view')
+        self.has_change_perm = self.has_model_perm(_model, 'change')
+        self.has_delete_perm = self.has_model_perm(_model, 'delete')
+        if self.use_op_menu:
+            if self.has_view_perm or self.has_add_perm or self.has_change_perm:
+                list_display.append('op_link')
+                self.admin_view.op_link = self.op_link
         if self.use_related_menu and len(self.get_related_list()):
             list_display.append('related_link')
             self.admin_view.related_link = self.related_link
+
         return list_display
 
 
