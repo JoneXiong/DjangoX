@@ -261,7 +261,7 @@ class ListAdminView(BaseGrid,ModelPage):
 
     @property
     def _tpl(self):
-        return self.list_template or self.object_list_template or self.get_template_list('views/grid.html')
+        return self.list_template or self.get_template_list('views/grid.html')
 
     @filter_hook
     def post_response(self, *args, **kwargs):
