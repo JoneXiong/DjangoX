@@ -112,7 +112,7 @@ class RelateMenuPlugin(BasePlugin):
         _model = self.admin_view.model
         links = []
         if self.has_view_perm:
-            links.append('''<a data-res-uri="%s" data-edit-uri="%s" rel="tooltip" class="btn btn-info btn-xs details-handler" ><i class="fa fa-search-plus"></i> 查看</a>'''%(self.admin_view.get_url('detail',instance.pk),self.admin_view.get_url('change',instance.pk)))
+            links.append('''<a data-res-uri="%s" data-edit-uri="%s" rel="tooltip" title="%s" class="btn btn-info btn-xs details-handler" ><i class="fa fa-search-plus"></i> 查看</a>'''%(self.admin_view.get_url('detail',instance.pk),self.admin_view.get_url('change',instance.pk),instance))
         if self.has_change_perm:
             links.append('''<a href="%s" class="btn btn-success btn-xs" ><i class="fa fa-edit"></i> 修改</a>'''%self.admin_view.get_url('change',instance.pk))
         if self.has_delete_perm:

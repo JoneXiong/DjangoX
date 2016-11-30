@@ -45,4 +45,4 @@ http://127.0.0.1:81/xadmin/
 
 [站点级配置介绍](http://oejia.net/blog/2016/11/21/djangox_site_config.html)
 
-[模型管理功能配置介绍](http://oejia.net/blog/2016/11/21/djangox_admin_conf.html)
+[模型管理功能配置介绍](http://oejia.net/blog/2016/11/29/djangox_admin_conf.html)
