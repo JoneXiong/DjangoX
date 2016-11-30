@@ -19,10 +19,16 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
+import django
+if django.VERSION[1] >= 8:
+    db_name = 'data18.db'
+else:
+    db_name = 'data.db'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': os.path.join(PROJECT_ROOT, 'data.db'),                      # Or path to database file if using sqlite3.
+        'NAME': os.path.join(PROJECT_ROOT, db_name),                      # Or path to database file if using sqlite3.
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -136,6 +142,7 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+
     'django.contrib.staticfiles',
     'django.contrib.admin',
 

@@ -39,7 +39,7 @@ class BaseModel(models.Model, ExtModel):
     class Meta:
         abstract = True
 
-models.Model = BaseModel
+#models.Model = BaseModel
 
 def add_view_permissions(sender, **kwargs):
     """

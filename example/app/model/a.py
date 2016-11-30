@@ -1,8 +1,9 @@
 # coding=utf-8
 
 from django.db import models
+from xadmin.models import BaseModel
 
-class A(models.Model):
+class A(BaseModel):
     name = models.CharField('名称', max_length=500)
     b = models.ForeignKey('app.B', verbose_name="属主")
     
