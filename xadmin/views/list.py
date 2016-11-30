@@ -36,7 +36,7 @@ class ListAdminView(BaseGrid,ModelPage):
     search_fields = ()             #: 按照这些列搜索数据
     ordering = None                #: 默认的数据排序规则
     
-    object_list_template = None    #: 显示数据的模板
+    list_template = None    #: 显示数据的模板
     pop = False
     search_sphinx_ins = None 
     col_ctrl = True
@@ -261,7 +261,7 @@ class ListAdminView(BaseGrid,ModelPage):
 
     @property
     def _tpl(self):
-        return self.object_list_template or self.get_template_list('views/grid.html')
+        return self.list_template or self.object_list_template or self.get_template_list('views/grid.html')
 
     @filter_hook
     def post_response(self, *args, **kwargs):
