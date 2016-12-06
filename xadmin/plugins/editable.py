@@ -151,6 +151,8 @@ class EditPatchView(ModelFormAdminView, ListAdminView):
 
         return HttpResponse(t.render(c))
 
+    def do_patch(self):
+        self.patch_form.save(commit=True)
 
     @filter_hook
     @csrf_protect_m
@@ -169,7 +171,8 @@ class EditPatchView(ModelFormAdminView, ListAdminView):
 
         result = {}
         if form.is_valid():
-            form.save(commit=True)
+            self.patch_form = form
+            self.do_patch()
             result['result'] = 'success'
             result['new_data'] = form.cleaned_data
             result['new_html'] = dict(
