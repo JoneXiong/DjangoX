@@ -3,11 +3,11 @@
 	{% if not cl.pop %}
 		{% if cl.opts %}
 			{% for name, descr, icon in action_choices %}
-			<a class="btn btn-success" onclick="$.do_action('{{name}}');"><i class="{{icon}}"></i> {{descr}}</a>
+			<a class="btn btn-primary" onclick="$.do_action('{{name}}');"><i class="{{icon}}"></i> {{descr}}</a>
 			{% endfor %}
       	{% else %}
 			{% for url, descr, icon in action_choices %}
-			<a href="{{url}}" class="btn btn-success" onclick="return $.do_form_action(this);"><i class="{{icon}}"></i> {{descr}}</a>
+			<a href="{{url}}" class="btn btn-primary" onclick="return $.do_form_action(this);"><i class="{{icon}}"></i> {{descr}}</a>
 			{% endfor %}
       	{% endif %}
     {% endif %}
