@@ -47,6 +47,7 @@ from xadmin import dutils
 class EditablePlugin(BasePlugin):
 
     list_editable = []
+    editable_media = False
 
     def __init__(self, admin_view):
         super(EditablePlugin, self).__init__(admin_view)
@@ -78,7 +79,7 @@ class EditablePlugin(BasePlugin):
 
     # Media
     def get_media(self, media):
-        if self.editable_need_fields:
+        if self.editable_need_fields or self.editable_media:
             media = media + self.model_form.media + \
                 self.vendor(
                     'xadmin.plugin.editable.js', 'xadmin.widget.editable.css')
