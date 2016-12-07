@@ -166,7 +166,7 @@ class LogoutView(BaseView):
 
         self.update_params(defaults)
         logout(request, **defaults)
-        return HttpResponseRedirect(self.get_admin_url('login'))
+        return HttpResponseRedirect(self.get_admin_url('index'))
 
     @never_cache
     def post(self, request, *args, **kwargs):
