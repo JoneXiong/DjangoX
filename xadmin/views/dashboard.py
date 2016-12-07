@@ -160,7 +160,7 @@ class Dashboard(SiteView):
     @filter_hook
     def get_widget(self, widget_or_id, data=None):
         '''
-        实例话widget
+        实例化widget
         '''
         try:
             if isinstance(widget_or_id, UserWidget):
