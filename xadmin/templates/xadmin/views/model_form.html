@@ -11,7 +11,7 @@
 
 {% block nav_btns %}
 {% if change %}
-<a href="{% url 'xadmin:index' %}admin/logentry/?_p_content_type={{ content_type_id }}&_p_object_id={{ original.pk }}" target="_blank" class="btn"><i class="fa fa-eye"></i> 历史</a>
+<a href="{% url 'xadmin:index' %}admin/logentry/?_p_content_type={{ content_type_id }}&_p_object_id={{ original.pk }}" class="btn"><i class="fa fa-eye"></i> 历史</a>
 {% endif %}
 {% endblock nav_btns %}
 
