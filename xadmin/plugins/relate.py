@@ -124,10 +124,9 @@ class RelateMenuPlugin(BasePlugin):
     op_link.is_column = False
 
     def get_list_display(self, list_display):
-        _model = self.admin_view.model
-        self.has_view_perm = self.has_model_perm(_model, 'view')
-        self.has_change_perm = self.has_model_perm(_model, 'change')
-        self.has_delete_perm = self.has_model_perm(_model, 'delete')
+        self.has_view_perm = self.admin_view.has_permission('view')
+        self.has_change_perm = self.admin_view.has_permission('change')
+        self.has_delete_perm = self.admin_view.has_permission('delete')
         if self.use_op_menu:
             if self.has_view_perm or self.has_add_perm or self.has_change_perm:
                 list_display.append('op_link')
