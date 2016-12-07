@@ -173,11 +173,15 @@ class EditPatchView(ModelFormAdminView, ListAdminView):
         result = {}
         if form.is_valid():
             self.patch_form = form
-            self.do_patch()
-            result['result'] = 'success'
-            result['new_data'] = form.cleaned_data
-            result['new_html'] = dict(
-                [(f, self.get_new_field_html(f)) for f in fields])
+            ret = self.do_patch()
+            if ret:
+                result['result'] = 'error'
+                result['errors'] = [{'errors':[ret]}]
+            else:
+                result['result'] = 'success'
+                result['new_data'] = form.cleaned_data
+                result['new_html'] = dict(
+                    [(f, self.get_new_field_html(f)) for f in fields])
         else:
             result['result'] = 'error'
             result['errors'] = JsonErrorDict(form.errors, form).as_json()
