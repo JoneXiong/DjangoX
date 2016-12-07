@@ -178,7 +178,7 @@ class ExportPlugin(BasePlugin):
 
     def _format_csv_text(self, t):
         if isinstance(t, bool):
-            return _('Yes') if t else _('No')
+            return '"是"' if t else '"否"'
         t = t.replace('"', '""').replace(',', '\,')
         if isinstance(t, basestring):
             t = '"%s"' % t
@@ -194,7 +194,7 @@ class ExportPlugin(BasePlugin):
         for row in datas:
             stream.append(','.join(map(self._format_csv_text, row)))
 
-        return '\r\n'.join(stream)
+        return '\r\n'.join(stream)#文件主要面向windows平台
 
     def _to_xml(self, xml, data):
         if isinstance(data, (list, tuple)):
