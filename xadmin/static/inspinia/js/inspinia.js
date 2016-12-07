@@ -143,6 +143,7 @@ $(document).ready(function () {
                 $('#page-wrapper').css("min-height", $(window).height() - 60 + "px");
             }
         }
+	$('#content-main').css("height",$(window).height() - 108 + "px");
 
     }
 
@@ -198,7 +199,7 @@ $(document).ready(function () {
     if (localStorageSupport) {
 
         var collapse = localStorage.getItem("collapse_menu");
-        var fixedsidebar = localStorage.getItem("fixedsidebar");
+        var fixedsidebar = 'on';//localStorage.getItem("fixedsidebar");
         var fixednavbar = localStorage.getItem("fixednavbar");
         var boxedlayout = localStorage.getItem("boxedlayout");
         var fixedfooter = localStorage.getItem("fixedfooter");
