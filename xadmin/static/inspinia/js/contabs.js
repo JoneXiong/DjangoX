@@ -10,7 +10,7 @@ $(function () {
 	$('.J_menuItem').on('click', menuItem);
 	
 	$('.J_menuTabs').on('click', '.J_menuTab i', closeTab);
-	
+    // 关闭其他	
 	$('.J_tabCloseOther').on('click', closeOtherTabs);
 	
 	$('.J_tabShowActive').on('click', showActiveTab);
@@ -36,6 +36,47 @@ $(function () {
 	        $(this).addClass("active");
 	    });
 	    $('.page-tabs-content').css("margin-left", "0");
+	});
+
+    //刷新当前选项卡
+	$('.J_tabRefresh').on("click",function() {
+		var dataId = $(".J_menuTab.active").data("id"),
+        index = 0;
+        $(".J_menuItem").each(function(k) {
+	        if ($(this).attr("href") == dataId) {
+	            index = k;
+	        }
+	    });
+        $(".J_iframe[name='iframe"+index+"']").remove();
+        var n = '<iframe class="J_iframe" name="iframe' + index + '" width="100%" height="100%" src="' + dataId + '" frameborder="0" data-id="' + dataId + '" seamless></iframe>';
+        $(".J_mainContent").find("iframe.J_iframe").hide();
+        $(".J_mainContent").append(n);
+
+        //显示loading提示
+        var loading = $('.loading-content').show();//layer.load();
+
+        $('.J_mainContent iframe:visible').load(function () {
+            //iframe加载完成后隐藏loading提示
+            loading.hide();//layer.close(loading);
+        });
+
+	});
+	
+	//关闭左侧选项卡
+	$('.J_tabCloseLeft').on("click",function() {
+        var currIndex = $(".page-tabs-content").children(".J_menuTab.active").index();
+        $(".page-tabs-content").children("[data-id]:lt('"+currIndex+"')").not(":first").each(function() {
+        	$('.J_iframe[data-id="' + $(this).data("id") + '"]').remove();
+               $(this).remove();
+        });
+	});
+	
+	//关闭右侧选项卡
+	$('.J_tabCloseRight').on("click",function() {
+        $(".page-tabs-content").children(".J_menuTab.active").nextAll(".J_menuTab").each(function() {
+            $('.J_iframe[data-id="' + $(this).data("id") + '"]').remove();
+            $(this).remove();
+        });
 	});
 
 });
@@ -143,6 +184,7 @@ function scrollTabRight() {
 
 
 function menuItem() {
+    $("ul.nav li.open").removeClass("open");
     // 获取标识数据
     var dataUrl = $(this).attr('href'),
         dataIndex = $(this).data('index'),
@@ -179,11 +221,11 @@ function menuItem() {
         $('.J_mainContent').find('iframe.J_iframe').hide().parents('.J_mainContent').append(str1);
 
         //显示loading提示
-        var loading = layer.load();
+        var loading = $('.loading-content').show();//layer.load();
 
         $('.J_mainContent iframe:visible').load(function () {
             //iframe加载完成后隐藏loading提示
-            layer.close(loading);
+            loading.hide();//layer.close(loading);
         });
         // 添加选项卡
         $('.J_menuTabs .page-tabs-content').append(str);
