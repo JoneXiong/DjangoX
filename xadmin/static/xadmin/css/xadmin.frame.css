@@ -112,7 +112,7 @@ nav.page-tabs .page-tabs-content {
 
 
 
-
+/*
 #content-main {
 	height: calc(100% - 140px);
 	overflow: hidden;
@@ -121,4 +121,21 @@ nav.page-tabs .page-tabs-content {
 .nav-header {
     padding: 20px 25px;
 }
-
+*/
+.loading-content {
+    cursor: default;
+    position: absolute;    z-index: 100019;
+    width: auto;
+    border: 1px solid rgb(187, 187, 187);
+    height: 80px;
+    line-height: 80px;
+    padding-left: 80px;
+    padding-right: 20px;
+    border-radius: 10px;
+    color: rgb(102, 102, 102);
+    font-size: 20px;
+    left: 0px;
+    top: 0px;
+    background: url(../img/loading.gif) 5px 50% no-repeat rgb(255, 255, 255);
+    box-shadow: 0 1px 15px rgba(0,0,0,.175);
+}

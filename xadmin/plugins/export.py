@@ -178,7 +178,7 @@ class ExportPlugin(BasePlugin):
 
     def _format_csv_text(self, t):
         if isinstance(t, bool):
-            return _('Yes') if t else _('No')
+            return '"是"' if t else '"否"'
         t = t.replace('"', '""').replace(',', '\,')
         if isinstance(t, basestring):
             t = '"%s"' % t
@@ -194,7 +194,7 @@ class ExportPlugin(BasePlugin):
         for row in datas:
             stream.append(','.join(map(self._format_csv_text, row)))
 
-        return '\r\n'.join(stream)
+        return '\r\n'.join(stream)#文件主要面向windows平台
 
     def _to_xml(self, xml, data):
         if isinstance(data, (list, tuple)):
@@ -234,7 +234,7 @@ class ExportPlugin(BasePlugin):
     def get_response(self, response, context, *args, **kwargs):
         file_type = self.request.GET.get('export_type', 'csv')
         response = HttpResponse(
-            mimetype="%s; charset=UTF-8" % self.export_mimes[file_type])
+            content_type="%s; charset=UTF-8" % self.export_mimes[file_type])
 
         file_name = self.opts.verbose_name.replace(' ', '_') if self.opts else self.admin_view.verbose_name
         response['Content-Disposition'] = ('attachment; filename=%s.%s' % (
