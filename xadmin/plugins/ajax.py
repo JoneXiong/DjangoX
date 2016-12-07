@@ -1,17 +1,21 @@
+# coding=utf-8
+
 from django import forms
 from django.utils.html import escape
 from django.utils.encoding import force_unicode
 
 from xadmin.sites import site
 from xadmin.core.structs import SortedDict
+from xadmin.views.common import JsonErrorDict
 from xadmin.views import BasePlugin, ListAdminView, ModelFormAdminView, DetailAdminView
+from xadmin.views.page import FormPage
 from xadmin import dutils
 
 
-NON_FIELD_ERRORS = '__all__'
-
-
 class BaseAjaxPlugin(BasePlugin):
+    '''
+    ajax后台处理基类
+    '''
 
     def init_request(self, *args, **kwargs):
         return bool(self.request.is_ajax() or '_ajax' in self.param_list() )
@@ -39,19 +43,13 @@ class AjaxListPlugin(BaseAjaxPlugin):
         return self.render_response({'headers': headers, 'objects': objects, 'total_count': av.result_count, 'has_more': av.has_more})
 
 
-class JsonErrorDict(dutils.ErrorDict):
 
-    def __init__(self, errors, form):
-        super(JsonErrorDict, self).__init__(errors)
-        self.form = form
-
-    def as_json(self):
-        if not self:
-            return u''
-        return [{'id': self.form[k].auto_id if k != NON_FIELD_ERRORS else NON_FIELD_ERRORS, 'name': k, 'errors': v} for k, v in self.items()]
 
 
 class AjaxFormPlugin(BaseAjaxPlugin):
+    '''
+    用于模型表单
+    '''
 
     def post_response(self, __):
         new_obj = self.admin_view.new_obj
@@ -76,8 +74,11 @@ class AjaxFormPlugin(BaseAjaxPlugin):
             result['errors'] = JsonErrorDict(form.errors, form).as_json()
 
         return self.render_response(result)
-    
+
 class AjaxFormPagePlugin(BaseAjaxPlugin):
+    '''
+    用于普通表单页
+    '''
 
     def post_response(self, __):
         return self.render_response({
@@ -120,3 +121,4 @@ class AjaxDetailPlugin(BaseAjaxPlugin):
 site.register_plugin(AjaxListPlugin, ListAdminView)
 site.register_plugin(AjaxFormPlugin, ModelFormAdminView)
 site.register_plugin(AjaxDetailPlugin, DetailAdminView)
+site.register_plugin(AjaxFormPagePlugin,FormPage)

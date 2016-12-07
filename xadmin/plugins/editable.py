@@ -47,6 +47,7 @@ from xadmin import dutils
 class EditablePlugin(BasePlugin):
 
     list_editable = []
+    editable_media = False
 
     def __init__(self, admin_view):
         super(EditablePlugin, self).__init__(admin_view)
@@ -78,7 +79,7 @@ class EditablePlugin(BasePlugin):
 
     # Media
     def get_media(self, media):
-        if self.editable_need_fields:
+        if self.editable_need_fields or self.editable_media:
             media = media + self.model_form.media + \
                 self.vendor(
                     'xadmin.plugin.editable.js', 'xadmin.widget.editable.css')
@@ -151,6 +152,8 @@ class EditPatchView(ModelFormAdminView, ListAdminView):
 
         return HttpResponse(t.render(c))
 
+    def do_patch(self):
+        self.patch_form.save(commit=True)
 
     @filter_hook
     @csrf_protect_m
@@ -169,11 +172,16 @@ class EditPatchView(ModelFormAdminView, ListAdminView):
 
         result = {}
         if form.is_valid():
-            form.save(commit=True)
-            result['result'] = 'success'
-            result['new_data'] = form.cleaned_data
-            result['new_html'] = dict(
-                [(f, self.get_new_field_html(f)) for f in fields])
+            self.patch_form = form
+            ret = self.do_patch()
+            if ret:
+                result['result'] = 'error'
+                result['errors'] = [{'errors':[ret]}]
+            else:
+                result['result'] = 'success'
+                result['new_data'] = form.cleaned_data
+                result['new_html'] = dict(
+                    [(f, self.get_new_field_html(f)) for f in fields])
         else:
             result['result'] = 'error'
             result['errors'] = JsonErrorDict(form.errors, form).as_json()

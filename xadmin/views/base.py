@@ -178,14 +178,14 @@ class Common(object):
         便捷方法，方便生成 HttpResponse，如果 response_type 为 ``json`` 会自动转为 json 格式后输出
         """
         if response_type == 'json':
-            response = HttpResponse(mimetype="application/json; charset=UTF-8")
+            response = HttpResponse(content_type='application/json; charset=UTF-8')
             response.write(
                 json.dumps(content, cls=JSONEncoder, ensure_ascii=False))
             return response
         return HttpResponse(content)
     
     def render_json(self, content):
-        response = HttpResponse(mimetype="application/json; charset=UTF-8")
+        response = HttpResponse(content_type='application/json; charset=UTF-8')
         response.write(
             json.dumps(content, cls=JSONEncoder, ensure_ascii=False))
         return response

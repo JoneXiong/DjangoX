@@ -170,7 +170,7 @@ class ModelAdmin(object):
     search_fields = ()             #: 按照这些列搜索数据
     ordering = None                #: 默认的数据排序
 
-    object_list_template = None    #: 显示数据的模板 默认为 model_list.html
+    list_template = None    #: 显示数据的模板 默认为 views/grid.html
     pop = False # 是否为弹窗页
     search_sphinx_ins = None # 使用的搜索引擎
     

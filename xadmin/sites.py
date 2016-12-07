@@ -534,7 +534,7 @@ class AdminSite(object):
         加载系统所有菜单
         '''
         for model, model_admin in self._registry.items():
-            if getattr(model_admin, 'hiden_menu', False) or getattr(model_admin, 'hidden_menu', False):
+            if getattr(model_admin, 'hide_menu', False) or getattr(model_admin, 'hidden_menu', False):
                 continue
             if hasattr(model_admin, 'menu_group'):
                 m_menu_group = model_admin.menu_group or '_default_group'

@@ -1,5 +1,5 @@
 ;(function($){
-
+    // 定义exform
   $.fn.exform = function(){
     this.each(function () {
       var form = $(this);
@@ -10,6 +10,7 @@
     })
   }
   $.fn.exform.renders = [];
+  // 处理 class=exform
   $(function() {
     $('.exform:not(.rended)').exform();
   });

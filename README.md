@@ -16,8 +16,8 @@ easy_install django
 easy_install django-crispy_forms
 ```
 推荐组合
-- django1.7及以下 + django-crispy_forms==1.4
-- django==1.8 + django-crispy_forms==1.5.1
+- django1.7及以下 + django-crispy_forms==1.4.0
+- django==1.8 + django-crispy_forms==1.4.0
 - django==1.9 + django-crispy_forms==1.6
 
 2.运行
@@ -42,3 +42,7 @@ http://127.0.0.1:81/xadmin/
 [示例启动脚本简析](http://www.oejia.net/blog/2016/01/25/djangox_start_py.html)
 
 [菜单控制与配置](http://www.oejia.net/blog/2016/06/13/djangox_menu.html)
+
+[站点级配置介绍](http://oejia.net/blog/2016/11/21/djangox_site_config.html)
+
+[模型管理功能配置介绍](http://oejia.net/blog/2016/11/29/djangox_admin_conf.html)
