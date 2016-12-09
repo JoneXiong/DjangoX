@@ -7,7 +7,7 @@ from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.views.decorators.cache import never_cache
 from django.contrib.auth.views import login
 from django.contrib.auth.views import logout
-from django.http import HttpResponse
+from django.http import HttpResponse,HttpResponseRedirect
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate
@@ -165,7 +165,8 @@ class LogoutView(BaseView):
             defaults['template_name'] = self.logout_template
 
         self.update_params(defaults)
-        return logout(request, **defaults)
+        logout(request, **defaults)
+        return HttpResponseRedirect(self.get_admin_url('index'))
 
     @never_cache
     def post(self, request, *args, **kwargs):
