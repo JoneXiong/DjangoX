@@ -14,6 +14,6 @@
 		return true;
 	}
 	if(top == this && isNormalUser()){
-		window.location.href = config.url;// + '#!' + location.href;
+		window.location.href = config.url;// + '#!' + location.href; 跳转关键点
 	}
 }());
