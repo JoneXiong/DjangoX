@@ -26,6 +26,11 @@ class RelateMenuPlugin(BasePlugin):
     use_related_menu = True
     use_op_menu = True
 
+    @staticmethod
+    def get_r_list(model):
+        opts = model._meta
+        return opts.get_all_related_objects() + opts.get_all_related_many_to_many_objects()
+
     def get_related_list(self):
         '''
         获取关联的对象
@@ -34,7 +39,9 @@ class RelateMenuPlugin(BasePlugin):
             return self._related_acts
 
         _related_acts = []
-        for r in self.opts.get_all_related_objects() + self.opts.get_all_related_many_to_many_objects():
+
+        _r_list = RelateMenuPlugin.get_r_list(self.model)
+        for r in _r_list:
             if self.related_list and (r.get_accessor_name() not in self.related_list):
                 continue
 
@@ -53,7 +60,34 @@ class RelateMenuPlugin(BasePlugin):
             _related_acts.append((r, has_view_perm, has_add_perm))
 
         self._related_acts = _related_acts
+        if len(_related_acts)>0:
+            self.first_rel_url = self._list_url(_related_acts[0][0])
         return self._related_acts
+
+    def _list_url(self,r):
+        info = RelateMenuPlugin.get_r_model_info(r)
+        list_url = reverse('%s:%s_%s_changelist' % (self.admin_site.app_name, info['label'], info['model_name']) )
+        return "%s?%s="%( list_url, RELATE_PREFIX + info['lookup_name'] )
+
+    @staticmethod
+    def get_r_model_info(r):
+        if hasattr(r, 'opts'):
+            opts = r.opts
+        else:
+            opts = r.related_model._meta
+        label = opts.app_label
+        model_name = opts.module_name
+        f = r.field
+        rel_name = f.rel.get_related_field().name
+        lookup_name = '%s__%s__exact' % (f.name, rel_name)
+        verbose_name = force_unicode(opts.verbose_name)
+        return {
+            'label': label,
+            'model_name': model_name,
+            'lookup_name': lookup_name,
+            'verbose_name': verbose_name
+        }
+
 
     def related_link(self, instance):
         '''
@@ -61,17 +95,11 @@ class RelateMenuPlugin(BasePlugin):
         '''
         links = []
         for r, view_perm, add_perm in self.get_related_list():
-            if hasattr(r, 'opts'):
-                opts = r.opts
-            else:
-                opts = r.related_model._meta
-            label = opts.app_label
-            model_name = opts.module_name
-            f = r.field
-            rel_name = f.rel.get_related_field().name
-
-            verbose_name = force_unicode(opts.verbose_name)
-            lookup_name = '%s__%s__exact' % (f.name, rel_name)
+            info = RelateMenuPlugin.get_r_model_info(r)
+            label = info['label']
+            model_name = info['model_name']
+            lookup_name = info['lookup_name']
+            verbose_name = info['verbose_name']
 
             _tojoin = [ '<li class="with_menu_btn">' ]
 
@@ -134,11 +162,18 @@ class RelateMenuPlugin(BasePlugin):
         if self.use_related_menu and len(self.get_related_list()):
             list_display.append('related_link')
             self.admin_view.related_link = self.related_link
+            self.admin_view.get_detail_url = self.get_first_rel_url
 
         return list_display
 
+    def get_first_rel_url(self, obj):
+        return self.first_rel_url + str(obj.pk)
+
 
 class RelateObject(object):
+    '''
+    列表关联的外键对象信息封装
+    '''
 
     def __init__(self, admin_view, lookup, value):
         self.admin_view = admin_view
@@ -148,11 +183,12 @@ class RelateObject(object):
         self.value = value
 
         parts = lookup.split(LOOKUP_SEP)
+        # 得到外键的字段
         field = self.opts.get_field_by_name(parts[0])[0]
 
         if not hasattr(field, 'rel') and not isinstance(field, RelatedObject):
             raise Exception(u'Relate Lookup field must a related field')
-
+        # 得到外键到的模型 to_model
         if hasattr(field, 'rel'):
             self.to_model = field.rel.to
             self.rel_name = field.rel.get_related_field().name
@@ -161,7 +197,7 @@ class RelateObject(object):
             self.to_model = field.model
             self.rel_name = self.to_model._meta.pk.name
             self.is_m2m = False
-
+        # 得带当前外键关联的对象 to_objs
         _manager = self.to_model._default_manager
         if hasattr(_manager, 'get_query_set'):
             to_qs = _manager.get_query_set()
@@ -181,6 +217,23 @@ class RelateObject(object):
             to_model_name = force_unicode(self.to_model._meta.verbose_name)
 
         return mark_safe(u"<span class='rel-brand'>%s <i class='fa fa-caret-right'></i></span> %s" % (to_model_name, force_unicode(self.opts.verbose_name_plural)))
+
+    def get_list_tabs(self):
+        _r_list = RelateMenuPlugin.get_r_list(self.to_model)
+        list_tabs = []
+        for r in _r_list:
+            _site = self.admin_view.admin_site
+            if hasattr(r, 'opts'):
+                _model = r.model
+            else:
+                _model = r.related_model
+            if _model not in _site._registry.keys():
+                continue
+            info = RelateMenuPlugin.get_r_model_info(r)
+            list_url = reverse('%s:%s_%s_changelist' % (_site.app_name, info['label'], info['model_name']) )
+            r_list_url = "%s?%s=%s"%( list_url, RELATE_PREFIX + info['lookup_name'],self.to_objs[0].pk)
+            list_tabs.append( (r_list_url, info['verbose_name']))
+        return list_tabs
 
 
 class BaseRelateDisplayPlugin(BasePlugin):
@@ -211,6 +264,9 @@ class BaseRelateDisplayPlugin(BasePlugin):
 
 
 class ListRelateDisplayPlugin(BaseRelateDisplayPlugin):
+    '''
+    列表视图增加外键信息显示
+    '''
 
     def get_list_queryset(self, queryset):
         if self.relate_obj:
@@ -221,10 +277,13 @@ class ListRelateDisplayPlugin(BaseRelateDisplayPlugin):
         return self._get_url(url)
 
     def get_context(self, context):
+        self.admin_view.list_template = 'xadmin/views/model_list_rel.html'
         context['brand_name'] = self.relate_obj.get_brand_name()
         context['rel_objs'] = self.relate_obj.to_objs
         if 'add_url' in context:
             context['add_url'] = self._get_url(context['add_url'])
+        context['rel_detail_url'] = self.admin_view.get_model_url(self.relate_obj.to_model,'detail',self.relate_obj.to_objs[0].id)
+        self.admin_view.list_tabs = self.relate_obj.get_list_tabs()
         return context
 
     def get_list_display(self, list_display):

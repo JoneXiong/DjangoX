@@ -1,0 +1,17 @@
+{% extends "xadmin/views/grid.html" %}
+{% load i18n %}
+
+{% block content %}
+<div id="rel-detail"></div>
+{{block.super}}
+{% endblock %}
+
+
+{% block extrabody %}
+{{block.super}}
+<script>
+$(document).ready(function () {
+    $('#rel-detail').load('{{ rel_detail_url }}?_format=html')
+});
+</script>
+{% endblock %}

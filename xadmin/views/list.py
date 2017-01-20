@@ -380,6 +380,9 @@ class ListAdminView(BaseGrid,ModelPage):
             field_name, row) for field_name in self.list_display]
         return row
 
+    def get_detail_url(self,obj):
+        return self.model_admin_url("detail", getattr(obj, self.pk_name))
+
     @filter_hook
     def result_item(self, obj, field_name, row):
         """
@@ -434,7 +437,7 @@ class ListAdminView(BaseGrid,ModelPage):
             item.row['is_display_first'] = False
             item.is_display_link = True
             if self.list_display_links_details:
-                url = self.model_admin_url("detail", getattr(obj, self.pk_name))
+                url = self.get_detail_url(obj)
                 #item_res_uri = self.model_admin_url("detail", getattr(obj, self.pk_name))
                 #if item_res_uri:
                 #    edit_url = self.model_admin_url("change", getattr(obj, self.pk_name))
