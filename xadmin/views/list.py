@@ -25,7 +25,7 @@ class ListAdminView(BaseGrid,ModelPage):
     list_exclude = ()              #: 排除显示的列, 在显示列的设置中不会出现这些被排除的列
     
     list_display_links = ()        #: 链接字段
-    list_display_links_details = False  #: 链接到详情页面而非编辑页
+    list_display_links_details = True  #: 链接到详情页面而非编辑页
     
     list_select_related = None     #: 是否提前加载关联数据, 使用 ``select_related``
     
@@ -40,6 +40,8 @@ class ListAdminView(BaseGrid,ModelPage):
     pop = False
     search_sphinx_ins = None 
     col_ctrl = True
+
+    list_tabs = []
 
     def init_request(self, *args, **kwargs):
         """
@@ -255,6 +257,9 @@ class ListAdminView(BaseGrid,ModelPage):
             'results': self.results(),
             'nav_buttons': mark_safe(' '.join(self.get_nav_btns()) ),
         }
+        if self.list_tabs:
+            cur_tab = self.request.GET.get('_tab','0')
+            new_context['cur_tab'] = int(cur_tab)
         context = super(ListAdminView, self).get_context()
         context.update(new_context)
         return context
@@ -429,24 +434,25 @@ class ListAdminView(BaseGrid,ModelPage):
             item.row['is_display_first'] = False
             item.is_display_link = True
             if self.list_display_links_details:
-                item_res_uri = self.model_admin_url("detail", getattr(obj, self.pk_name))
-                if item_res_uri:
-                    edit_url = self.model_admin_url("change", getattr(obj, self.pk_name))
-                    item.wraps.append('<a data-res-uri="%s" data-edit-uri="%s" class="details-handler" rel="tooltip" title="%s">%%s</a>'
-                                     % (item_res_uri, edit_url, _(u'Details of %s') % str(obj)))
+                url = self.model_admin_url("detail", getattr(obj, self.pk_name))
+                #item_res_uri = self.model_admin_url("detail", getattr(obj, self.pk_name))
+                #if item_res_uri:
+                #    edit_url = self.model_admin_url("change", getattr(obj, self.pk_name))
+                #    item.wraps.append('<a data-res-uri="%s" data-edit-uri="%s" class="details-handler" rel="tooltip" title="%s">%%s</a>'
+                #                     % (item_res_uri, edit_url, _(u'Details of %s') % str(obj)))
             else:
                 url = self.get_object_url(obj)
-                if self.pop:
-                    if 's' in self.request.GET:
-                        show = getattr(obj, self.request.GET.get('s'))
-                        if callable(show):show = show()
-                    else:
-                        show = escape(Truncator(obj).words(14, truncate='...'))
-                    show = str(show).replace('%','%%').replace("\'","\\\'")
-                    pop = format_html(' class="for_multi_select" show="{0}" sid="{1}" ', show, getattr(obj, self.request.GET.get('t')) )
+            if self.pop:
+                if 's' in self.request.GET:
+                    show = getattr(obj, self.request.GET.get('s'))
+                    if callable(show):show = show()
                 else:
-                    pop = ''
-                item.wraps.append(u'<a href="%s" %s>%%s</a>' % (url, pop))
+                    show = escape(Truncator(obj).words(14, truncate='...'))
+                show = str(show).replace('%','%%').replace("\'","\\\'")
+                pop = format_html(' class="for_multi_select" show="{0}" sid="{1}" ', show, getattr(obj, self.request.GET.get('t')) )
+            else:
+                pop = ''
+            item.wraps.append(u'<a href="%s" %s>%%s</a>' % (url, pop))
 
         return item
 

@@ -181,3 +181,5 @@ class ModelAdmin(object):
     page_num = 0    # 当前第几页
     paginator = None    #分页类实例
     result_count = None #总记录数
+
+    list_tabs = [] #列表页tab配置

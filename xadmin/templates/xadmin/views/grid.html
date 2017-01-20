@@ -36,6 +36,13 @@
 {% endblock nav_btns %}
 
 {% block content %}
+{% if cl.list_tabs %}
+<ul class="nav nav-tabs">
+    {% for tab_url,tab_title in cl.list_tabs %}
+    <li class="{% ifequal cur_tab forloop.counter0 %}active{% endifequal %}"><a href="{{ tab_url }}&_tab={{ forloop.counter0 }}">{{ tab_title }}</a></li>
+    {% endfor %}
+</ul>
+{% endif %}
   <div class="content-toolbar btn-toolbar pull-right clearfix">
     {% view_block 'top_toolbar' %}
 	{% if cl.col_ctrl %}
