@@ -395,14 +395,14 @@ class SiteView(BaseView):
         else:
             return self.user.has_perm(need_perm)
         
-    def get_nav_menu(self):
+    def get_nav_menu(self, app_label=None):
         # 非DEBUG模式会首先尝试从SESSION中取得缓存的 app 菜单项
-        menu_session_key = self.app_label and 'nav_menu_%s'%self.app_label or 'nav_menu'
+        menu_session_key = app_label and 'nav_menu_%s'%app_label or 'nav_menu'
         if not settings.DEBUG and menu_session_key in self.request.session:
             nav_menu = json.loads(self.request.session[menu_session_key])
         else:
-            if hasattr(self, 'app_label') and self.app_label:
-                menus = copy.deepcopy(self.admin_site.get_app_menu(self.app_label)) #copy.copy(self.get_nav_menu())
+            if app_label:
+                menus = copy.deepcopy(self.admin_site.get_app_menu(app_label)) #copy.copy(self.get_nav_menu())
             else:
                 menus = copy.deepcopy(self.admin_site.get_menu())
 
@@ -423,6 +423,13 @@ class SiteView(BaseView):
                 self.request.session[menu_session_key] = json.dumps(nav_menu)
                 self.request.session.modified = True
         return nav_menu
+
+    def get_site_menu(self):
+        if hasattr(self, 'app_label'):
+            menus = self.admin_site.get_site_menu(self.app_label)
+            return menus
+        else:
+            return []
  
     def deal_selected(self, nav_menu):
         def check_selected(menu, path):
@@ -455,14 +462,15 @@ class SiteView(BaseView):
 
         nav_menu = []
         if '_pop' not in self.request.GET:
-            nav_menu = self.get_nav_menu()
+            _app_label = hasattr(self, 'app_label') and self.app_label or None
+            nav_menu = self.get_nav_menu(_app_label)
             self.deal_selected(nav_menu)
         
         m_site = self.admin_site
         context.update({
             'menu_template': defs.BUILDIN_STYLES.get(m_site.menu_style, defs.BUILDIN_STYLES['default']), 
             'nav_menu': nav_menu,
-            'site_menu': hasattr(self, 'app_label') and m_site.get_site_menu(self.app_label) or [],
+            'site_menu': self.get_site_menu(),
             'site_title': m_site.site_title or defs.DEFAULT_SITE_TITLE,
             'site_footer': m_site.site_footer or defs.DEFAULT_SITE_FOOTER,
             'breadcrumbs': self.get_breadcrumb(),
