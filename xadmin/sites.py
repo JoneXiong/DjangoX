@@ -69,6 +69,7 @@ class AdminSite(object):
 
     login_view = None
     main_view = None #frame框架main页试图
+    show_default_index = True
 
     
     def __init__(self, name='xadmin'):
@@ -622,13 +623,16 @@ class AdminSite(object):
         获取APP列表菜单
         '''
         if not self.sys_menu_loaded:self.get_sys_menu()
-        ret = [{
-                    'app_lavel': '',
-                    'title': u'面板',
-                    'url': self.url_for('index'),
-                    'icon': '',
-                    'selected': not select_app
-                }]
+        if self.show_default_index:
+            ret = [{
+                        'app_label': '',
+                        'title': u'面板',
+                        'url': self.url_for('index'),
+                        'icon': '',
+                        'selected': not select_app
+                    }]
+        else:
+            ret = []
         for app_label,mod in self.app_dict.iteritems():
             if hasattr(mod,'verbose_name'):
                 m_first_url = None
@@ -651,7 +655,7 @@ class AdminSite(object):
                             m_first_url = '#'
 
                 ret.append({
-                            'app_lavel': app_label,
+                            'app_label': app_label,
                             'title': getattr(mod,'verbose_name', unicode(capfirst(app_label))  ),
                             'url': m_first_url,
                             'icon': '',
