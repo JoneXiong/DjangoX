@@ -54,7 +54,9 @@
     this.content = null
     this.$element.on('click.' + this.type, $.proxy(this.beforeToggle, this))
 
+    // 要更新值的界面内容
     this.$text = this.$element.parent().parent().find('.editable-field')
+    // 要获取的表单字段
     this.field = this.$element.data('editable-field')
   }
 
