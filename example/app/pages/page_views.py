@@ -8,6 +8,7 @@ class TestPage1(PageView):
     verbose_name = u'PageView1(基本)'
     app_label = 'app'
     menu_group = 'test_group'
+    icon = "fa fa-circle"
 
     def get_content(self):
         return 'OK'
