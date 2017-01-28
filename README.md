@@ -33,6 +33,8 @@ http://127.0.0.1:81/xadmin/
 
 4.示例网站
 [DjangoX网站](http://xadmin.ablog.top/xadmin/main.html)
+用户名: admin
+密码: admin
 
 # Screenshots
 ![info](https://github.com/JoneXiong/DjangoX/raw/master/example/app/static/app/img/show1.png)
