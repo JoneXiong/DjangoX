@@ -31,6 +31,9 @@ windows下则直接双击运行 run.cmd
 http://127.0.0.1:81/xadmin/
 登陆：admin admin
 
+4.示例网站
+[DjangoX网站](http://xadmin.ablog.top/xadmin/main.html)
+
 # Screenshots
 ![info](https://github.com/JoneXiong/DjangoX/raw/master/example/app/static/app/img/show1.png)
 
