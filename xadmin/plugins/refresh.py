@@ -29,6 +29,7 @@ from django.template import loader
 
 from xadmin.sites import site
 from xadmin.views import BasePlugin, ListAdminView
+from xadmin import dutils
 
 REFRESH_VAR = '_refresh'
 
@@ -57,7 +58,7 @@ class RefreshPlugin(BasePlugin):
                     'selected': str(r) == current_refresh,
                 } for r in self.refresh_times],
             })
-            nodes.append(loader.render_to_string('xadmin/blocks/model_list.top_toolbar.refresh.html', context_instance=context))
+            nodes.append(dutils.render_to_string('xadmin/blocks/model_list.top_toolbar.refresh.html', context_instance=context))
 
 
 site.register_plugin(RefreshPlugin, ListAdminView)

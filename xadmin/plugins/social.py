@@ -6,6 +6,7 @@ from django.conf import settings
 from xadmin.views.base import BasePlugin
 from xadmin.sites import site
 from xadmin.views.website import LoginView
+from xadmin import dutils
 
 
 class SocialLoginPlugin(BasePlugin):
@@ -19,6 +20,6 @@ class SocialLoginPlugin(BasePlugin):
 
     def block_form_bottom(self, context, nodes):
         _tpl = 'xadmin/auth/login_social_block.html'
-        nodes.append(loader.render_to_string(_tpl, context_instance=context))
+        nodes.append(dutils.render_to_string(_tpl, context_instance=context))
 
 site.register_plugin(SocialLoginPlugin, LoginView)

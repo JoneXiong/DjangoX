@@ -11,6 +11,7 @@ from xadmin.core.structs import SortedDict
 from xadmin.wizard.storage import get_storage
 from xadmin.wizard.forms import ManagementForm
 from xadmin.wizard.views import StepsHelper
+from xadmin import dutils
 
 
 def normalize_name(name):
@@ -307,13 +308,13 @@ class WizardFormPlugin(BasePlugin):
                 'current_step': self.steps.current,
             }),
         }
-        nodes.append(loader.render_to_string('xadmin/blocks/model_form.before_fieldsets.wizard.html', context_instance=context))
+        nodes.append(dutils.render_to_string('xadmin/blocks/model_form.before_fieldsets.wizard.html', context_instance=context))
 
     def block_submit_line(self, context, nodes):
         context.update(dict(self.storage.extra_data))
         context['wizard'] = {
             'steps': self.steps
         }
-        nodes.append(loader.render_to_string('xadmin/blocks/model_form.submit_line.wizard.html', context_instance=context))
+        nodes.append(dutils.render_to_string('xadmin/blocks/model_form.submit_line.wizard.html', context_instance=context))
 
 site.register_plugin(WizardFormPlugin, ModelFormAdminView)
