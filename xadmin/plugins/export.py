@@ -10,7 +10,6 @@ import datetime
 import sys
 
 from django.http import HttpResponse
-from django.template import loader
 from django.utils.encoding import force_unicode, smart_unicode
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
@@ -23,6 +22,7 @@ from xadmin.views import BasePlugin, ListAdminView
 from xadmin.util import json
 from xadmin.views.list import ALL_VAR
 from xadmin.views.page import GridPage
+from xadmin.dutils import render_to_string
 
 try:
     import xlwt
@@ -55,7 +55,7 @@ class ExportMenuPlugin(BasePlugin):
                 'form_params': self.admin_view.get_form_params({'_do_': 'export'}, ('export_type',)),
                 'export_types': [{'type': et, 'name': self.export_names[et]} for et in self.list_export],
             })
-            nodes.append(loader.render_to_string('xadmin/blocks/model_list.top_toolbar.exports.html', context_instance=context))
+            nodes.append(render_to_string('xadmin/blocks/model_list.top_toolbar.exports.html', context_instance=context))
 
 
 class ExportPlugin(BasePlugin):

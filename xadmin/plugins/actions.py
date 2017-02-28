@@ -4,7 +4,6 @@
 """
 from django import forms
 from django.http import HttpResponse, HttpResponseRedirect
-from django.template import loader
 from django.utils.encoding import force_unicode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _, ungettext
@@ -20,6 +19,7 @@ from xadmin.views.action_delete import DeleteSelectedAction
 from xadmin.views.grid import BaseGrid
 from xadmin.views import UpdateAdminView
 from xadmin.core.structs import SortedDict
+from xadmin.dutils import render_to_string
 
 checkbox_form_field = forms.CheckboxInput({'class': 'action-select'}, lambda value: False)
 
@@ -203,7 +203,7 @@ class ActionPlugin(BasePlugin):
     def block_results_bottom(self, context, nodes):
         if self.admin_view.result_count:
             _tpl = 'xadmin/blocks/grid.results_bottom.actions.html' if self.admin_view.grid else 'xadmin/blocks/form.results_bottom.actions.html'
-            nodes.append(loader.render_to_string(_tpl, context_instance=context))
+            nodes.append(render_to_string(_tpl, context_instance=context))
 
 
 site.register_plugin(ActionPlugin, ListAdminView)
