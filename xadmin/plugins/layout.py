@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from xadmin.sites import site
 from xadmin.views import BasePlugin, ListAdminView
 from xadmin.util import label_for_field
+from xadmin import dutils
 
 LAYOUT_VAR = '_layout'
 
@@ -73,7 +74,7 @@ class GridLayoutPlugin(BasePlugin):
                 'layouts': self._active_layouts,
                 'current_icon': self._current_icon,
             })
-            nodes.append(loader.render_to_string('xadmin/blocks/model_list.top_toolbar.layouts.html', context_instance=context))
+            nodes.append(dutils.render_to_string('xadmin/blocks/model_list.top_toolbar.layouts.html', context_instance=context))
 
 
 site.register_plugin(GridLayoutPlugin, ListAdminView)
