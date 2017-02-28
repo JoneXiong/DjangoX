@@ -8,6 +8,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.encoding import smart_unicode
 from django.db.models.base import ModelBase
 from django.template import loader
+from django.template.context import RequestContext
 
 
 class JSONEncoder(DjangoJSONEncoder):
@@ -73,6 +74,21 @@ else:
 
 def render_to_string(tpl, context_instance=None):
     if django.VERSION[1]>=8:
-        return loader.render_to_string(tpl, context=context_instance)
+        return loader.render_to_string(tpl, context=get_context_dict(context_instance))
     else:
         return loader.render_to_string(tpl, context_instance=context_instance)
+
+
+def get_context_dict(context):
+    """
+     Contexts in django version 1.9+ must be dictionaries. As xadmin has a legacy with older versions of django,
+    the function helps the transition by converting the [RequestContext] object to the dictionary when necessary.
+    :param context: RequestContext
+    :return: dict
+    """
+    if isinstance(context, RequestContext):
+        ctx = {}
+        map(ctx.update, context.dicts)
+    else:
+        ctx = context
+    return ctx
