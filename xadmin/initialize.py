@@ -1,10 +1,6 @@
 # coding=utf-8
 
 from django.conf import settings
-try:
-    from django.utils.importlib import import_module
-except:
-    from importlib import import_module
 from django.utils.module_loading import module_has_submodule
 
 
@@ -27,6 +23,7 @@ def register_builtin_views(site):
     
 def register_builtin_plugins(site):
     from xadmin.plugins import PLUGINS
+    from dutils import import_module
 
     exclude_plugins = getattr(settings, 'XADMIN_EXCLUDE_PLUGINS', [])
     [import_module('xadmin.plugins.%s' % plugin) for plugin in PLUGINS if plugin not in exclude_plugins]
@@ -34,6 +31,7 @@ def register_builtin_plugins(site):
 def autodiscover():
     import xadmin
     from xadmin.sites import site
+    from dutils import import_module
     
     xadmin.site = site
     
