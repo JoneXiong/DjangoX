@@ -1,5 +1,5 @@
 import django 
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url#,patterns
 from django.conf import settings
 
 # Uncomment the next two lines to enable the admin:
@@ -15,9 +15,11 @@ xadmin.autodiscover()
 from django.contrib import admin
 admin.autodiscover()
 
-urlpatterns = patterns('',
+
+from django.views.generic import TemplateView
+from django.conf.urls.static import static
+
+urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^xadmin/', include(xadmin.site.urls)),
-    url(r'^static/(?P<path>.*)$','django.views.static.serve',{'document_root':settings.STATIC_ROOT}),
-    url(r'^uploads/(?P<path>.*)', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}), 
-)
+              ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
