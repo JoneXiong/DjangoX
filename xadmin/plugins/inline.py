@@ -3,10 +3,11 @@ import copy
 import inspect
 
 from django import forms
+from django.template import loader
 from django.forms.formsets import all_valid, DELETION_FIELD_NAME
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
-from django.template import loader
-from django.template.loader import render_to_string
+from django.template import loader, RequestContext
+from crispy_forms.utils import TEMPLATE_PACK
 
 from xadmin.layout import FormHelper, Layout, flatatt, Container, Column, Field, Fieldset
 from xadmin.sites import site
@@ -26,7 +27,7 @@ class ShowField(Field):
         if admin_view.style == 'table':
             self.template = "xadmin/layout/field_value_td.html"
 
-    def render(self, form, form_style, context, **kwargs):
+    def render(self, form, form_style, context, template_pack=TEMPLATE_PACK, **kwargs):
         html = ''
         detail = form.detail
         for field in self.fields:
@@ -41,10 +42,10 @@ class DeleteField(Field):
     u'''
     用于删除控制的字段
     '''
-    def render(self, form, form_style, context, **kwargs):
+    def render(self, form, form_style, context, template_pack=TEMPLATE_PACK, **kwargs):
         if form.instance.pk:
             self.attrs['type'] = 'hidden'
-            return super(DeleteField, self).render(form, form_style, context)
+            return super(DeleteField, self).render(form, form_style, context, template_pack=TEMPLATE_PACK, **kwargs)
         else:
             return ""
 
@@ -207,6 +208,7 @@ class InlineModelAdmin(ModelFormAdminView):
 
         helper = FormHelper()
         helper.form_tag = False
+        helper.include_media = False
         # override form method to prevent render csrf_token in inline forms, see template 'bootstrap/whole_uni_form.html'
         helper.form_method = 'get'
 
@@ -347,9 +349,10 @@ class InlineFormset(Fieldset):
         self.flat_attrs = flatatt(kwargs)
         self.extra_attrs = formset.style.get_attrs()
 
-    def render(self, form, form_style, context, **kwargs):
-        return render_to_string(
-            self.template, dict({'formset': self, 'prefix': self.formset.prefix, 'inline_style': self.inline_style}, **self.extra_attrs),
+    def render(self, form, form_style, context, template_pack=TEMPLATE_PACK, **kwargs):
+        context.update(dict({'formset': self, 'prefix': self.formset.prefix, 'inline_style': self.inline_style}, **self.extra_attrs))
+        return dutils.render_to_string(
+            self.template,
             context_instance=context)
 
 
