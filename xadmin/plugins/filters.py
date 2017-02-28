@@ -221,12 +221,12 @@ class FilterPlugin(BasePlugin):
 
     def block_nav_form(self, context, nodes):
         if self.search_fields:
-            _context = context.update({'search_var': SEARCH_VAR,
+            context.update({'search_var': SEARCH_VAR,
                         'remove_search_url': self.admin_view.get_query_string(remove=[SEARCH_VAR]),
                         'search_form_params': self.admin_view.get_form_params(remove=[SEARCH_VAR,'p'])})
             nodes.append(
                 render_to_string(
-                    'xadmin/blocks/model_list.nav_form.search_form.html', context_instance=_context))
+                    'xadmin/blocks/model_list.nav_form.search_form.html', context_instance=context))
 
 site.register_plugin(FilterPlugin, ListAdminView)
 site.register_plugin(FilterPlugin, GridPage)
