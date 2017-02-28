@@ -159,4 +159,4 @@ class FormAction(Action):
             'action_url': self.action_url
         })
         
-        return TemplateResponse(self.request, self.form_template, context, current_app=self.admin_site.name)
+        return TemplateResponse(self.request, self.form_template, context)

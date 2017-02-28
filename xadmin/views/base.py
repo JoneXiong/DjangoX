@@ -47,7 +47,6 @@ def inclusion_tag(file_name, context_class=Context, takes_context=False):
                 t = get_template(file_name)
             new_context = context_class(_dict, **{
                 'autoescape': context.autoescape,
-                'current_app': context.current_app,
                 'use_l10n': context.use_l10n,
                 'use_tz': context.use_tz,
             })
@@ -197,7 +196,8 @@ class Common(object):
         return self.render_tpl(template, context)
     
     def render_tpl(self, tpl, context):
-        return TemplateResponse(self.request, tpl, context, current_app=self.admin_site.name)
+        context.update({'current_app': self.admin_site.name})
+        return TemplateResponse(self.request, tpl, context)
 
     def message_user(self, message, level='info'):
         """

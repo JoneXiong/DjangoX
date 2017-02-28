@@ -40,18 +40,18 @@ class PermissionModelMultipleChoiceField(ModelMultipleChoiceField):
 
     def label_from_instance(self, p):
         return get_permission_name(p)
-    
+
 
 class GroupAddUsers(FormAction):
     verbose_name = '批量添加成员'
     app_label = 'xadmin'
-    
+
     def prepare_form(self):
         class GroupAddUsersForm(forms.Form):
             users = forms.CharField(label=u'选择用户', widget=widgets.ManyToManyPopupWidget(self, User, 'id') )
-        
+
         self.view_form = GroupAddUsersForm
-        
+
     def action(self, queryset):
         m_data = self.form_obj.cleaned_data
         users = m_data.get('users').split(',')
@@ -69,7 +69,7 @@ class GroupAdmin(object):
     model_icon = 'fa fa-group'
     app_label = 'xadmin'
     menu_group = 'auth_group'
-    
+
     actions = [GroupAddUsers]
 
     def get_field_attrs(self, db_field, **kwargs):
@@ -88,7 +88,7 @@ class UserAdmin(object):
     ordering = ('username',)
     style_fields = {
                     'groups': 'm2m_transfer',
-                    'user_permissions': 'm2m_raw' 
+                    'user_permissions': 'm2m_raw'
     }
     model_icon = 'fa fa-user'
     relfield_style = 'fk-ajax'
@@ -158,6 +158,9 @@ site.register(Permission, PermissionAdmin)
 
 
 class UserFieldPlugin(BasePlugin):
+    '''
+    用户字段在表单中隐藏，默认为当前用户
+    '''
 
     user_fields = []
 
@@ -194,6 +197,9 @@ site.register_plugin(ModelPermissionPlugin, ModelAdminView)
 
 
 class ChangePasswordView(ModelAdminView):
+    '''
+    管理员修改用户密码
+    '''
     model = User
     change_password_form = AdminPasswordChangeForm
     change_user_password_template = None
@@ -232,7 +238,7 @@ class ChangePasswordView(ModelAdminView):
         return TemplateResponse(self.request, [
             self.change_user_password_template or
             'xadmin/auth/user/change_password.html'
-        ], self.get_context(), current_app=self.admin_site.name)
+        ], self.get_context())
 
     @method_decorator(sensitive_post_parameters())
     @csrf_protect_m
@@ -251,6 +257,9 @@ class ChangePasswordView(ModelAdminView):
 
 
 class ChangeAccountPasswordView(ChangePasswordView):
+    '''
+    用户修改自己密码
+    '''
     change_password_form = PasswordChangeForm
 
     @csrf_protect_m

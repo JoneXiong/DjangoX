@@ -198,7 +198,7 @@ class FormView(SiteView):
 
         return TemplateResponse(
             self.request, self.template,
-            context, current_app=self.admin_site.name)
+            context)
 
     @filter_hook
     def post_response(self):

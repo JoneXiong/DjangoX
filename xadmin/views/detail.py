@@ -324,7 +324,7 @@ class DetailAdminView(ModelAdminView):
         return TemplateResponse(self.request, self.detail_template or
                                 self.get_template_list(
                                     'views/model_detail.html'),
-                                context, current_app=self.admin_site.name)
+                                context)
 
 
 class DetailAdminUtil(DetailAdminView):

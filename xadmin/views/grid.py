@@ -62,8 +62,8 @@ class BaseGrid(object):
         context.update(kwargs or {})
 
         response = self.get_response(context, *args, **kwargs)
-
-        return response or TemplateResponse(request, self._tpl, context, current_app=self.admin_site.name)
+        context.update({'current_app': self.admin_site.name})
+        return response or TemplateResponse(request, self._tpl, context)
     
     def _get_default_ordering(self):
         ordering = []
