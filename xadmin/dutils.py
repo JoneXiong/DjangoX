@@ -7,6 +7,7 @@ import django
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.encoding import smart_unicode
 from django.db.models.base import ModelBase
+from django.template import loader
 
 
 class JSONEncoder(DjangoJSONEncoder):
@@ -40,21 +41,6 @@ except:
 
 
 try:
-    from django.forms.util import flatatt
-except:
-    from django.forms.utils import flatatt
-    
-try:
-    from django.forms.util import ErrorDict
-except:
-    from django.forms.utils import ErrorDict
-    
-try:
-    from django.forms.util import ErrorList
-except:
-    from django.forms.utils import ErrorList
-    
-try:
     from django.db import transaction
     commit_on_success = transaction.commit_on_success
 except:
@@ -67,10 +53,26 @@ except:
     def get_cache(k):
         from django.core.cache import caches
         return caches[k]
-    
-try:
-    from django.contrib.contenttypes.generic import BaseGenericInlineFormSet, generic_inlineformset_factory
-except:
-    from django.contrib.contenttypes.forms import BaseGenericInlineFormSet, generic_inlineformset_factory
-    
+
+
 from django.core.mail import send_mail # use: send_mail(subject, email, from_email, [user.email])
+
+if django.VERSION[1] >= 8:
+    from django.utils.module_loading import import_module
+    from django.forms.utils import flatatt
+    from django.forms.utils import ErrorDict
+    from django.forms.utils import ErrorList
+    from django.contrib.contenttypes.forms import BaseGenericInlineFormSet, generic_inlineformset_factory
+else:
+    from django.utils.importlib import import_module
+    from django.forms.util import flatatt
+    from django.forms.util import ErrorDict
+    from django.forms.util import ErrorList
+    from django.contrib.contenttypes.generic import BaseGenericInlineFormSet, generic_inlineformset_factory
+
+
+def render_to_string(tpl, context_instance=None):
+    if django.VERSION[1]>=8:
+        return loader.render_to_string(tpl, context=context_instance)
+    else:
+        return loader.render_to_string(tpl, context_instance=context_instance)
