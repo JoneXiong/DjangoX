@@ -42,7 +42,6 @@
 暂无
 
 """
-from django.template import loader
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
@@ -163,7 +162,7 @@ class BookmarkPlugin(BasePlugin):
     # Block Views
     def block_nav_menu(self, context, nodes):
         if self.show_bookmarks:
-            nodes.insert(0, loader.render_to_string('xadmin/blocks/model_list.nav_menu.bookmarks.html', context_instance=context))
+            nodes.insert(0, dutils.render_to_string('xadmin/blocks/model_list.nav_menu.bookmarks.html', context_instance=context))
 
 
 class BookmarkView(ModelAdminView):
