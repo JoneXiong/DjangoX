@@ -74,6 +74,7 @@
                 for (var j = e['errors'].length - 1; j >= 0; j--) {
                   err_html.push('<span id="error_'+j+'_'+ e['id'] +'" class="text-danger">'+e['errors'][j]+'</span>')
                 }
+		errdiv.find("span[id^='error_']").remove();
                 errdiv.find('.controls').append(err_html.join('\n'))
               } else {
                 non_fields_errors = non_fields_errors.concat(e['errors'])
