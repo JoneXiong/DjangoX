@@ -129,6 +129,7 @@ class BaseWidget(forms.Form):
     def setup(self):
         helper = FormHelper()
         helper.form_tag = False
+        helper.include_media = False
         self.helper = helper
 
         self.id = self.cleaned_data['id']
@@ -142,7 +143,9 @@ class BaseWidget(forms.Form):
         context = {'widget_id': self.id, 'widget_title': self.title, 'widget_icon': self.widget_icon,
             'widget_type': self.widget_type, 'form': self, 'widget': self}
         self.context(context)
-        return loader.render_to_string(self.template, context, context_instance=RequestContext(self.request))
+        _context = RequestContext(self.request)
+        _context.update(context)
+        return loader.render_to_string(self.template, context_instance=_context)
 
     def context(self, context):
         pass
@@ -348,6 +351,7 @@ class AddFormWidget(ModelBaseWidget, PartialBaseWidget):
     def context(self, context):
         helper = FormHelper()
         helper.form_tag = False
+        helper.include_media = False
 
         context.update({
             'addform': self.add_view.form_obj,
