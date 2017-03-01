@@ -90,6 +90,7 @@ class WidgetManager(object):
     def get_widgets(self, page_id):
         return self._widgets.values()
 
+# 单例模式
 widget_manager = WidgetManager()
 
 
@@ -102,22 +103,34 @@ class WidgetDataError(Exception):
 
 
 class BaseWidget(forms.Form):
+    '''
+    区块: 本质为表单
+    '''
 
+    # 区块使用的模板
     template = 'xadmin/widgets/base.html'
+    # 描述信息
     description = 'Base Widget, don\'t use it.'
+
     widget_title = None
+    # 区块的icon
     widget_icon = 'fa fa-plus-square'
+    # 类型
     widget_type = 'base'
+
     base_title = None
 
+    # 表单字段
     id = forms.IntegerField(label=_('Widget ID'), widget=forms.HiddenInput)
     title = forms.CharField(label=_('Widget Title'), required=False, widget=exwidgets.AdminTextInputWidget)
 
     def __init__(self, dashboard, data):
+        # 一些上下文对象
         self.dashboard = dashboard
         self.admin_site = dashboard.admin_site
         self.request = dashboard.request
         self.user = dashboard.request.user
+
         self.convert(data)
         super(BaseWidget, self).__init__(data)
 
@@ -127,6 +140,9 @@ class BaseWidget(forms.Form):
         self.setup()
 
     def setup(self):
+        '''
+        API方法：初始化时的安装
+        '''
         helper = FormHelper()
         helper.form_tag = False
         self.helper = helper
@@ -139,21 +155,36 @@ class BaseWidget(forms.Form):
 
     @property
     def widget(self):
+        '''
+        关键方法：输出内容,类似render
+        '''
         context = {'widget_id': self.id, 'widget_title': self.title, 'widget_icon': self.widget_icon,
             'widget_type': self.widget_type, 'form': self, 'widget': self}
         self.context(context)
         return loader.render_to_string(self.template, context, context_instance=RequestContext(self.request))
 
     def context(self, context):
+        '''
+        API方法：用于提供上下文变量
+        '''
         pass
 
     def convert(self, data):
+        '''
+        API方法：用于将数据保存到类成员字段
+        '''
         pass
 
     def has_perm(self):
+        '''
+        API方法：用于权限判断
+        '''
         return False
 
     def save(self):
+        '''
+        保存表单数据
+        '''
         value = dict([(f.name, f.value()) for f in self])
         user_widget = UserWidget.objects.get(id=self.id)
         user_widget.set_value(value)
@@ -171,6 +202,7 @@ class BaseWidget(forms.Form):
 
 @widget_manager.register
 class HtmlWidget(BaseWidget):
+
     widget_type = 'html'
     widget_icon = 'fa fa-file-o'
     description = _(
@@ -184,13 +216,17 @@ class HtmlWidget(BaseWidget):
 
     def context(self, context):
         context['content'] = self.cleaned_data['content']
-        
-        
+
+
 class ModelBaseWidget(BaseWidget):
+    '''
+    模型相关区块基类
+    '''
 
     app_label = None
     module_name = None
     model_perm = 'change'
+
     model = ModelChoiceField(label=_(u'Target Model'), widget=exwidgets.SelectWidget)
 
     def __init__(self, dashboard, data):
@@ -208,15 +244,24 @@ class ModelBaseWidget(BaseWidget):
         return self.dashboard.has_model_perm(self.model, self.model_perm)
 
     def filte_choices_model(self, model, modeladmin):
+        '''
+        过滤出有权限的模型
+        '''
         return self.dashboard.has_model_perm(model, self.model_perm)
 
     def model_admin_url(self, name, *args, **kwargs):
+        '''
+        获取模型 name 操作的url
+        '''
         return reverse(
             "%s:%s_%s_%s" % (self.admin_site.app_name, self.app_label,
             self.module_name, name), args=args, kwargs=kwargs)
 
 
 class PartialBaseWidget(BaseWidget):
+    '''
+    页面部件基类
+    '''
 
     def get_view_class(self, view_class, model=None, **opts):
         admin_class = self.admin_site._registry.get(model) if model else None
@@ -231,16 +276,25 @@ class PartialBaseWidget(BaseWidget):
         return request
 
     def make_get_request(self, path, data={}, **extra):
+        '''
+        发起 GET 请求
+        '''
         req = self.get_factory().get(path, data, **extra)
         return self.setup_request(req)
 
     def make_post_request(self, path, data={}, **extra):
+        '''
+        发起 POST 请求
+        '''
         req = self.get_factory().post(path, data, **extra)
         return self.setup_request(req)
-    
-    
+
+
 @widget_manager.register
 class QuickBtnWidget(BaseWidget):
+    '''
+    快捷链接按钮组
+    '''
     widget_type = 'qbutton'
     description = _(u'Quick button Widget, quickly open any page.')
     template = "xadmin/widgets/qbutton.html"
@@ -288,6 +342,9 @@ class QuickBtnWidget(BaseWidget):
 
 @widget_manager.register
 class ListWidget(ModelBaseWidget, PartialBaseWidget):
+    '''
+    模型数据列表
+    '''
     widget_type = 'list'
     description = _(u'Any Objects list Widget.')
     template = "xadmin/widgets/list.html"
@@ -328,6 +385,9 @@ class ListWidget(ModelBaseWidget, PartialBaseWidget):
 
 @widget_manager.register
 class AddFormWidget(ModelBaseWidget, PartialBaseWidget):
+    '''
+    快速添加
+    '''
     widget_type = 'addform'
     description = _(u'Add any model object Widget.')
     template = "xadmin/widgets/addform.html"
