@@ -5,7 +5,7 @@ import math
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import *
 from crispy_forms.bootstrap import *
-from crispy_forms.utils import render_field, flatatt
+from crispy_forms.utils import render_field, flatatt, TEMPLATE_PACK
 
 from crispy_forms import layout
 from crispy_forms import bootstrap
@@ -75,7 +75,7 @@ class InputGroup(layout.Field):
 
         super(InputGroup, self).__init__(field, **kwargs)
 
-    def render(self, form, form_style, context, template_pack='bootstrap'):
+    def render(self, form, form_style, context, template_pack=TEMPLATE_PACK):
         classes = form.fields[self.field].widget.attrs.get('class', '')
         context.update(
             {'inputs': self.inputs, 'classes': classes.replace('form-control', '')})

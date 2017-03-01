@@ -4,7 +4,8 @@ import os
 import shutil
 
 from django.core.management.base import CommandError, BaseCommand
-from django.utils.importlib import import_module
+
+from xadmin.dutils import import_module
 
 
 class Command(BaseCommand):

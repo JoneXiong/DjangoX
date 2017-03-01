@@ -47,7 +47,6 @@ def inclusion_tag(file_name, context_class=Context, takes_context=False):
                 t = get_template(file_name)
             new_context = context_class(_dict, **{
                 'autoescape': context.autoescape,
-                'current_app': context.current_app,
                 'use_l10n': context.use_l10n,
                 'use_tz': context.use_tz,
             })
@@ -197,7 +196,8 @@ class Common(object):
         return self.render_tpl(template, context)
     
     def render_tpl(self, tpl, context):
-        return TemplateResponse(self.request, tpl, context, current_app=self.admin_site.name)
+        context.update({'current_app': self.admin_site.name})
+        return TemplateResponse(self.request, tpl, context)
 
     def message_user(self, message, level='info'):
         """
@@ -383,6 +383,7 @@ class BaseView(Common, View):
 class SiteView(BaseView):
 
     base_template = 'xadmin/base_site.html'    #: View模板继承的基础模板
+    force_select = None
 
     def _check_menu_permission(self, item):
         need_perm = item.pop('perm', None)
@@ -436,11 +437,14 @@ class SiteView(BaseView):
             # 判断菜单项是否被选择，使用当前url跟菜单项url对比
             selected = False
             if 'url' in menu:
+                base_url = ''
                 chop_index = menu['url'].find('?')
                 if chop_index == -1:
-                    selected = path.startswith(menu['url'])
+                    base_url = menu['url']
                 else:
-                    selected = path.startswith(menu['url'][:chop_index])
+                    base_url = menu['url'][:chop_index]
+                path = self.force_select or path
+                selected = path.startswith(base_url)
             if 'menus' in menu:
                 for m in menu['menus']:
                     _s = check_selected(m, path)

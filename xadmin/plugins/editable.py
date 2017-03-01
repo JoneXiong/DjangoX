@@ -143,6 +143,7 @@ class EditPatchView(ModelFormAdminView, ListAdminView):
 
         helper = FormHelper()
         helper.form_tag = False
+        helper.include_media = False
         form.helper = helper
 
         s = '{% load i18n crispy_forms_tags %}<form method="post" action="{{action_url}}" autocomplete="off">{% crispy form %}'+ \

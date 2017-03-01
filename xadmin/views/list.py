@@ -52,6 +52,9 @@ class ListAdminView(BaseGrid,ModelPage):
 
         request = self.request
         #request.session['LIST_QUERY'] = (self.model_info, self.request.META['QUERY_STRING'])
+        if 'pop' in self.request.GET:
+            self.pop = True
+            self.base_template = 'xadmin/base_pure.html'
 
         self.list_display = self.get_list_display() #插件在其后起作用
         self.list_display_links = self.get_list_display_links()
@@ -66,10 +69,6 @@ class ListAdminView(BaseGrid,ModelPage):
         self.show_all = ALL_VAR in request.GET
         self.to_field = request.GET.get(TO_FIELD_VAR)
         self.params = dict(request.GET.items())
-        
-        if 'pop' in self.request.GET:
-            self.pop = True
-            self.base_template = 'xadmin/base_pure.html'
 
         # 删除已经获取的参数, 因为后面可能要用 params 或过滤数据
         if PAGE_VAR in self.params:

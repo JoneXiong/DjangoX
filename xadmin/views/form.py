@@ -108,6 +108,7 @@ class FormView(SiteView):
     def get_form_helper(self):
         helper = FormHelper()
         helper.form_tag = False
+        helper.include_media = False
         helper.add_layout(self.get_form_layout())
 
         return helper
@@ -198,7 +199,7 @@ class FormView(SiteView):
 
         return TemplateResponse(
             self.request, self.template,
-            context, current_app=self.admin_site.name)
+            context)
 
     @filter_hook
     def post_response(self):

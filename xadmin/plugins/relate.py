@@ -141,9 +141,9 @@ class RelateMenuPlugin(BasePlugin):
         links = []
         if self.has_view_perm:
             links.append('''<a data-res-uri="%s" data-edit-uri="%s" rel="tooltip" title="%s" class="btn btn-info btn-xs details-handler" ><i class="fa fa-search-plus"></i> 查看</a>'''%(self.admin_view.get_url('detail',instance.pk),self.admin_view.get_url('change',instance.pk),instance))
-        if self.has_change_perm:
+        if not self.admin_view.pop and self.has_change_perm:
             links.append('''<a href="%s" class="btn btn-success btn-xs" ><i class="fa fa-edit"></i> 修改</a>'''%self.admin_view.get_url('change',instance.pk))
-        if self.has_delete_perm:
+        if not self.admin_view.pop and self.has_delete_perm:
             links.append('''<a href="%s" class="btn btn-danger btn-xs" ><i class="fa fa-trash"></i> 删除</a>'''%self.admin_view.get_url('delete',instance.pk))
         return ' '.join(links)
     op_link.short_description = '&nbsp;'
@@ -159,7 +159,7 @@ class RelateMenuPlugin(BasePlugin):
             if self.has_view_perm or self.has_add_perm or self.has_change_perm:
                 list_display.append('op_link')
                 self.admin_view.op_link = self.op_link
-        if self.use_related_menu and len(self.get_related_list()):
+        if not self.admin_view.pop and self.use_related_menu and len(self.get_related_list()):
             list_display.append('related_link')
             self.admin_view.related_link = self.related_link
             self.admin_view.get_detail_url = self.get_first_rel_url
@@ -197,7 +197,7 @@ class RelateObject(object):
             self.to_model = field.model
             self.rel_name = self.to_model._meta.pk.name
             self.is_m2m = False
-        # 得带当前外键关联的对象 to_objs
+        # 得到当前外键关联的对象 to_objs
         _manager = self.to_model._default_manager
         if hasattr(_manager, 'get_query_set'):
             to_qs = _manager.get_query_set()
@@ -268,6 +268,12 @@ class ListRelateDisplayPlugin(BaseRelateDisplayPlugin):
     列表视图增加外键信息显示
     '''
 
+    def init_request(self, *args, **kwargs):
+        ret = super(ListRelateDisplayPlugin, self).init_request(*args, **kwargs)
+        if self.relate_obj:
+            self.admin_view.force_select = self.admin_view.get_model_url(self.relate_obj.to_model,'changelist')
+        return ret
+
     def get_list_queryset(self, queryset):
         if self.relate_obj:
             queryset = self.relate_obj.filter(queryset)
@@ -278,12 +284,23 @@ class ListRelateDisplayPlugin(BaseRelateDisplayPlugin):
 
     def get_context(self, context):
         self.admin_view.list_template = 'xadmin/views/model_list_rel.html'
-        context['brand_name'] = self.relate_obj.get_brand_name()
+        #context['brand_name'] = self.relate_obj.get_brand_name()
         context['rel_objs'] = self.relate_obj.to_objs
         if 'add_url' in context:
             context['add_url'] = self._get_url(context['add_url'])
         context['rel_detail_url'] = self.admin_view.get_model_url(self.relate_obj.to_model,'detail',self.relate_obj.to_objs[0].id)
         self.admin_view.list_tabs = self.relate_obj.get_list_tabs()
+        context['cur_tab'] = int(self.request.GET.get('_tab','0'))
+
+        to_model = self.relate_obj.to_model
+        to_objs = self.relate_obj.to_objs
+        context['has_rel_change_permission'] = self.admin_view.has_model_perm(to_model,'change')
+        context['has_rel_delete_permission'] = self.admin_view.has_model_perm(to_model,'delete')
+        if context['has_rel_change_permission']:
+            context['rel_change_url'] = self.admin_view.get_model_url(to_model,'change',to_objs[0].pk)
+        if context['has_rel_delete_permission']:
+            context['rel_delete_url'] = self.admin_view.get_model_url(to_model,'delete',to_objs[0].pk)
+
         return context
 
     def get_list_display(self, list_display):
@@ -293,6 +310,39 @@ class ListRelateDisplayPlugin(BaseRelateDisplayPlugin):
             except Exception:
                 pass
         return list_display
+
+    def get_breadcrumb(self, bcs):
+        u'''
+        导航链接基础部分
+        '''
+        if self.admin_site.head_fix:
+            return []
+        base = [{
+            'url': self.get_admin_url('index'),
+            'title': _('Home')
+            }]
+        to_model = self.relate_obj.to_model
+        model_admin = self.admin_site._registry[to_model]
+        app_label = getattr(model_admin, 'app_label', to_model._meta.app_label)
+        app_mod = self.admin_site.app_dict[app_label]
+        base.append({
+                     'url': app_mod.index_url,
+                     'title':  hasattr(app_mod,'verbose_name') and app_mod.verbose_name or app_label
+                     })
+        item = {}
+        opts = to_model._meta
+        item = {'title': opts.verbose_name_plural}
+        item['url'] = self.admin_view.get_model_url(to_model,'changelist')
+        base.append(item)
+
+        to_objs = self.relate_obj.to_objs
+        if len(to_objs) == 1:
+            to_model_name = str(to_objs[0])
+        else:
+            to_model_name = force_unicode(to_model._meta.verbose_name)
+        base.append({'title': to_model_name,'url':''})
+
+        return base
 
 
 class EditRelateDisplayPlugin(BaseRelateDisplayPlugin):

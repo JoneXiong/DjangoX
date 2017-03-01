@@ -99,6 +99,7 @@ class FormAction(Action):
     def get_form_helper(self):
         helper = FormHelper()
         helper.form_tag = False
+        helper.include_media = False
         helper.add_layout(self.get_form_layout())
 
         return helper
@@ -159,4 +160,4 @@ class FormAction(Action):
             'action_url': self.action_url
         })
         
-        return TemplateResponse(self.request, self.form_template, context, current_app=self.admin_site.name)
+        return TemplateResponse(self.request, self.form_template, context)

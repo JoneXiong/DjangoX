@@ -14,6 +14,8 @@ from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.utils.html import conditional_escape
+from crispy_forms.utils import TEMPLATE_PACK
+
 from xadmin.layout import FormHelper, Layout, Fieldset, Container, Column, Field, Col, TabHolder
 from xadmin.util import unquote, lookup_field, display_for_field, boolean_icon, label_for_field
 from xadmin.defs import EMPTY_CHANGELIST_VALUE
@@ -35,7 +37,7 @@ class ShowField(Field):
 
         self.results = [(field, callback(field)) for field in self.fields]
 
-    def render(self, form, form_style, context):
+    def render(self, form, form_style, context, template_pack=TEMPLATE_PACK):
         if hasattr(self, 'wrapper_class'):
             context['wrapper_class'] = self.wrapper_class
 
@@ -243,6 +245,7 @@ class DetailAdminView(ModelAdminView):
         """
         helper = FormHelper()
         helper.form_tag = False
+        helper.include_media = False
         layout = self.get_form_layout()
         # 替换所有的字段为 ShowField
         replace_field_to_value(layout, self.get_field_result)
@@ -324,7 +327,7 @@ class DetailAdminView(ModelAdminView):
         return TemplateResponse(self.request, self.detail_template or
                                 self.get_template_list(
                                     'views/model_detail.html'),
-                                context, current_app=self.admin_site.name)
+                                context)
 
 
 class DetailAdminUtil(DetailAdminView):

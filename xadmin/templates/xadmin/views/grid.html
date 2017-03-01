@@ -11,7 +11,9 @@
 {% endblock %}
 {% block bodyclass %}change-list{% endblock %}
 
-{% block nav_title %}{% if brand_icon %}<i class="{{brand_icon}}"></i> {% endif %}{{brand_name}}{% endblock %}
+{% block nav_title %}
+    {% if brand_icon %}<i class="{{brand_icon}}"></i> {% endif %}{{brand_name}}
+{% endblock %}
 
 {% block nav_toggles %}
 {% include "xadmin/includes/toggle_menu.html" %}

@@ -49,7 +49,6 @@ import datetime
 import decimal
 import calendar
 
-from django.template import loader
 from django.http import HttpResponseNotFound
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse
@@ -62,7 +61,7 @@ from xadmin.sites import site
 from xadmin.views import BasePlugin, ListAdminView
 from xadmin.views.dashwidget import ModelBaseWidget, widget_manager
 from xadmin.util import lookup_field, label_for_field, force_unicode, json
-
+from xadmin import dutils
 
 @widget_manager.register
 class ChartWidget(ModelBaseWidget):
@@ -144,7 +143,7 @@ class ChartsPlugin(BasePlugin):
         context.update({
             'charts': [{"name": name, "title": v['title'], 'url': self.get_chart_url(name, v)} for name, v in self.data_charts.items()],
         })
-        nodes.append(loader.render_to_string('xadmin/blocks/model_list.results_top.charts.html', context_instance=context))
+        nodes.append(dutils.render_to_string('xadmin/blocks/model_list.results_top.charts.html', context_instance=context))
 
 
 class ChartsView(ListAdminView):

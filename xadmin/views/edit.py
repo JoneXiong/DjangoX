@@ -14,6 +14,7 @@ from django.template import loader
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse
 from django.utils.encoding import force_text
+from crispy_forms.utils import TEMPLATE_PACK
 
 import xadmin
 from xadmin import widgets
@@ -54,7 +55,7 @@ class ReadOnlyField(Field):
         self.detail = kwargs.pop('detail')
         super(ReadOnlyField, self).__init__(*args, **kwargs)
 
-    def render(self, form, form_style, context):
+    def render(self, form, form_style, context, template_pack=TEMPLATE_PACK, **kwargs):
         html = ''
         for field in self.fields:
             result = self.detail.get_field_result(field)
@@ -322,6 +323,7 @@ class ModelFormAdminView(ModelAdminView):
         """
         helper = FormHelper()
         helper.form_tag = False # 默认不需要 crispy 生成 form_tag
+        helper.include_media = False
         helper.add_layout(self.get_form_layout())
 
         # 处理只读字段
@@ -579,7 +581,7 @@ class CreateAdminView(ModelFormAdminView):
         return TemplateResponse(
             self.request, self.add_form_template or self.get_template_list(
                 'views/model_form.html'),
-            context, current_app=self.admin_site.name)
+            context)
 
     @filter_hook
     def post_response(self):
@@ -713,7 +715,7 @@ class UpdateAdminView(ModelFormAdminView):
         return TemplateResponse(
             self.request, self.change_form_template or self.get_template_list(
                 'views/model_form.html'),
-            context, current_app=self.admin_site.name)
+            context)
 
     def post(self, request, *args, **kwargs):
         if "_saveasnew" in self.param_list():

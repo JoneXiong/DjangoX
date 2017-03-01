@@ -122,6 +122,7 @@ class BatchChangeAction(BaseActionView):
 
         helper = FormHelper()
         helper.form_tag = False
+        helper.include_media = False
         helper.add_layout(Layout(Container(Col('full',
             Fieldset("", *self.form_obj.fields.keys(), css_class="unsort no_title"), horizontal=True, span=12)
         )))
@@ -145,7 +146,7 @@ class BatchChangeAction(BaseActionView):
         })
 
         return TemplateResponse(self.request, self.batch_change_form_template or
-                                self.get_template_list('views/batch_change_form.html'), context, current_app=self.admin_site.name)
+                                self.get_template_list('views/batch_change_form.html'), context)
 
     @filter_hook
     def get_media(self):

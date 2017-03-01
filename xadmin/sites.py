@@ -266,10 +266,7 @@ class AdminSite(object):
         if not ContentType._meta.installed:
             raise ImproperlyConfigured("Put 'django.contrib.contenttypes' in "
                                        "your INSTALLED_APPS setting in order to use the admin application.")
-        if not ('django.contrib.auth.context_processors.auth' in settings.TEMPLATE_CONTEXT_PROCESSORS or
-                'django.core.context_processors.auth' in settings.TEMPLATE_CONTEXT_PROCESSORS):
-            raise ImproperlyConfigured("Put 'django.contrib.auth.context_processors.auth' "
-                                       "in your TEMPLATE_CONTEXT_PROCESSORS setting in order to use the admin application.")
+
 
     def site_view_decor(self, view, cacheable=False):
         """
@@ -439,7 +436,7 @@ class AdminSite(object):
         return wrap(self.create_model_admin_view(clz, model, admin_class))
 
     def get_urls(self):
-        from django.conf.urls import patterns, url, include
+        from django.conf.urls import url, include
         from xadmin.views.base import BaseView
 
         if settings.DEBUG:
@@ -456,17 +453,15 @@ class AdminSite(object):
             return update_wrapper(wrapper, view)
 
         # 添加 i18n_javascript view， 用于js的国际化
-        urlpatterns = patterns('',
+        urlpatterns = [
                                url(r'^jsi18n/$', wrap(self.i18n_javascript,
                                                       cacheable=True), name='jsi18n')
-                               )
+                      ]
 
         # 添加注册的所有 AdminViewClass
-        urlpatterns += patterns('',
-                                *[url(
+        urlpatterns += [url(
                                   path, wrap(self.create_admin_view(clz_or_func)) if type(clz_or_func) == type and issubclass(clz_or_func, BaseView) else include(clz_or_func(self)),
                                   name=name) for path, clz_or_func, name in self._registry_views]
-                                )
 
         # 循环所有已注册的 Model, 逐一添加其ModelAdminViewClass
         for model, admin_class in self._registry.iteritems():
@@ -481,12 +476,12 @@ class AdminSite(object):
                     clz = view_class or clz
                 m_view = wrap( self.create_model_admin_view(clz, model, admin_class) )
                 view_urls.append( url(path, m_view, name=name) )
-            urlpatterns += patterns('',
+            urlpatterns += [
                                         url(
                                             r'^%s/%s/' % (app_label, module_name),
-                                            include(patterns('', *view_urls))
+                                            include(view_urls)
                                         )
-                                    )
+                           ]
 
         return urlpatterns
 

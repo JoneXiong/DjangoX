@@ -15,7 +15,6 @@ from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured, Va
 from django.db import models
 from django.db.models.fields import FieldDoesNotExist
 from django.db.models.sql.query import LOOKUP_SEP, QUERY_TERMS
-from django.template import loader
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
 
@@ -25,6 +24,7 @@ from xadmin.views import BasePlugin, ListAdminView
 from xadmin.views.page import GridPage
 from xadmin.defs import FILTER_PREFIX, SEARCH_VAR
 from xadmin.dutils import RelatedObject
+from xadmin.dutils import render_to_string
 
 class IncorrectLookupParameters(Exception):
     pass
@@ -217,17 +217,16 @@ class FilterPlugin(BasePlugin):
     # Block Views
     def block_nav_menu(self, context, nodes):
         if self.has_filters:
-            nodes.append(loader.render_to_string('xadmin/blocks/model_list.nav_menu.filters.html', context_instance=context))
+            nodes.append(render_to_string('xadmin/blocks/model_list.nav_menu.filters.html', context_instance=context))
 
     def block_nav_form(self, context, nodes):
         if self.search_fields:
-            nodes.append(
-                loader.render_to_string(
-                    'xadmin/blocks/model_list.nav_form.search_form.html',
-                    {'search_var': SEARCH_VAR,
+            context.update({'search_var': SEARCH_VAR,
                         'remove_search_url': self.admin_view.get_query_string(remove=[SEARCH_VAR]),
-                        'search_form_params': self.admin_view.get_form_params(remove=[SEARCH_VAR,'p'])},
-                    context_instance=context))
+                        'search_form_params': self.admin_view.get_form_params(remove=[SEARCH_VAR,'p'])})
+            nodes.append(
+                render_to_string(
+                    'xadmin/blocks/model_list.nav_form.search_form.html', context_instance=context))
 
 site.register_plugin(FilterPlugin, ListAdminView)
 site.register_plugin(FilterPlugin, GridPage)
@@ -382,6 +381,6 @@ class QuickFilterPlugin(BasePlugin):
             return queryset
     
     def block_left_navbar(self, context, nodes):
-        nodes.append(loader.render_to_string('xadmin/blocks/modal_list.left_navbar.quickfilter.html',context))
+        nodes.append(render_to_string('xadmin/blocks/modal_list.left_navbar.quickfilter.html', context_instance=context))
         
 site.register_plugin(QuickFilterPlugin, ListAdminView)
