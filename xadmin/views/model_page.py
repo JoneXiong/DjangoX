@@ -91,6 +91,15 @@ class ModelPage(SiteView):
             "%s:%s_%s_%s" % (self.admin_site.app_name, self.opts.app_label,
             self.module_name, name), args=args, kwargs=kwargs)
 
+    def get_model_url(self, model, name, *args, **kwargs):
+        u'''
+        模型相关url
+        '''
+        opts = model._meta
+        return reverse(
+            "%s:%s_%s_%s" % (self.admin_site.app_name, opts.app_label,
+            opts.module_name, name), args=args, kwargs=kwargs)
+
     def model_admin_url(self, name, *args, **kwargs):
         return self.get_url(name, *args, **kwargs)
 
@@ -134,6 +143,13 @@ class ModelPage(SiteView):
         raw_code = perm_code[:]
         if perm_code in ('view', 'add', 'change', 'delete'):
             perm_code = '%s.%s_%s' %(self.model._meta.app_label, perm_code ,self.module_name)
+        return (raw_code not in self.remove_permissions) and self.user.has_perm(perm_code)
+
+    def has_model_permission(self, model, perm_code):
+        opts = model._meta
+        raw_code = perm_code[:]
+        if perm_code in ('view', 'add', 'change', 'delete'):
+            perm_code = '%s.%s_%s' %(opts.app_label, perm_code ,opts.module_name)
         return (raw_code not in self.remove_permissions) and self.user.has_perm(perm_code)
     
     def get_model_perms(self):

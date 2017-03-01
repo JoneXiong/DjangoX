@@ -1,8 +1,29 @@
 {% extends "xadmin/views/grid.html" %}
 {% load i18n %}
 
+{% block nav_btns %}
+
+  {% if has_rel_change_permission %}
+  <a href="{{ rel_change_url }}" class="btn btn-primary"><i class="fa fa-pencil"></i> <span>{% trans "Edit" %}</span></a>
+  {% endif %}
+  {% if has_rel_delete_permission %}
+  <a href="{{ rel_delete_url }}" class="btn btn-danger"><i class="fa fa-trash-o"></i> <span>{% trans "Delete" %}</span></a>
+  {% endif %}
+
+
+
+{% endblock nav_btns %}
+
 {% block content %}
 <div id="rel-detail"></div>
+
+<div class="content-toolbar btn-toolbar pull-right clearfix">
+  {% if has_add_permission %}
+    <a href="{{add_url}}" class="btn btn-primary"><i class="fa fa-plus"></i>
+    {% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}</a>
+  {% endif %}
+  {{ nav_buttons }}
+</div>
 {{block.super}}
 {% endblock %}
 

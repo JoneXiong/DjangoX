@@ -268,6 +268,12 @@ class ListRelateDisplayPlugin(BaseRelateDisplayPlugin):
     列表视图增加外键信息显示
     '''
 
+    def init_request(self, *args, **kwargs):
+        ret = super(ListRelateDisplayPlugin, self).init_request(*args, **kwargs)
+        if self.relate_obj:
+            self.admin_view.force_select = self.admin_view.get_model_url(self.relate_obj.to_model,'changelist')
+        return ret
+
     def get_list_queryset(self, queryset):
         if self.relate_obj:
             queryset = self.relate_obj.filter(queryset)
@@ -278,13 +284,23 @@ class ListRelateDisplayPlugin(BaseRelateDisplayPlugin):
 
     def get_context(self, context):
         self.admin_view.list_template = 'xadmin/views/model_list_rel.html'
-        context['brand_name'] = self.relate_obj.get_brand_name()
+        #context['brand_name'] = self.relate_obj.get_brand_name()
         context['rel_objs'] = self.relate_obj.to_objs
         if 'add_url' in context:
             context['add_url'] = self._get_url(context['add_url'])
         context['rel_detail_url'] = self.admin_view.get_model_url(self.relate_obj.to_model,'detail',self.relate_obj.to_objs[0].id)
         self.admin_view.list_tabs = self.relate_obj.get_list_tabs()
         context['cur_tab'] = int(self.request.GET.get('_tab','0'))
+
+        to_model = self.relate_obj.to_model
+        to_objs = self.relate_obj.to_objs
+        context['has_rel_change_permission'] = self.admin_view.has_model_perm(to_model,'change')
+        context['has_rel_delete_permission'] = self.admin_view.has_model_perm(to_model,'delete')
+        if context['has_rel_change_permission']:
+            context['rel_change_url'] = self.admin_view.get_model_url(to_model,'change',to_objs[0].pk)
+        if context['has_rel_delete_permission']:
+            context['rel_delete_url'] = self.admin_view.get_model_url(to_model,'delete',to_objs[0].pk)
+
         return context
 
     def get_list_display(self, list_display):
@@ -294,6 +310,39 @@ class ListRelateDisplayPlugin(BaseRelateDisplayPlugin):
             except Exception:
                 pass
         return list_display
+
+    def get_breadcrumb(self, bcs):
+        u'''
+        导航链接基础部分
+        '''
+        if self.admin_site.head_fix:
+            return []
+        base = [{
+            'url': self.get_admin_url('index'),
+            'title': _('Home')
+            }]
+        to_model = self.relate_obj.to_model
+        model_admin = self.admin_site._registry[to_model]
+        app_label = getattr(model_admin, 'app_label', to_model._meta.app_label)
+        app_mod = self.admin_site.app_dict[app_label]
+        base.append({
+                     'url': app_mod.index_url,
+                     'title':  hasattr(app_mod,'verbose_name') and app_mod.verbose_name or app_label
+                     })
+        item = {}
+        opts = to_model._meta
+        item = {'title': opts.verbose_name_plural}
+        item['url'] = self.admin_view.get_model_url(to_model,'changelist')
+        base.append(item)
+
+        to_objs = self.relate_obj.to_objs
+        if len(to_objs) == 1:
+            to_model_name = str(to_objs[0])
+        else:
+            to_model_name = force_unicode(to_model._meta.verbose_name)
+        base.append({'title': to_model_name,'url':''})
+
+        return base
 
 
 class EditRelateDisplayPlugin(BaseRelateDisplayPlugin):

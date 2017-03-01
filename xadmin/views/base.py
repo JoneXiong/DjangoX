@@ -383,6 +383,7 @@ class BaseView(Common, View):
 class SiteView(BaseView):
 
     base_template = 'xadmin/base_site.html'    #: View模板继承的基础模板
+    force_select = None
 
     def _check_menu_permission(self, item):
         need_perm = item.pop('perm', None)
@@ -436,11 +437,14 @@ class SiteView(BaseView):
             # 判断菜单项是否被选择，使用当前url跟菜单项url对比
             selected = False
             if 'url' in menu:
+                base_url = ''
                 chop_index = menu['url'].find('?')
                 if chop_index == -1:
-                    selected = path.startswith(menu['url'])
+                    base_url = menu['url']
                 else:
-                    selected = path.startswith(menu['url'][:chop_index])
+                    base_url = menu['url'][:chop_index]
+                path = self.force_select or path
+                selected = path.startswith(base_url)
             if 'menus' in menu:
                 for m in menu['menus']:
                     _s = check_selected(m, path)
