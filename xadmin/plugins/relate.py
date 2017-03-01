@@ -141,9 +141,9 @@ class RelateMenuPlugin(BasePlugin):
         links = []
         if self.has_view_perm:
             links.append('''<a data-res-uri="%s" data-edit-uri="%s" rel="tooltip" title="%s" class="btn btn-info btn-xs details-handler" ><i class="fa fa-search-plus"></i> 查看</a>'''%(self.admin_view.get_url('detail',instance.pk),self.admin_view.get_url('change',instance.pk),instance))
-        if self.has_change_perm:
+        if not self.admin_view.pop and self.has_change_perm:
             links.append('''<a href="%s" class="btn btn-success btn-xs" ><i class="fa fa-edit"></i> 修改</a>'''%self.admin_view.get_url('change',instance.pk))
-        if self.has_delete_perm:
+        if not self.admin_view.pop and self.has_delete_perm:
             links.append('''<a href="%s" class="btn btn-danger btn-xs" ><i class="fa fa-trash"></i> 删除</a>'''%self.admin_view.get_url('delete',instance.pk))
         return ' '.join(links)
     op_link.short_description = '&nbsp;'
@@ -159,7 +159,7 @@ class RelateMenuPlugin(BasePlugin):
             if self.has_view_perm or self.has_add_perm or self.has_change_perm:
                 list_display.append('op_link')
                 self.admin_view.op_link = self.op_link
-        if self.use_related_menu and len(self.get_related_list()):
+        if not self.admin_view.pop and self.use_related_menu and len(self.get_related_list()):
             list_display.append('related_link')
             self.admin_view.related_link = self.related_link
             self.admin_view.get_detail_url = self.get_first_rel_url
@@ -197,7 +197,7 @@ class RelateObject(object):
             self.to_model = field.model
             self.rel_name = self.to_model._meta.pk.name
             self.is_m2m = False
-        # 得带当前外键关联的对象 to_objs
+        # 得到当前外键关联的对象 to_objs
         _manager = self.to_model._default_manager
         if hasattr(_manager, 'get_query_set'):
             to_qs = _manager.get_query_set()
