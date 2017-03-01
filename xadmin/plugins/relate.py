@@ -284,6 +284,7 @@ class ListRelateDisplayPlugin(BaseRelateDisplayPlugin):
             context['add_url'] = self._get_url(context['add_url'])
         context['rel_detail_url'] = self.admin_view.get_model_url(self.relate_obj.to_model,'detail',self.relate_obj.to_objs[0].id)
         self.admin_view.list_tabs = self.relate_obj.get_list_tabs()
+        context['cur_tab'] = int(self.request.GET.get('_tab','0'))
         return context
 
     def get_list_display(self, list_display):
