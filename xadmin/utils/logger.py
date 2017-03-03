@@ -65,18 +65,25 @@ class StdoutLogger(object):
 
     def info(self, msg):
         self._logger.info(safe_str(msg))
+        self.hook(msg,'info')
 
     def debug(self, msg):
         self._logger.debug(safe_str(msg))
+        self.hook(msg,'debug')
 
     def warn(self, msg):
         self._logger.warn(safe_str(msg))
+        self.hook(msg, 'warn')
 
     def error(self, msg):
         self._logger.error(safe_str(msg))
+        self.hook(msg, 'error')
 
     def write(self, msg):
         self.info(msg)
+
+    def hook(self, msg, levelname):
+        pass
 
 
 class Syslog(logging.handlers.SysLogHandler):
