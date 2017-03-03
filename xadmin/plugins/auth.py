@@ -159,7 +159,7 @@ site.register(Permission, PermissionAdmin)
 
 class UserFieldPlugin(BasePlugin):
     '''
-    用户字段在表单中隐藏，默认为当前用户
+    用户字段在表单中隐藏，默认填充为当前用户
     '''
 
     user_fields = []
@@ -181,6 +181,9 @@ site.register_plugin(UserFieldPlugin, ModelFormAdminView)
 
 
 class ModelPermissionPlugin(BasePlugin):
+    '''
+    控制只有对象所有者才能查看对象 影响范围: 列表视图、表单视图等用到queryset的地方
+    '''
 
     user_can_access_owned_objects_only = False
     user_owned_objects_field = 'user'
@@ -188,7 +191,7 @@ class ModelPermissionPlugin(BasePlugin):
     def queryset(self, qs):
         if self.user_can_access_owned_objects_only and \
                 not self.user.is_superuser:
-            filters = {self.user_owned_objects_field: self.user}
+            filters = {self.user_owned_objects_field: self.user.id}
             qs = qs.filter(**filters)
         return qs
 
