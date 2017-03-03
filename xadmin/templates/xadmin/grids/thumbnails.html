@@ -21,7 +21,7 @@
         {% if obj.thumbnail_label %}
           <h4>{{obj.thumbnail_label.label}}</h4>
         {% endif %}
-        <ul class="list-unstyled">
+        <ul class="list-unstyled" style="line-height: 25px;">
         {% for o in obj.cells %}
         {% if not o.thumbnail_hidden %}
         <li class="text-right">
