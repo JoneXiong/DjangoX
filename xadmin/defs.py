@@ -11,7 +11,7 @@ SEARCH_VAR = '_q_'
 
 DEFAULT_MODEL_ICON = 'fa fa-circle-o'
 
-DEFAULT_SITE_TITLE = u'Django Xadmin'
+DEFAULT_SITE_TITLE = u'DjangoX'
 
 DEFAULT_SITE_FOOTER = u'my-company.inc 2013'
 
