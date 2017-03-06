@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+{% load staticfiles %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" >
+    <title>DjangoX</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'account/css/reset.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'account/css/animate.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'account/css/style.css' %}">
+
+    <script src="{% static 'account/js/jquery.min.js' %}" type="text/javascript"></script>
+
+</head>
+<body>
+<section class="headerwrap ">
+    <header>
+        <div  class=" header">
+            <div class="top">
+                <div class="wp">
+                    <div class="fl"><p><b>DjangoX</b></p></div>
+                    <!--登录后跳转-->
+
+                    {% if request.user.is_authenticated %}
+                        <div class="personal">
+                            <dl class="user fr">
+                                <dd>bobby<img class="down fr" src="/static/images/top_down.png"/></dd>
+                                <dt><img width="20" height="20" src="/static/media/image/2016/12/default_big_14.png"/></dt>
+                            </dl>
+                            <div class="userdetail">
+                                <dl>
+                                    <dt><img width="80" height="80" src="/static/media/image/2016/12/default_big_14.png"/></dt>
+                                    <dd>
+                                        <h2>django</h2>
+                                        <p>bobby</p>
+                                    </dd>
+                                </dl>
+                                <div class="btn">
+                                    <a class="personcenter fl" href="usercenter-info.html">进入个人中心</a>
+                                    <a class="fr" href="/logout/">退出</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <a style="color:white" class="fr registerbtn" href="{% url 'register' %}">注册</a>
+                        <a style="color:white" class="fr loginbtn" href="{% url 'login' %}">登录</a>
+                    {% endif %}
+
+
+                </div>
+            </div>
+
+  
+
+
+
+        </div>
+    </header>
+</section>
+<script src="{% static 'account/js/unslider.js' %}" type="text/javascript"></script>
+
+
+</body>
+</html>
