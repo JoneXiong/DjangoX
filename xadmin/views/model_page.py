@@ -116,7 +116,8 @@ class ModelPage(SiteView):
         模型的默认数据集排序规则
         """
         return self.ordering or ()
-        
+
+    @filter_hook
     def queryset(self):
         u"""
         模型的默认数据集
