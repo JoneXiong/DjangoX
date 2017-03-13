@@ -31,5 +31,6 @@ class EmailVerifyRecord(models.Model):
         return '{0}({1})'.format(self.code, self.email)
 
     class Meta:
+        app_label ='account'
         verbose_name = u'Email验证码'
         verbose_name_plural = verbose_name

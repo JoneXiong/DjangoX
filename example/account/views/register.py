@@ -6,9 +6,10 @@ from captcha.fields import CaptchaField
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login as my_login
 from django.http import HttpResponseRedirect
-
-
+from django.core.mail import send_mail
 from django.contrib.auth.hashers import make_password
+
+
 from account.models import EmailVerifyRecord
 from xadmin.util import User as UserProfile
 from xadmin import site
@@ -28,8 +29,6 @@ def generate_random_string(random_length=8):
     return string
 
 def send_register_email(email, send_type="register"):
-    from xadmin.models import EmailVerifyRecord
-    from django.core.mail import send_mail
 
     EMAIL_FROM = 'jianhongxiong@kingthy.com'
     HOST = '192.168.1.153:8080'
