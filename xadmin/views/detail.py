@@ -156,6 +156,8 @@ class DetailAdminView(ModelAdminView):
     detail_template = None
     form_layout = None
 
+    readonly_fields = ()
+
     def init_request(self, object_id, *args, **kwargs):
         """
         初始化操作。根据传入的 ``object_id`` 取得要被显示的数据对象，而后进行权限判断, 如果没有数据查看权限会显示禁止页面.
@@ -183,9 +185,10 @@ class DetailAdminView(ModelAdminView):
         layout = copy.deepcopy(self.detail_layout or self.form_layout)
 
         if layout is None:
+            fields = self.form_obj.fields.keys() + list(self.get_readonly_fields())
             layout = Layout(Container(Col('full',
                                           Fieldset(
-                                              "", *self.form_obj.fields.keys(),
+                                              "", *fields,
                                               css_class="unsort no_title"), horizontal=True, span=12)
                                       ))
         elif type(layout) in (list, tuple) and len(layout) > 0:
@@ -252,7 +255,25 @@ class DetailAdminView(ModelAdminView):
         helper.add_layout(layout)
         helper.filter(
             basestring, max_level=20).wrap(ShowField, admin_view=self)
+
+        # 处理只读字段
+        readonly_fields = self.get_readonly_fields()
+        if readonly_fields:
+            # 使用 :class:`xadmin.views.detail.DetailAdminUtil` 来显示只读字段的内容
+            detail = self.get_model_view(
+                DetailAdminUtil, self.model, self.form_obj.instance)
+            for field in readonly_fields:
+                # 替换只读字段
+                helper[field].wrap(ShowField, detail=detail)
+
         return helper
+
+    @filter_hook
+    def get_readonly_fields(self):
+        """
+        返回只读字段，子类或 OptionClass 可以复写该方法
+        """
+        return self.readonly_fields
 
     @csrf_protect_m
     @filter_hook
