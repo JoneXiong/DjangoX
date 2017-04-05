@@ -756,10 +756,13 @@ class UpdateAdminView(ModelFormAdminView):
                 return change_list_url
             else:
                 return self.get_admin_url('index')
-            
+
+    def get_org(self):
+        return self.get_object(unquote(self.org_obj.pk))
+
     def do_update(self):
         '''
-        self.org_obj
+        self.org_obj = self.get_org()
         self.new_obj
         '''
         self.new_obj.save()
