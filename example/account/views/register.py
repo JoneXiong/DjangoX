@@ -67,7 +67,7 @@ class ActiveUserView(View):
                 user.save()
         else:
             return render(request, auth_tpl_path+'active_fail.html')
-        return render(request, auth_tpl_path+'login.html')
+        return HttpResponseRedirect('/login/')
 
 class RegisterForm(forms.Form):
     email = forms.EmailField(required=True)
