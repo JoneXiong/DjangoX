@@ -11,6 +11,7 @@ from django.core import exceptions
 from django.db.models import SlugField
 
 from .form_fields import MultiSelectFormField
+from .subclassing import SubfieldBase
 
 
 class AutoMD5SlugField(SlugField):
@@ -78,7 +79,7 @@ class AutoMD5SlugField(SlugField):
 
 
 class MultiSelectField(models.Field):
-    __metaclass__ = models.SubfieldBase
+    __metaclass__ = SubfieldBase
  
     def get_internal_type(self):
         return "CharField"
