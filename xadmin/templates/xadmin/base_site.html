@@ -6,6 +6,7 @@
 
 {% block body %}
 <div class="wrapper">
+
     <!-- Header -->
     {% if not head_fix %}
       {% include 'xadmin/includes/head_nav.html' %}
@@ -13,6 +14,8 @@
 
   <div id="body-content" class="clearfix row">
 
+    <!-- left side menu -->
+    {% block left_menu %}
     {% if not head_fix %}
     <div id="left-side" class="col-sm-1 col-md-2">
         {% block navbar %}
@@ -25,8 +28,11 @@
       {% view_block 'left_navbar' %}
     </div>
     {% endif %}
+    {% endblock %}
 
     <div id="content-block" class="{% if not head_fix %}col-sm-10 col-md-10{% else %}col-sm-12 col-md-12 main-content{% endif %}" {% if head_fix %}style="padding-left: 15px"{% endif %}>
+
+      <!-- breadcrumbs -->
       {% block breadcrumbs %}
       <ul class="breadcrumb">
 	      {% if breadcrumbs %}
@@ -43,6 +49,7 @@
       </ul>
       {% endblock %}
 
+      <!-- content nav -->
       {% block content-nav %}
       <div class="navbar content-navbar navbar-default navbar-xs" data-toggle="breakpoint"
         data-class-xs="navbar content-navbar navbar-inverse navbar-xs"
@@ -71,6 +78,7 @@
       </div>
       {% endblock %}
 
+      <!-- messages -->
       {% block messages %}
       {% if messages %}
         {% for message in messages %}
@@ -82,12 +90,15 @@
       {% endif %}
       {% endblock messages %}
 
+      <!-- content -->
       {% block content %}
       {{ content }}
       {% endblock %}
-    </div>
-  </div>
 
+    </div>
+</div>
+
+  <!-- footer -->
   {% if not head_fix %}
   {% block footer %}
   <div id="footer">
@@ -101,5 +112,6 @@
   <br/>
   <br/>
   {% endif %}
+
 </div>
 {% endblock body %}
