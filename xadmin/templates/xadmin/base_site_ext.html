@@ -1,0 +1,117 @@
+{% extends 'xadmin/base.html' %}
+{% load i18n xadmin_tags %}
+
+
+{% block title %}{{ title }} | {{ site_title }}{% endblock %}
+
+{% block body %}
+<div class="wrapper">
+
+    <!-- Header -->
+    {% if not head_fix %}
+      {% include 'xadmin/includes/head_nav.html' %}
+    {% endif %}
+
+  <div id="body-content" class="clearfix row">
+
+    <!-- left side menu -->
+    {% block left_menu %}
+    {% if not head_fix %}
+    <div id="left-side" class="col-sm-1 col-md-2">
+        {% block navbar %}
+        {% if nav_menu %}
+          {% include menu_template %}
+        {% else %}
+          <p></p>
+        {% endif %}
+      {% endblock %}
+      {% view_block 'left_navbar' %}
+    </div>
+    {% endif %}
+    {% endblock %}
+
+    <div id="content-block" class="{% if not head_fix %}col-sm-10 col-md-10{% else %}col-sm-12 col-md-12 main-content{% endif %}" {% if head_fix %}style="padding-left: 15px"{% endif %}>
+
+      <!-- breadcrumbs -->
+      {% block breadcrumbs %}
+      <ul class="breadcrumb">
+	      {% if breadcrumbs %}
+		      {% for bc in breadcrumbs %}
+		      <li>
+		        {% if forloop.last or not bc.url %}{{bc.title}}
+		        {% else %}<a href="{{bc.url}}">{{bc.title}}</a>{% endif %}
+		      </li>
+		      {% endfor %}
+	      {% else %}
+		      <li><a href="{% url 'xadmin:index' %}">{% trans 'Home' %}</a></li>
+		      {% if title %}{{ title }}{% endif %}
+	      {% endif %}
+      </ul>
+      {% endblock %}
+
+      <!-- content nav -->
+      {% block content-nav %}
+      <div class="navbar content-navbar navbar-default navbar-xs" data-toggle="breakpoint"
+        data-class-xs="navbar content-navbar navbar-inverse navbar-xs"
+        data-class-sm="navbar content-navbar navbar-default navbar-xs">
+        <div class="navbar-header">
+          {% view_block 'nav_toggles' %}
+          {% block nav_toggles %}
+          {% include "xadmin/includes/toggle_back.html" %}
+          {% endblock %}
+
+          <a class="navbar-brand" data-toggle="collapse" data-target="#top-nav .navbar-collapse">
+            {% block nav_title %}{% endblock %}
+          </a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            {% view_block 'nav_menu' %}
+          </ul>
+          {% view_block 'nav_form' %}
+          {% block nav_form %}{% endblock %}
+          <div class="navbar-btn navbar-right hide-xs">
+            {% view_block 'nav_btns' %}
+            {% block nav_btns %}{% endblock %}
+          </div>
+        </div>
+      </div>
+      {% endblock %}
+
+      <!-- messages -->
+      {% block messages %}
+      {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-dismissable{% if message.tags %} {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}{% endif %}">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          {{ message|safe }}
+        </div>
+        {% endfor %}
+      {% endif %}
+      {% endblock messages %}
+
+      <!-- content -->
+      {% block content %}
+      {{ content }}
+      {% endblock %}
+
+    </div>
+</div>
+
+  <!-- footer -->
+  {% if not head_fix %}
+  {% block footer %}
+  <div id="footer">
+    <hr/>
+    <footer class="text-center">
+        <p>&copy; {% block site_footer %}{{ site_footer }}{% endblock %}</p>
+    </footer>
+  </div>
+  {% endblock %}
+  {% else %}
+  <br/>
+  <br/>
+  {% endif %}
+
+</div>
+{% endblock body %}
