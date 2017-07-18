@@ -5,6 +5,7 @@
 {% block title %}{{ title }} | {{ site_title }}{% endblock %}
 
 {% block body %}
+<div class="wrapper">
     <!-- Header -->
     {% if not head_fix %}
       {% include 'xadmin/includes/head_nav.html' %}
@@ -100,5 +101,5 @@
   <br/>
   <br/>
   {% endif %}
-
+</div>
 {% endblock body %}
