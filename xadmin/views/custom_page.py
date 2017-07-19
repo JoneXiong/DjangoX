@@ -30,7 +30,7 @@ class PageView(SiteView):
             raise PermissionDenied
         if '_pop' in self.request.GET or 'pop' in self.request.GET:
             self.pop = True
-            self.base_template = 'xadmin/base_pure.html'
+            # self.base_template = 'xadmin/base_pure.html'
     
     def get(self, request, *args, **kwargs):
         u'''
@@ -54,6 +54,8 @@ class PageView(SiteView):
                         'content': self.get_content() or '',
                         'title': self.verbose_name or self.__class__.__bases__ [0].__name__,
                         })
+        if self.pop:
+            context['base_template'] = 'xadmin/base_pure.html'
         return context
     
     @classmethod 

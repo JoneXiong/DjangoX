@@ -48,7 +48,7 @@ class FormView(SiteView):
         self.prepare_form()
         if '_pop' in self.request.GET:
             self.pop = True
-            self.base_template = 'xadmin/base_pure.html'
+            # self.base_template = 'xadmin/base_pure.html'
 
     @filter_hook
     def prepare_form(self):
@@ -170,6 +170,8 @@ class FormView(SiteView):
             'errors': self.get_error_list(),
             'has_file_field': self._has_file_field,
         })
+        if self.pop:
+            context['base_template'] = 'xadmin/base_pure.html'
         return context
     
     def get_nav_btns(self):
