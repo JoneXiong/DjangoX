@@ -366,7 +366,7 @@ class BaseView(Common, View):
         """
         返回显示页面所需的 context 对象。
         """
-        return {'admin_view': self, 'media': self.media, 'base_template': self.base_template}
+        return {'cl': self, 'media': self.media, 'base_template': self.base_template}
 
     @property
     def media(self):
