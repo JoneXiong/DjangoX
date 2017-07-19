@@ -1,20 +1,35 @@
 {% load i18n xadmin_tags %}
-  <div id="top-nav" class="navbar navbar-xs navbar-inverse navbar-fixed-top">
-    <div class="navbar-header">
-      <a class="navbar-brand" href="#">{% block branding %}{{ site_title }}{% endblock %}</a>
-    </div>
+<header class="main-header">
+    <!-- Logo -->
+    <a href="{% url 'xadmin:index' %}" class="logo">
+      <!-- mini logo for sidebar mini 50x50 pixels -->
+      <span class="logo-mini">{% block branding_mini %}<i class="fa fa-dashboard"></i>{% endblock %}</span>
+      <!-- logo for regular state and mobile devices -->
+      <span class="logo-lg">{% block branding %}<b>{{ site_title }}</b> {{ site_subtitle }}{% endblock %}</span>
+    </a>
 
-    <div class="navbar-collapse collapse">
 
+    <!-- Header Navbar: style can be found in header.less -->
+    <nav class="navbar navbar-static-top" role="navigation">
+      <!-- Sidebar toggle button-->
+      <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+
+   <div class="navbar-custom-menu pull-left">
       <ul class="nav navbar-nav">
-	      {% for sitem in site_menu %}
-	      <li{% if sitem.selected %} class="active"{% endif %}>
-	        <a href="{{ sitem.url }}">{% if sitem.icon %}<i class="fa-fw {{sitem.icon}}"></i>{% endif %} {{ sitem.title }}</a>
-	      </li>
-	      {% endfor %}
+             {% for sitem in site_menu %}
+             <li{% if sitem.selected %} class="active"{% endif %}>
+               <a href="{{ sitem.url }}">{% if sitem.icon %}<i class="fa-fw {{sitem.icon}}"></i>{% endif %} {{ sitem.title }}</a>
+             </li>
+             {% endfor %}
       </ul>
+   </div>
 
-
+    <div class="navbar-custom-menu">
       <ul class="nav navbar-nav navbar-right">
         {% view_block 'top_navmenu' %}
         {% if user.is_active and user.is_staff %}
@@ -29,7 +44,6 @@
         {% endif %}
         <li><a href="{% url 'xadmin:logout' %}"><i class="fa fa-sign-out"></i><span class="hide-sm">{% trans 'Log out' %}</span></a></li>
       </ul>
-      {% view_block 'top_navbar' %}
     </div>
-  </div>
-
+  </nav>
+</header>
