@@ -51,7 +51,7 @@ def inclusion_tag(file_name, context_class=Context, takes_context=False):
                 'use_tz': context.use_tz,
             })
             # 添加 admin_view
-            new_context['admin_view'] = context['admin_view']
+            new_context['cl'] = context['cl']
             csrf_token = context.get('csrf_token', None)
             if csrf_token is not None:
                 new_context['csrf_token'] = csrf_token
@@ -480,7 +480,8 @@ class SiteView(BaseView):
             'site_footer': m_site.site_footer or defs.DEFAULT_SITE_FOOTER,
             'breadcrumbs': self.get_breadcrumb(),
             'head_fix': m_site.head_fix,
-            'base_template': m_site.ext_ui and 'xadmin/base_site.html' or self.base_template
+            'ext_ui': m_site.ext_ui,
+            'base_template': m_site.ext_ui and 'xadmin/base_site_ext.html' or self.base_template
         })
 
         return context

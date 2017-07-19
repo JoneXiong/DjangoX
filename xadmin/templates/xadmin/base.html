@@ -10,7 +10,7 @@
   <title>{% block title %}{% endblock %}</title>
   {% vendor 'bootstrap.css' %}
 
-  {% if cl.ext_ui %}
+  {% if ext_ui %}
   <link rel="stylesheet" type="text/css" href="{% static "adminlte/dist/css/AdminLTE.css" %}" />
   <link rel="stylesheet" type="text/css" href="{% static "adminlte/dist/css/skins/_all-skins.min.css" %}" />
   {% endif %}
@@ -39,11 +39,11 @@
   {% block extrahead %}{% endblock %}
   {% view_block 'extrahead' %}
 </head>
-<body class="{% block bodyclass %}{% endblock %}">
+<body class="{% if ext_ui %}skin-blue sidebar-mini {% endif %}{% block bodyclass %}{% endblock %}">
   {% block body %}{% endblock body %}
   {% vendor 'jquery-ui-sortable.js' 'bootstrap.js' 'xadmin.main.js' 'xadmin.responsive.js' %}
 
-  {% if cl.ext_ui %}
+  {% if ext_ui %}
   <script src="{% static "adminlte/dist/js/app.min.js" %}"></script>
   {% endif %}
 

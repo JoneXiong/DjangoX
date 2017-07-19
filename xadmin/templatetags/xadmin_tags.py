@@ -11,10 +11,10 @@ def view_block(context, block_name, *args, **kwargs):
     u'''
     后台block实现
     '''
-    if 'admin_view' not in context:
+    if 'cl' not in context:
         return ""
 
-    admin_view = context['admin_view']
+    admin_view = context['cl']
     nodes = []
     method_name = 'block_%s' % block_name
 

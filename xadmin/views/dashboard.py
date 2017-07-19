@@ -251,7 +251,7 @@ class Dashboard(SiteView):
     @filter_hook
     def get_context(self):
         new_context = {
-            'base_template': self.admin_site.ext_ui and 'xadmin/base_site_noleft_ext.html' or 'xadmin/base_site_noleft.html'
+            'base_template': self.admin_site.ext_ui and 'xadmin/base_site_ext.html' or 'xadmin/base_site_noleft.html',
             'title': self.get_title(),
             'icon': self.icon,
             'portal_key': self.get_portal_key(),
@@ -378,6 +378,7 @@ class AppDashboard(Dashboard):
         self.set_widgets(context)
         self.widgets = self.get_widgets()
         new_context = {
+            'base_template': self.admin_site.ext_ui and 'xadmin/base_site_ext.html' or 'xadmin/base_site.html',
             'title': self.get_title(),
             'icon': self.icon,
             'portal_key': self.get_portal_key(),

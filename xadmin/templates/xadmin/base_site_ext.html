@@ -18,7 +18,6 @@
     {% if not head_fix %}
     <aside class="main-sidebar">
     <section style="height: auto;" class="sidebar">
-    <div id="left-side" class="col-sm-1 col-md-2">
         {% block navbar %}
         {% if nav_menu %}
           {% include menu_template %}
@@ -27,7 +26,6 @@
         {% endif %}
       {% endblock %}
       {% view_block 'left_navbar' %}
-    </div>
     </section>
     </aside>
     {% endif %}
