@@ -16,6 +16,7 @@ DEFAULT_SITE_TITLE = u'DjangoX'
 DEFAULT_SITE_FOOTER = u'my-company.inc 2013'
 
 BUILDIN_STYLES = {
+    'ext': 'xadmin/includes/sitemenu_ext.html',
     'default': 'xadmin/includes/sitemenu_default.html',
     'accordion': 'xadmin/includes/sitemenu_accordion.html',
     'inspinia': 'xadmin/includes/sitemenu_inspinia.html'

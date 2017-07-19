@@ -471,6 +471,7 @@ class SiteView(BaseView):
             self.deal_selected(nav_menu)
         
         m_site = self.admin_site
+        if m_site.ext_ui:m_site.menu_style = 'ext'
         context.update({
             'menu_template': defs.BUILDIN_STYLES.get(m_site.menu_style, defs.BUILDIN_STYLES['default']), 
             'nav_menu': nav_menu,
