@@ -75,12 +75,13 @@ class InlineStyle(object):
     def __init__(self, view, formset):
         self.view = view
         self.formset = formset
+        self.box_tpl = self.view.admin_site.ext_ui and 'xadmin/includes/box_ext.html' or 'xadmin/includes/box.html'
 
     def update_layout(self, helper):
         pass
 
     def get_attrs(self):
-        return {}
+        return {'box_tpl': self.box_tpl}
 style_manager.register_style('stacked', InlineStyle)
 
 

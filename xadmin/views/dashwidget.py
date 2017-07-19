@@ -164,6 +164,7 @@ class BaseWidget(forms.Form):
         self.context(context)
         _context = RequestContext(self.request)
         _context.update(context)
+        _context['box_tpl'] = self.admin_site.ext_ui and 'xadmin/includes/box_ext.html' or 'xadmin/includes/box.html'
         return loader.render_to_string(self.template, context_instance=_context)
 
     def context(self, context):

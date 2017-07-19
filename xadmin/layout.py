@@ -20,6 +20,11 @@ class Fieldset(layout.Fieldset):
         self.collapsed = kwargs.pop('collapsed', None)
         super(Fieldset, self).__init__(legend, *fields, **kwargs)
 
+    def render(self, form, form_style, context, template_pack=TEMPLATE_PACK):
+        box_tpl = context['cl'].admin_site.ext_ui and 'xadmin/includes/box_ext.html' or 'xadmin/includes/box.html'
+        self.box_tpl = box_tpl
+        return super(Fieldset, self).render(form, form_style, context, template_pack=template_pack)
+
 
 class Row(layout.Div):
 

@@ -143,6 +143,8 @@ class ChartsPlugin(BasePlugin):
         context.update({
             'charts': [{"name": name, "title": v['title'], 'url': self.get_chart_url(name, v)} for name, v in self.data_charts.items()],
         })
+        box_tpl = self.admin_site.ext_ui and 'xadmin/includes/box_ext.html' or 'xadmin/includes/box.html'
+        context['box_tpl'] = box_tpl
         nodes.append(dutils.render_to_string('xadmin/blocks/model_list.results_top.charts.html', context_instance=context))
 
 

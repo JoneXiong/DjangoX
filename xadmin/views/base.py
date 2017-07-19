@@ -366,7 +366,7 @@ class BaseView(Common, View):
         """
         返回显示页面所需的 context 对象。
         """
-        return {'admin_view': self, 'media': self.media, 'base_template': self.base_template}
+        return {'cl': self, 'media': self.media, 'base_template': self.base_template}
 
     @property
     def media(self):
@@ -479,7 +479,8 @@ class SiteView(BaseView):
             'site_title': m_site.site_title or defs.DEFAULT_SITE_TITLE,
             'site_footer': m_site.site_footer or defs.DEFAULT_SITE_FOOTER,
             'breadcrumbs': self.get_breadcrumb(),
-            'head_fix': m_site.head_fix
+            'head_fix': m_site.head_fix,
+            'base_template': m_site.ext_ui and 'xadmin/base_site.html' or self.base_template
         })
 
         return context

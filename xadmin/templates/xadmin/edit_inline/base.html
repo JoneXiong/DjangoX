@@ -1,4 +1,4 @@
-{% extends "xadmin/includes/box.html" %}
+{% extends box_tpl %}
 {% load i18n xadmin_tags crispy_forms_tags %}
 
 {% block box_class %}formset fieldset{% if formset.css_class or inline_style %} {{ formset.css_class }} {{ inline_style }}{% endif %}{% endblock box_class %}
