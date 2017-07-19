@@ -62,6 +62,7 @@ class AdminSite(object):
     site_footer = None         # 网站的下角标文字
     menu_style = 'accordion'    # 网站左侧菜单风格 可选项 default、accordion
     head_fix = False
+    ext_ui = True
     app_dict = SortedDict()   # app模块全局字典
     sys_menu = {}                   # 网站菜单全局字典
     sys_menu_loaded = False  # 菜单是否加载过
