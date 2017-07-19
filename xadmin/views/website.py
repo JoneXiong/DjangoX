@@ -130,6 +130,8 @@ class LoginView(BaseView):
             'helper': helper,
             'app_path': request.get_full_path(),
             REDIRECT_FIELD_NAME: request.get_full_path(),
+            'base_template': self.admin_site.ext_ui and 'xadmin/base_site_ext.html' or self.base_template,
+            'ext_ui': self.admin_site.ext_ui
         })
         defaults = {
             'extra_context': context,
