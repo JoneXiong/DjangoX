@@ -3,12 +3,17 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
   {% block extrameta %}
-  <meta name="description" content="">
-  <meta name="author" content="">
+  <meta name="description" content="" />
+  <meta name="author" content="" />
   {% endblock %}
   {% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
   <title>{% block title %}{% endblock %}</title>
   {% vendor 'bootstrap.css' %}
+
+  {% if ext_ui %}
+  <link rel="stylesheet" type="text/css" href="{% static "adminlte/dist/css/AdminLTE.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "adminlte/dist/css/skins/_all-skins.min.css" %}" />
+  {% endif %}
 
   <link rel="stylesheet" type="text/css" href="{% static "xadmin/css/themes/bootstrap-xadmin.css" %}" />
 
@@ -25,8 +30,8 @@
   {% block extrahead %}{% endblock %}
   {% view_block 'extrahead' %}
 </head>
-<body class="{% block bodyclass %}{% endblock %}">
-	
+<body class="{% if ext_ui %}skin-blue sidebar-mini {% endif %}{% block bodyclass %}{% endblock %}">
+
       {% block content-nav %}
       <div class="navbar content-navbar navbar-default navbar-xs" data-toggle="breakpoint"
         data-class-xs="navbar content-navbar navbar-inverse navbar-xs"
@@ -56,7 +61,13 @@
       {% endblock %}
 	
   {% block content %}{% endblock %}
+
   {% vendor 'jquery-ui-sortable.js' 'bootstrap.js' 'xadmin.main.js' 'xadmin.responsive.js' %}
+
+  {% if ext_ui %}
+  <script src="{% static "adminlte/dist/js/app.min.js" %}"></script>
+  {% endif %}
+
   {{ media.js }}
   {% block extrabody %}{% endblock %}
   {% view_block 'extrabody' %}
