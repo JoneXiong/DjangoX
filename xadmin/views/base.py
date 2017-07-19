@@ -478,7 +478,8 @@ class SiteView(BaseView):
             'site_title': m_site.site_title or defs.DEFAULT_SITE_TITLE,
             'site_footer': m_site.site_footer or defs.DEFAULT_SITE_FOOTER,
             'breadcrumbs': self.get_breadcrumb(),
-            'head_fix': m_site.head_fix
+            'head_fix': m_site.head_fix,
+            'base_template': m_site.ext_ui and 'xadmin/base_site.html' or self.base_template
         })
 
         return context
