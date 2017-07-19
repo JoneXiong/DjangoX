@@ -3,7 +3,9 @@
     <div class="navbar-header">
       <a class="navbar-brand" href="#">{% block branding %}{{ site_title }}{% endblock %}</a>
     </div>
-   <div>
+
+    <div class="navbar-collapse collapse">
+
       <ul class="nav navbar-nav">
 	      {% for sitem in site_menu %}
 	      <li{% if sitem.selected %} class="active"{% endif %}>
@@ -11,8 +13,8 @@
 	      </li>
 	      {% endfor %}
       </ul>
-   </div>
-    <div class="navbar-collapse collapse">
+
+
       <ul class="nav navbar-nav navbar-right">
         {% view_block 'top_navmenu' %}
         {% if user.is_active and user.is_staff %}
