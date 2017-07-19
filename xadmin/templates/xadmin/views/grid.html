@@ -15,6 +15,7 @@
     {% if brand_icon %}<i class="{{brand_icon}}"></i> {% endif %}{{brand_name}}
 {% endblock %}
 
+{% if not ext_ui %}
 {% block nav_toggles %}
 {% include "xadmin/includes/toggle_menu.html" %}
 {% if has_add_permission %}
@@ -24,6 +25,7 @@
   <i class="fa fa-filter"></i>
 </button>
 {% endblock %}
+{% endif %}
 
 {% block nav_btns %}
 {% if cl.pop %}
@@ -45,6 +47,12 @@
     {% endfor %}
 </ul>
 {% endif %}
+
+{% if ext_ui %}
+<div class="box">
+    <div class="box-header">
+{% endif %}
+
   <div class="content-toolbar btn-toolbar pull-right clearfix">
     {% view_block 'top_toolbar' %}
 	{% if cl.col_ctrl %}
@@ -86,10 +94,14 @@
   <ul class="pagination pagination-sm pagination-left pagination-inline">
     {% view_block 'pagination' 'small' %}
   </ul>
+
+{% if ext_ui %}
+ </div>
+{% endif %}
   
   <form id="changelist-form" action="" method="post"{% view_block 'result_list_form' %}>{% csrf_token %}
   {% view_block 'results_top' %}
-  <div class="results table-responsive">
+  <div class="results table-responsive{% if ext_ui %} box-body no-padding{% endif %}">
   {% if results %}
   {% block results_grid %}
   <table class="table table-bordered table-striped table-hover">
@@ -164,7 +176,17 @@
   {% view_block 'results_bottom' %}
   </form>
 
+{% if ext_ui %}
+ <div class="box-footer">
+  <ul class="pagination pagination-sm no-margin">
+    {% view_block 'pagination' 'small' %}
+  </ul>
+ </div>
+</div>
+{% else %}
   <ul class="pagination">
     {% view_block 'pagination' %}
   </ul>
+{% endif %}
+
 {% endblock %}
