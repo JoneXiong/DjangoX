@@ -28,7 +28,7 @@ function windowname_to_id(text) {
 }
 // 打开选择对象的列表页窗口
 function showRelatedObjectLookupPopup(triggeringLink) {
-    $scope = $(triggeringLink).parent().parent().parent();
+    $scope = $(triggeringLink).parent().parent().parent().parent();
 
     var name = triggeringLink.id.replace(/^lookup_/, '');
     name = id_to_windowname(name);
