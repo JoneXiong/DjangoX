@@ -30,7 +30,7 @@
     {% endif %}
     {% endblock %}
 
-    <div id="content-block" class="{% if not head_fix %}col-sm-10 col-md-10{% else %}col-sm-12 col-md-12 main-content{% endif %}" {% if head_fix %}style="padding-left: 15px"{% endif %}>
+    <div id="content-block" class="{% block content_block_class %}{% if not head_fix %}col-sm-10 col-md-10{% else %}col-sm-12 col-md-12 main-content{% endif %}{% endblock %}" {% if head_fix %}style="padding-left: 15px"{% endif %}>
 
       <!-- breadcrumbs -->
       {% block breadcrumbs %}
