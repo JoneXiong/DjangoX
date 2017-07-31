@@ -4,7 +4,6 @@ from django import forms
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db.models.base import ModelBase
-from django.template import loader
 from django.template.context import RequestContext
 from django.test.client import RequestFactory
 from django.utils.encoding import force_unicode, smart_unicode
@@ -165,7 +164,7 @@ class BaseWidget(forms.Form):
         _context = RequestContext(self.request)
         _context.update(context)
         _context['box_tpl'] = self.admin_site.ext_ui and 'xadmin/includes/box_ext.html' or 'xadmin/includes/box.html'
-        return loader.render_to_string(self.template, context_instance=_context)
+        return dutils.render_to_string(self.template, context_instance=_context)
 
     def context(self, context):
         '''
