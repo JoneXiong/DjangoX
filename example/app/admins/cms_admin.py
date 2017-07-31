@@ -20,6 +20,9 @@ class ArticleAdmin(object):
         Fieldset('文章内容',
             Field('content')#, template="xcms/content_field.html")
         ),
+        Fieldset('分类',
+            'categories'
+        ),
     )
     #style_fields = {'content': 'wysi_ck', 'categories':'m2m_tree'}
 xadmin.site.register(models.Article, ArticleAdmin)

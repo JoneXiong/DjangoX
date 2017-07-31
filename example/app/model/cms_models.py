@@ -18,7 +18,7 @@ class Article(models.Model):
     title = models.CharField(u"标题", max_length=200)
     date = models.DateField(u"发布时间")
     content = models.TextField(u"内容", null=True, blank=True)
-    categories = models.ManyToManyField('Category', null=True, blank=True)
+    categories = models.ManyToManyField('Category', verbose_name='所属分类', null=True, blank=True)
 
     class Meta:
         app_label = 'app'

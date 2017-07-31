@@ -5,7 +5,7 @@ from xadmin.views import ModelAdminView
 
 
 class TestModelAdminView(ModelAdminView):
-    
+
     def get(self, request, obj_id):
         return self.render_text('OK')
 
