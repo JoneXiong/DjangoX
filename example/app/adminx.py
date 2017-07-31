@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import xadmin
+from xadmin import site
 from xadmin import views
 from xadmin.views.dashboard import AppDashboard
 
@@ -11,6 +12,7 @@ from app import models
 xadmin.site.site_title = 'DjangoX'
 xadmin.site.site_footer = 'My Footer'
 xadmin.site.head_fix = False
+xadmin.site.ext_ui = False
 #xadmin.site.menu_style = 'default'
 
 
@@ -18,15 +20,18 @@ xadmin.site.head_fix = False
 class BaseSetting(object):
     enable_themes = True
     use_bootswatch = False
-xadmin.site.register(views.BaseView, BaseSetting)
+site.register(views.BaseView, BaseSetting)
 
 class GlobalSetting(object):
     global_search_models = [models.Host, models.IDC]
-xadmin.site.register(views.SiteView, GlobalSetting)
+site.register(views.SiteView, GlobalSetting)
 
 
 ### 站点首页设置 ### 
 class MainDashboard(object):
+
+    title = '我的面板'
+
     widgets = [
         [
             {"type": "html", "title": "Test Widget", "content": "<h3> Welcome to DjangoX! </h3><p>Join us: <br/>Github : https://github.com/JoneXiong/DjangoX</p>"},
@@ -38,7 +43,7 @@ class MainDashboard(object):
             {"type": "addform", "model": models.MaintainLog},
         ]
     ]
-xadmin.site.register(views.website.IndexView, MainDashboard)
+site.register(views.website.IndexView, MainDashboard)
 
 
 ### 各 App 默认首页设置 ###

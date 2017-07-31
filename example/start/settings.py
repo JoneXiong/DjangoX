@@ -1,5 +1,4 @@
 # coding=utf-8
-# Django settings for wictrl project.
 
 import sys
 import os.path
@@ -44,7 +43,7 @@ ALLOWED_HOSTS = '*'
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
 # In a Windows environment this must be set to your system time zone.
-TIME_ZONE = 'America/Chicago'
+TIME_ZONE = 'Asia/Shanghai'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -170,7 +169,7 @@ INSTALLED_APPS = (
 )
 
 DATE_FORMAT = 'Y-m-d'
-DATETIME_FORMAT = 'Y-m-d H:i'
+DATETIME_FORMAT = 'Y-m-d H:i:s'
 TIME_FORMAT = 'H:i'
 
 # A sample logging configuration. The only tangible logging
@@ -212,12 +211,12 @@ LOGGING = {
 
 SESSION_SAVE_EVERY_REQUEST = False
 
-REMOTE_MEDIA_URL = 'http://meilatest.qiniudn.com'
+REMOTE_MEDIA_URL = 'http://xxx.qiniudn.com'
 
 QINIU_CONF = {
-              'access_key': 'o7Lv8DXCvYOQLBsLl4zcZBj6epECrxOQu1JNcxd4',
-              'secret_key': 'nn7-tSEdEGKpo07GK0xuDI6TkgL3-PoUIEIboMx9',
-              'bucket': 'meilatest'
+              'access_key': 'o7Lv8DXCvYOQLBsLl4zcZBj6epECrxOQu1JNcxd4x',
+              'secret_key': 'nn7-tSEdEGKpo07GK0xuDI6TkgL3-PoUIEIboMx9x',
+              'bucket': 'xxxbucket'
               }
 
 XADMIN_SOCIAL_ENABLE = False
