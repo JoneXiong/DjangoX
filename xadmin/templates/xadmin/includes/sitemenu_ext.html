@@ -9,16 +9,16 @@
     {% for item in nav_menu %}
       <li class="treeview {% if item.selected %} active{% endif %}">
         <a href="#" class="section">
-          {% if item.icon %}<i class="icon fa-fw {{item.icon}}"></i>
-          {% elif item.first_icon %}<i class="icon fa-fw {{item.first_icon}}"></i>
-          {%else%}<i class="icon fa-fw fa fa-circle-o"></i>{% endif %}
+          {% if item.icon %}<i class="fa fa-fw {{item.icon}}"></i>
+          {% elif item.first_icon %}<i class="fa fa-fw {{item.first_icon}}"></i>
+          {%else%}<i class="fa fa-fw fa-circle-o"></i>{% endif %}
           <span>{{item.title}}</span>
         </a>
         <ul class="treeview-menu">
           {% for sitem in item.menus %}
           <li{% if sitem.selected %} class="active"{% endif %}>
             {% if sitem.url %}<a href="{{ sitem.url }}">{% endif %}
-            {% if sitem.icon %}<i class="fa-fw {{sitem.icon}}"></i>{%else%}<i class="fa-fw fa fa-circle-o"></i>{% endif %}
+            {% if sitem.icon %}<i class="fa fa-fw {{sitem.icon}}"></i>{%else%}<i class="fa fa-fw fa-circle-o"></i>{% endif %}
             {{ sitem.title }}</span>{% if sitem.url %}</a>{% endif %}
           </li>
           {% endfor %}
