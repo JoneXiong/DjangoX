@@ -201,7 +201,6 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
 
     def value_from_datadict(self, data, files, name):
         value = data.get(name)
-import views
         if value:
             return value.split(',')
 
