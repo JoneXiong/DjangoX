@@ -201,6 +201,7 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
 
     def value_from_datadict(self, data, files, name):
         value = data.get(name)
+import views
         if value:
             return value.split(',')
 
@@ -457,4 +458,4 @@ class SelectMultipleAjax(forms.SelectMultiple):
         if value != '':
             # Only add the 'value' attribute if a value is non-empty.
             final_attrs['value'] = force_text(self._format_value(value))
-        return format_html('<input{0} />', flatatt(final_attrs))
+        return format_html('<input{0} />', dutils.flatatt(final_attrs))
