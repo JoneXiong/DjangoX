@@ -19,16 +19,6 @@
         <span class="icon-bar"></span>
       </a>
 
-   <div class="navbar-custom-menu pull-left">
-      <ul class="nav navbar-nav">
-             {% for sitem in site_menu %}
-             <li{% if sitem.selected %} class="active"{% endif %}>
-               <a href="{{ sitem.url }}">{% if sitem.icon %}<i class="fa-fw {{sitem.icon}}"></i>{% endif %} {{ sitem.title }}</a>
-             </li>
-             {% endfor %}
-      </ul>
-   </div>
-
     <div class="navbar-custom-menu">
       <ul class="nav navbar-nav navbar-right">
         {% view_block 'top_navmenu' %}

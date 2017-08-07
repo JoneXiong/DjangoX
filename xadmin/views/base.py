@@ -398,6 +398,8 @@ class SiteView(BaseView):
         
     def get_nav_menu(self, app_label=None):
         # 非DEBUG模式会首先尝试从SESSION中取得缓存的 app 菜单项
+        if self.admin_site.ext_ui:
+            app_label = None
         menu_session_key = app_label and 'nav_menu_%s'%app_label or 'nav_menu'
         if not settings.DEBUG and menu_session_key in self.request.session:
             nav_menu = json.loads(self.request.session[menu_session_key])

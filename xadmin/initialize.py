@@ -59,7 +59,8 @@ def autodiscover():
         site.app_dict[app_label] = mod
         
         # app级菜单初始化
-        site.sys_menu[app_label] = {'_default_group':{'title': u'其他', 'icon': 'fa-th-large', 'menus': []}  }
+        default_title = hasattr(mod,'verbose_name') and '%s 其他'%mod.verbose_name or '其他'
+        site.sys_menu[app_label] = {'_default_group':{'title': default_title, 'icon': 'fa-th-large', 'menus': []}  }
         if hasattr(mod,'menus'):
             m_menus = mod.menus
             for e in m_menus:
