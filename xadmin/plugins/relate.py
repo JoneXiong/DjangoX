@@ -210,12 +210,15 @@ class RelateObject(object):
     def filter(self, queryset):
         return queryset.filter(**{self.lookup: self.value})
 
-    def get_brand_name(self):
+    def get_title(self):
         if len(self.to_objs) == 1:
             to_model_name = str(self.to_objs[0])
         else:
             to_model_name = force_unicode(self.to_model._meta.verbose_name)
+        return to_model_name
 
+    def get_brand_name(self):
+        to_model_name = self.get_title()
         return mark_safe(u"<span class='rel-brand'>%s <i class='fa fa-caret-right'></i></span> %s" % (to_model_name, force_unicode(self.opts.verbose_name_plural)))
 
     def get_list_tabs(self):
@@ -285,6 +288,7 @@ class ListRelateDisplayPlugin(BaseRelateDisplayPlugin):
     def get_context(self, context):
         self.admin_view.list_template = 'xadmin/views/model_list_rel.html'
         #context['brand_name'] = self.relate_obj.get_brand_name()
+        context['title'] = self.relate_obj.get_title()
         context['rel_objs'] = self.relate_obj.to_objs
         if 'add_url' in context:
             context['add_url'] = self._get_url(context['add_url'])
