@@ -3,6 +3,7 @@
 
 {% block content_css %}tabs{% endblock content_css %}
 {% block content %}
+<div class="nav-tabs-custom">
 {% if not widget.one_chart %}
   <ul class="nav nav-tabs chart-tab">
     {% for c in charts %}
@@ -16,4 +17,5 @@
       style="height: 300px; margin:0px; overflow: hidden;"></div>
     {% endfor %}
   </div>
+</div>
 {% endblock content %}

@@ -41,6 +41,7 @@
 
 {% block content %}
 {% if cl.list_tabs %}
+<div class="nav-tabs-custom">
 <ul class="nav nav-tabs">
     {% for tab_url,tab_title in cl.list_tabs %}
     <li class="{% ifequal cur_tab forloop.counter0 %}active{% endifequal %}"><a href="{{ tab_url }}&_tab={{ forloop.counter0 }}">{{ tab_title }}</a></li>
@@ -183,10 +184,15 @@
   </ul>
  </div>
 </div>
+
 {% else %}
   <ul class="pagination">
     {% view_block 'pagination' %}
   </ul>
+{% endif %}
+
+{% if cl.list_tabs %}
+</div>
 {% endif %}
 
 {% endblock %}
