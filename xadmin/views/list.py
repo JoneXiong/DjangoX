@@ -235,7 +235,7 @@ class ListAdminView(BaseGrid,ModelPage):
         if hasattr(self, 'verbose_name'):
             self.opts.verbose_name = self.verbose_name
             self.opts.verbose_name_plural = self.verbose_name
-        self.title = _('%s List') % force_unicode(self.opts.verbose_name)
+        self.title = _('%s 列表') % force_unicode(self.opts.verbose_name)
 
         # 获取所有可供显示的列的信息
         model_fields = [(f, f.name in self.list_display, self.get_check_field_url(f))

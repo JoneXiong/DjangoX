@@ -296,7 +296,7 @@ class DetailAdminView(ModelAdminView):
             ``object`` : 要显示的 Model 对象
         """
         new_context = {
-            'title': _('%s Detail') % force_unicode(self.opts.verbose_name),
+            'title': _('%s 详细') % force_unicode(self.opts.verbose_name),
             'form': self.form_obj,
 
             'object': self.obj,
