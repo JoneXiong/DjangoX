@@ -24,7 +24,7 @@ class ShowField(Field):
     def __init__(self, admin_view, *args, **kwargs):
         super(ShowField, self).__init__(*args, **kwargs)
         self.admin_view = admin_view
-        if admin_view.style == 'table':
+        if admin_view.style in ['table','gather']:
             self.template = "xadmin/layout/field_value_td.html"
 
     def render(self, form, form_style, context, template_pack=TEMPLATE_PACK, **kwargs):
@@ -120,9 +120,15 @@ class TableInlineStyle(InlineStyle):
             readonly_fields = [f for f in getattr(self.formset[0], 'readonly_fields', [])]
         return {
             'fields': fields,
-            'readonly_fields': readonly_fields
+            'readonly_fields': readonly_fields,
+            'box_tpl': self.box_tpl
         }
 style_manager.register_style("table", TableInlineStyle)
+
+
+class GatherInlineStyle(TableInlineStyle):
+    template = 'xadmin/edit_inline/gather.html'
+style_manager.register_style("gather", GatherInlineStyle)
 
 
 def replace_field_to_value(layout, av):

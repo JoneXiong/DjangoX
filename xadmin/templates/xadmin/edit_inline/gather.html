@@ -1,0 +1,33 @@
+{% extends "xadmin/edit_inline/base.html" %}
+{% load i18n xadmin_tags crispy_forms_tags %}
+
+{% block box_content_class %}nopadding{% endblock box_content_class %}
+{% block box_content_attrs %}{% endblock box_content_attrs %}
+
+{% block formset_content %}
+  <table class="table">
+
+    <tbody class="formset-content" data-prefix="{{ prefix }}" data-style="stacked">
+      <tr class="formset-row">
+      {% for fs in formset.formset %}
+        {% crispy fs formset.formset.helper %}
+        {% for r_o_f in fs.readonly_fields %}
+            <td>{{ r_o_f.contents|safe }}</td>
+        {% endfor %}
+        {% if formset.formset.can_delete %}
+          <td><a class="delete-row"><i class="fa fa-times"></i></a></td>
+        {% endif %}
+      {% endfor %}
+      </tr>
+    </tbody>
+  </table>
+{% endblock formset_content %}
+
+{% block formset_empty %}
+  <tr class="formset-row">
+    {% crispy formset.formset.empty_form formset.formset.helper %}
+    {% if formset.formset.can_delete %}
+      <td><a class="delete-row"><i class="fa fa-times"></i></a></td>
+    {% endif %}
+  </tr>
+{% endblock formset_empty %}
