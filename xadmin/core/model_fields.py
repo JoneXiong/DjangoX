@@ -4,6 +4,7 @@ import logging
 import time
 import hashlib
 import random
+import uuid
 
 from django.db import models
 from django.utils.text import capfirst
@@ -35,7 +36,10 @@ class AutoMD5SlugField(SlugField):
             hash_key = self.hash_key()
         else:
             hash_key = self.hash_key
-        slug = hashlib.md5('%s%s%s' % (hash_key, getattr(model_instance, self._populate_from), extra)).hexdigest()
+
+        #所选字段取不到值的时候,用uuid来代替做hash
+        hash_field_val = getattr(model_instance, self._populate_from) or str(uuid.uuid1())
+        slug = hashlib.md5('%s%s%s' % (hash_key, hash_field_val, extra)).hexdigest()
         slug_len = slug_field.max_length
         if slug_len:
             slug = slug[:slug_len]
