@@ -427,6 +427,7 @@ class ModelFormAdminView(ModelAdminView):
                 return ret
             
             self.save_related()
+            self.after_save()
             response = self.post_response()
             if isinstance(response, basestring):
                 return HttpResponseRedirect(response)
@@ -434,6 +435,9 @@ class ModelFormAdminView(ModelAdminView):
                 return response
 
         return self.get_response()
+
+    def after_save(self):
+        pass
 
     @filter_hook
     def get_context(self):
