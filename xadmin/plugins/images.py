@@ -56,8 +56,13 @@ class AdminImageWidget(forms.FileInput):
             else:
                 file_path = ''
             label = self.attrs.get('label', name)
-            output.append('<a href="%s" target="_blank" title="%s" data-gallery="gallery"><img src="%s" class="field_img"/></a><br/>%s ' %
-                         (file_path, label, file_path, _('Change:')))
+            #output.append('<a href="%s" target="_blank" title="%s" data-gallery="gallery"><img src="%s" class="field_img"/></a><br/>%s ' %
+            #             (file_path, label, file_path, _('Change:')))
+            output.append('<img src="%s" onclick="$(\'#id_%s\').click()" class="field_img"/>'%(file_path,name))
+        else:
+            output.append('<img src="/static/xadmin/img/upload_default.png" onclick="$(\'#id_%s\').click()" class="field_img"/>'%name)
+        attrs['class'] = 'img-file-ext'
+        #attrs['onChange'] = 'previewImage(this)'
         output.append(super(AdminImageWidget, self).render(name, value, attrs))
         return mark_safe(u''.join(output))
 
@@ -66,7 +71,7 @@ class ModelDetailPlugin(BasePlugin):
 
     def __init__(self, admin_view):
         super(ModelDetailPlugin, self).__init__(admin_view)
-        self.include_image = False
+        self.include_image = hasattr(admin_view,'include_image') and admin_view.include_image or False
 
     def get_field_attrs(self, attrs, db_field, **kwargs):
         if isinstance(db_field, models.ImageField):
@@ -92,7 +97,7 @@ class ModelDetailPlugin(BasePlugin):
     def get_media(self, media):
         if self.include_image:
             media = media + self.vendor('image-gallery.js',
-                                        'image-gallery.css')
+                                        'image-gallery.css') + self.vendor('xadmin.plugin.imgupload.js')
         return media
 
     def block_before_fieldsets(self, context, node):

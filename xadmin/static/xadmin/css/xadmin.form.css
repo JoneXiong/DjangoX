@@ -186,7 +186,12 @@ select.selectmultiple {
 
 /** detail page **/
 img.field_img {
-  max-height: 100px;
+  max-height: 160px;
+}
+
+.img-file-ext {
+    position: absolute !important;
+    clip: rect(1px,1px,1px,1px);
 }
 
 /** revision form **/
