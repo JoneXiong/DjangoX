@@ -8,6 +8,6 @@
     <li><a href="{{cl.clean_query_url}}"><i class="fa fa-trash-o"></i> {% trans "Clean Filters" %}</a></li>
     <li class="divider"></li>
     {% endif %}
-  	{% for spec in cl.filter_specs %}{{ spec|safe }}{% endfor %}
+  	{% for spec in cl.filter_specs %}{% if spec not in cl.filter_default %}{{ spec|safe }}{% endif %}{% endfor %}
   </ul>
 </li>

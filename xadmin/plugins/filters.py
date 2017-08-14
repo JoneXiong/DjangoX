@@ -32,8 +32,12 @@ class IncorrectLookupParameters(Exception):
 
 class FilterPlugin(BasePlugin):
     list_filter = ()
+
     search_fields = ()
     free_query_filter = True
+
+    filter_grid_left = False
+    filter_default_list = []
 
     def lookup_allowed(self, lookup, value):
         model = self.model
@@ -103,6 +107,7 @@ class FilterPlugin(BasePlugin):
                         "Filtering by %s not allowed" % key)
 
         self.filter_specs = []
+        self.filter_default = []
         if self.list_filter:
             for list_filter in self.list_filter:
                 if callable(list_filter):
@@ -146,11 +151,16 @@ class FilterPlugin(BasePlugin):
                         queryset = new_qs
 
                     self.filter_specs.append(spec)
+                    if list_filter in self.filter_default_list:
+                        spec.template = spec.template.replace('.html', '_box.html')
+                        self.filter_default.append(spec)
+
 
         self.has_filters = bool(self.filter_specs)
         self.admin_view.filter_specs = self.filter_specs
+        self.admin_view.filter_default = self.filter_default
         self.admin_view.used_filter_num = len(
-            filter(lambda f: f.is_used, self.filter_specs))
+            filter(lambda f: f.is_used and f not in self.filter_default, self.filter_specs))
 
         try:
             for key, value in lookup_params.items():
@@ -219,6 +229,11 @@ class FilterPlugin(BasePlugin):
         if self.has_filters:
             nodes.append(render_to_string('xadmin/blocks/model_list.nav_menu.filters.html', context_instance=context))
 
+    # Block Views
+    def block_grid_left(self, context, nodes):
+        if self.has_filters and self.filter_grid_left:
+            nodes.append(render_to_string('xadmin/blocks/model_list.grid_left.filters.html', context_instance=context))
+
     def block_nav_form(self, context, nodes):
         if self.search_fields:
             context.update({'search_var': SEARCH_VAR,
@@ -236,10 +251,8 @@ site.register_plugin(FilterPlugin, GridPage)
 # @filter_manager.register
 class QuickFilterMultiSelectFieldListFilter(MultiSelectFieldListFilter):
     """ Delegates the filter to the default filter and ors the results of each
-     
     Lists the distinct values of each field as a checkbox
-    Uses the default spec for each 
-     
+    Uses the default spec for each
     """
     template = 'xadmin/filters/quickfilter.html'
 
@@ -248,18 +261,19 @@ class QuickFilterPlugin(BasePlugin):
     Add a filter menu to the left column of the page
     """
     list_quick_filter = () # these must be a subset of list_filter to work
-    quickfilter = {} 
+    quickfilter = {}
+
     search_fields = ()
     free_query_filter = True
-    
+
     def init_request(self, *args, **kwargs):
         menu_style_accordian = hasattr(self.admin_view,'menu_style') and self.admin_view.menu_style == 'accordion'
         return bool(self.list_quick_filter) and not menu_style_accordian
-    
+
     # Media
     def get_media(self, media):
         return media + self.vendor('xadmin.plugin.quickfilter.js','xadmin.plugin.quickfilter.css')
-    
+
     def lookup_allowed(self, lookup, value):
         model = self.model
         # Check FKey lookups that are allowed, so that popups produced by

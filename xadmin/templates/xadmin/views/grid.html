@@ -40,6 +40,16 @@
 {% endblock nav_btns %}
 
 {% block content %}
+
+{% if cl.filter_grid_left %}
+<div class="row">
+<div class="col-md-2">
+    {% view_block 'grid_left' %}
+</div>
+<div class="col-md-10">
+{% endif %}
+
+
 {% if cl.list_tabs %}
 <div class="nav-tabs-custom">
 <ul class="nav nav-tabs">
@@ -192,6 +202,12 @@
 {% endif %}
 
 {% if cl.list_tabs %}
+</div>
+{% endif %}
+
+
+{% if cl.filter_grid_left %}
+</div>
 </div>
 {% endif %}
 
