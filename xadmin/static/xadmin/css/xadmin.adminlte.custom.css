@@ -1,0 +1,18 @@
+.sidebar-menu > li.active {
+    border-left: 4px solid #3c8dbc;
+    background: #293846;
+}
+
+.skin-blue .sidebar-menu>li:hover>a, .skin-blue .sidebar-menu>li.active>a {
+    color: #fff;
+    background: #1e282c;
+    border-left-color: transparent;;
+}
+
+.sidebar-menu .treeview-menu {
+	padding-left: 24px;
+}
+
+.sidebar-menu > li > a i {
+    margin-right: 6px;
+}
