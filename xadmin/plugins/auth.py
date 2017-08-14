@@ -84,6 +84,8 @@ class UserAdmin(object):
     change_user_password_template = None
     list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
     list_filter = ('is_staff', 'is_superuser', 'is_active')
+    filter_grid_left = True
+    filter_default_list = ['is_staff', 'is_superuser']
     search_fields = ('username', 'first_name', 'last_name', 'email')
     ordering = ('username',)
     style_fields = {
