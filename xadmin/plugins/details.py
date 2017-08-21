@@ -27,6 +27,7 @@
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db import models
+from django.utils.html import escape
 
 from xadmin.sites import site
 from xadmin.views import BasePlugin, ListAdminView
@@ -75,7 +76,7 @@ class DetailsPlugin(BasePlugin):
                         else:
                             edit_url = ''
                         item.btns.append('<a data-res-uri="%s" data-edit-uri="%s" class="details-handler" rel="tooltip" title="%s"><i class="fa fa-info-circle"></i></a>'
-                                         % (item_res_uri, edit_url, _(u'Details of %s') % str(rel_obj)))
+                                         % (item_res_uri, edit_url, _(u'Details of %s') % escape(escape(str(rel_obj)))))
                 except NoReverseMatch:
                     pass
         return item

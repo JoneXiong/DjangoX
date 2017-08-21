@@ -151,7 +151,7 @@ class PermissionAdmin(object):
     app_label = 'xadmin'
     menu_group = 'auth_group'
     style_fields = {
-                    'content_type': 'fk_select'
+                    'content_type': 'fk_raw'
                     }
 
 site.register(Group, GroupAdmin)
