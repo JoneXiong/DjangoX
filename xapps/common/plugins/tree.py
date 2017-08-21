@@ -1,7 +1,9 @@
 #coding:utf-8
+from collections import Iterable
+
 import xadmin
 from django import forms
-from django.db.models import ManyToManyField
+from django.db.models import ManyToManyField, ForeignKey
 #from django.forms.util import flatatt
 from django.utils.encoding import force_unicode
 from django.utils.html import conditional_escape
@@ -9,9 +11,9 @@ from django.utils.safestring import mark_safe
 from xadmin.views import BasePlugin, ModelFormAdminView
 from xadmin import dutils
 
-class TreeCheckboxSelect(forms.CheckboxSelectMultiple):
+class TreeSelect(object):
 
-    def fill_output(self, output, choices, str_values):
+    def fill_output(self, output, choices, str_values, label_list):
         if len(choices):
             output.append(u'<ul>')
             for (option_value, option_label, children) in choices:
@@ -19,36 +21,60 @@ class TreeCheckboxSelect(forms.CheckboxSelectMultiple):
                 option_label = conditional_escape(force_unicode(option_label))
 
                 children_output = []
-                self.fill_output(children_output, children, str_values)
+                self.fill_output(children_output, children, str_values, label_list)
 
                 classes = []
                 if children_output:
                     classes.append('jstree-open')
                 if option_value in str_values:
                     classes.append('jstree-checked')
+                    label_list.append(option_label)
 
-                output.append(u'<li value="%s" class="%s"><a href="javascript:void(0);">%s</a>' % \
-                    (option_value, " ".join(classes), option_label))
+                output.append(u'<li value="%s" label="%s" class="%s"><a href="javascript:void(0);">%s</a>' % \
+                    (option_value, option_label, " ".join(classes), option_label))
                 if children_output:
                     output.extend(children_output)
                 output.append(u'</li>')
-                
+
             output.append(u'</ul>')
 
     def render(self, name, value, attrs=None, choices=()):
         if value is None: value = []
         if attrs:
-            attrs['class'] = attrs.get('class', '') + ' admin-tree'
+            attrs['class'] = attrs.get('class', '') + ' %s dropdown-menu open'%self.base_css
         else:
-            attrs['class'] = 'admin-tree'
+            attrs['class'] = '%s dropdown-menu open'%self.base_css
 
         final_attrs = self.build_attrs(attrs, name=name)
-        output = [u'<div%s>' % dutils.flatatt(final_attrs)]
+        label_list = []
+        output = [u'<div%s role="combobox">' % dutils.flatatt(final_attrs)]
         # Normalize to strings
-        str_values = set([force_unicode(v) for v in value])
-        self.fill_output(output, self.choices, str_values)
+        if self.base_css=='admin-m2m-tree':
+            str_values = set([force_unicode(v) for v in value])
+        else:
+            str_values = [force_unicode(value)]
+        self.fill_output(output, self.choices, str_values, label_list)
+        raw_str = ''
+        if self.base_css=='admin-fk-tree':
+            raw_str = '<input type="hidden" id="id_%s" name="%s" value="%s"></input>'%(name, name,str_values and str_values.pop() or '')
         output.append(u'</div>')
+
+        wapper = '''
+<div class="dropdown">%s
+<button type="button" class="btn dropdown-toggle btn-default bs-placeholder" data-toggle="dropdown" role="button" title="点击下拉选择" aria-expanded="true"><span class="filter-option pull-left">%s</span>&nbsp;<span class="bs-caret"><span class="caret"></span></span></button>
+        '''%(raw_str, (', '.join(label_list) or '请选择...'))
+        output.insert(0, wapper)
+        output.append(u'</div>')
+
         return mark_safe(u'\n'.join(output))
+
+class TreeCheckboxSelect(TreeSelect, forms.CheckboxSelectMultiple):
+    base_css = 'admin-m2m-tree'
+    pass
+
+class TreeRadioSelect(TreeSelect, forms.RadioSelect):
+    base_css = 'admin-fk-tree'
+    pass
 
 class ModelTreeIterator(object):
 
@@ -57,8 +83,8 @@ class ModelTreeIterator(object):
         self.queryset = field.queryset.filter(**{field.parent_field: parent})
 
     def __iter__(self):
-        if self.field.empty_label is not None:
-            yield (u"", self.field.empty_label)
+        #if self.field.empty_label is not None:
+        #    yield (u"", self.field.empty_label)
         if hasattr(self.field, 'cache_choices'):
             if self.field.choice_cache is None:
                 self.field.choice_cache = [
@@ -86,17 +112,30 @@ class ModelTreeChoiceField(forms.ModelMultipleChoiceField):
         return ModelTreeIterator(self)
     choices = property(_get_choices, forms.ChoiceField._set_choices)
 
+class ModelTreeChoiceFieldFK(forms.ModelChoiceField):
+    widget = TreeRadioSelect
+    parent_field = 'parent'
+
+    def _get_choices(self):
+        if hasattr(self, '_choices'):
+            return self._choices
+        return ModelTreeIterator(self)
+    choices = property(_get_choices, forms.ChoiceField._set_choices)
+
 class M2MTreePlugin(BasePlugin):
 
     def init_request(self, *args, **kwargs):
         self.include_m2m_tree = False
         return hasattr(self.admin_view, 'style_fields') and \
-            'm2m_tree' in self.admin_view.style_fields.values()
+            ('m2m_tree' in self.admin_view.style_fields.values() or 'fk_tree' in self.admin_view.style_fields.values())
 
     def get_field_style(self, attrs, db_field, style, **kwargs):
         if style == 'm2m_tree' and isinstance(db_field, ManyToManyField):
             self.include_m2m_tree = True
             return {'form_class': ModelTreeChoiceField, 'help_text': None}
+        if style == 'fk_tree' and isinstance(db_field, ForeignKey):
+            self.include_m2m_tree = True
+            return {'form_class': ModelTreeChoiceFieldFK, 'help_text': None}
         return attrs
 
     def get_media(self, media):

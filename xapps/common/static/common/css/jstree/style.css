@@ -75,3 +75,16 @@
 .jstree-classic .jstree-checked a .jstree-checkbox { _background-position:-38px -19px; }
 .jstree-classic .jstree-unchecked a .jstree-checkbox { _background-position:-2px -19px; }
 /* IE6 END */
+
+
+.admin-m2m-tree, .admin-fk-tree {
+    max-height: 500px;
+    overflow-y: auto;
+    min-height: 260px;
+    height: 100%;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+    padding-top: 5px;
+    padding-left: 10px;
+}
