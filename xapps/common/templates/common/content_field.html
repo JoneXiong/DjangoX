@@ -1,0 +1,10 @@
+{% load crispy_forms_field %}
+
+{% if field.is_hidden %}
+    {{ field }}
+{% else %}
+    <div id="div_{{ field.auto_id }}" class="clearfix nopadding control-group{% if form_show_errors%}{% if field.errors %} error{% endif %}{% endif %}{% if field.css_classes %} {{ field.css_classes }}{% endif %}">
+        {% crispy_field field %}
+        {% include 'bootstrap/layout/help_text_and_errors.html' %}
+    </div>
+{% endif %}
