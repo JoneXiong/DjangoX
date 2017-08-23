@@ -3,7 +3,6 @@ import time
 
 from django import forms
 from django.views.generic import View
-from django.http import HttpResponse, JsonResponse
 
 from xadmin import site
 from xadmin.views.base import BaseView
@@ -25,7 +24,7 @@ class UploadView(BaseView):
         except Exception, e:
             import traceback;traceback.print_exc()
         res = "<script>window.parent.CKEDITOR.tools.callFunction("+callback+",'/"+file_name+"', '');</script>"
-        return HttpResponse(res)
+        return self.render_text(res)
 site.register_view(r'^ckupload/$', UploadView, name='ckupload')
 
 
@@ -47,7 +46,7 @@ class UploadDrogImgView(BaseView):
                 "fileName": file_dir_name + "_" + f.name,
                 "url": '/' + file_name
             }
-            return JsonResponse(success_message)
+            return self.render_json(success_message)
         except:
             import traceback
             traceback.print_exc()
@@ -57,6 +56,6 @@ class UploadDrogImgView(BaseView):
                     "message": "上传失败"
                 }
             }
-            return JsonResponse(fail_message)
+            return self.render_json(fail_message)
 
 site.register_view(r'^ckupdrogload/$', UploadDrogImgView, name='ckupdrogupload')
