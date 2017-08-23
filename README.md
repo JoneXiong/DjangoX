@@ -32,17 +32,15 @@ http://127.0.0.1:81/xadmin/
 * 登陆：admin 
 * 密码：admin
 
-4.示例网站
-[DjangoX示例网站](http://xadmin.ablog.top/xadmin/main.html)
-* 登陆：admin 
-* 密码：admin
 
 # Screenshots
-![info](https://github.com/JoneXiong/DjangoX/raw/master/example/app/static/app/img/show1.png)
+![info](https://github.com/JoneXiong/DjangoX/raw/master/example/app/static/app/img/main.jpg)
 
-![info](https://github.com/JoneXiong/DjangoX/raw/master/example/app/static/app/img/show2.png)
+![info](https://github.com/JoneXiong/DjangoX/raw/master/example/app/static/app/img/quick_filter.jpg)
 
-![info](https://github.com/JoneXiong/DjangoX/raw/master/example/app/static/app/img/show3.png)
+![info](https://github.com/JoneXiong/DjangoX/raw/master/example/app/static/app/img/quick_filter2.jpg)
+
+![info](https://github.com/JoneXiong/DjangoX/raw/master/example/app/static/app/img/m2m_tree.jpg)
 
 # Document
 [示例启动脚本简析](http://www.oejia.net/blog/2016/01/25/djangox_start_py.html)
