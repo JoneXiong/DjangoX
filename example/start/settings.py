@@ -164,6 +164,7 @@ INSTALLED_APPS = (
 
     'xadmin',
     'crispy_forms',
+    'xapps.common',
 
     'app',
 )

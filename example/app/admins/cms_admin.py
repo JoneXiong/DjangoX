@@ -17,14 +17,15 @@ class ArticleAdmin(object):
         Fieldset('基本信息',
             'title', 'date'
         ),
-        Fieldset('文章内容',
-            Field('content')#, template="xcms/content_field.html")
-        ),
         Fieldset('分类',
             'categories'
         ),
+        Fieldset('文章内容',
+            Field('content')#, template="xcms/content_field.html")
+        ),
+
     )
-    #style_fields = {'content': 'wysi_ck', 'categories':'m2m_tree'}
+    style_fields = {'content': 'wysi_ck', 'categories':'m2m_tree'}
 xadmin.site.register(models.Article, ArticleAdmin)
 
 class CategoryAdmin(object):
@@ -34,5 +35,6 @@ class CategoryAdmin(object):
     search_fields = ('name', )
     list_editable = ('name', )
     list_filter = ('parent', )
+    style_fields = {'parent':'fk_tree'}
 
 xadmin.site.register(models.Category, CategoryAdmin)

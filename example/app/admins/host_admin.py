@@ -12,7 +12,7 @@ class MaintainInline(object):
     style = 'accordion'
 
 class HostAdmin(object):
-    
+
     def open_web(self, instance):
         return "<a href='http://%s' target='_blank'>Open</a>" % instance.ip
     open_web.short_description = "Acts"
@@ -21,7 +21,7 @@ class HostAdmin(object):
 
     list_display = ('name', 'idc', 'guarantee_date', 'service_type', 'status', 'open_web', 'description')
     list_display_links = ('name',)
-    
+
 
     raw_id_fields = ('idc',)
     style_fields = {'system': "radio-inline"}
@@ -29,7 +29,11 @@ class HostAdmin(object):
     search_fields = ['name', 'ip', 'description']
     list_filter = ['id','idc', 'guarantee_date', 'status', 'brand', 'model',
                    'cpu', 'core_num', 'hard_disk', 'memory', ('service_type',xadmin.filters.MultiSelectFieldListFilter)]
-    
+
+    filter_grid_left = True
+
+    filter_default_list = ['idc', 'is_superuser', 'model', 'core_num']
+
     #list_quick_filter = ['service_type',{'field':'idc__name','limit':10}]
     list_bookmarks = [{'title': "Need Guarantee", 'query': {'status__exact': 2}, 'order': ('-guarantee_date',), 'cols': ('brand', 'guarantee_date', 'service_type')}]
 
@@ -72,7 +76,7 @@ class HostAdmin(object):
     inlines = [MaintainInline]
     reversion_enable = True
 #     relfield_style = 'fk-ajax'
-    
+
     data_charts = {
         "host_service_type_counts": {'title': u"Host service type count", "x-field": "service_type", "y-field": ("service_type",), 
                               "option": {
@@ -82,5 +86,5 @@ class HostAdmin(object):
                               },
     }
     model_icon = 'fa fa-laptop'
-    
+
 xadmin.site.register(models.Host, HostAdmin)
