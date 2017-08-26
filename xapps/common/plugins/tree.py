@@ -62,7 +62,7 @@ class TreeSelect(object):
                 str_values = []
         self.fill_output(output, self.choices, str_values, label_list)
         raw_str = ''
-        if self.base_css=='admin-fk-tree':
+        if self.base_css in ['admin-fk-tree', 'admin-fk-tree-leaf']:
             raw_str = '<input type="hidden" id="id_%s" name="%s" value="%s"></input>'%(name, name,str_values and str_values.pop() or '')
         output.append(u'</div></div>')
 
