@@ -77,14 +77,22 @@
 /* IE6 END */
 
 
+.jstree-container {
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+    padding-top: 0px
+}
+
 .admin-m2m-tree, .admin-fk-tree {
     max-height: 500px;
     overflow-y: auto;
     min-height: 260px;
     height: 100%;
-    border: 1px solid rgba(0, 0, 0, 0.15);
-    border-radius: 4px;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
     padding-top: 5px;
     padding-left: 10px;
+}
+
+.jstree-classic a.jstree-search {
+    color: #3c8dbc;
 }

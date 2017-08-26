@@ -6,7 +6,7 @@
       f.find('.admin-m2m-tree:not(.rended)').each(function(){
         var tree_input = $(this);
         var tree = tree_input.jstree({
-          "plugins" : [ "themes", "html_data", "checkbox", "ui" ],
+          "plugins" : [ "themes", "html_data", "checkbox", "ui", "search" ],
           "themes": {
             "theme": "classic",
             "icons": false,
@@ -17,6 +17,9 @@
 				"icon" : false  // 关闭默认图标
 			  },
 		  },
+          "search": {
+            show_only_matches: true
+          },
           "checkbox": {
             override_ui: true,
             real_checkboxes: true,
@@ -32,7 +35,7 @@
             for (var i=0; i<li.length; i++){
                 arr.push(li[i].getAttribute('label'))
             }
-            $(this).prev().children(".filter-option").text(arr.join(', '));
+            $(this).parent().prev().children(".filter-option").text(arr.join(', '));
         })
         .bind('check_node.jstree', function(e, data){
           var node = data.args[0];
@@ -47,7 +50,7 @@
       f.find('.admin-fk-tree:not(.rended)').each(function(){
         var tree_input = $(this);
         var tree = tree_input.jstree({
-          "plugins" : [ "themes", "html_data", "ui" ],
+          "plugins" : [ "themes", "html_data", "ui", "search" ],
           "themes": {
             "theme": "classic",
             "icons": false,
@@ -58,19 +61,23 @@
 				"icon" : false  // 关闭默认图标
 			  },
 		  },
-          "checkbox": {
-            override_ui: true,
-            //real_checkboxes: true,
-            two_state: true,
-            real_checkboxes_names: function(n){
-              return [tree_input.attr('name'), $(n[0]).attr('value')];
-            }
+          "search": {
+            show_only_matches: true
           }
         })
         .bind('select_node.jstree', function(e, data){
+            if ($(this).hasClass('leaf')){
+                var node = data.args[0];
+                var children = data.inst._get_children(node);
+                if (children.length>0){
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;               
+                }
+            }
             var li = data.inst.get_selected();
-            $(this).prev().children(".filter-option").text(li[0].getAttribute('label'));
-            $(this).prev().prev().val(li[0].value);
+            $(this).parent().prev().children(".filter-option").text(li[0].getAttribute('label'));
+            $(this).parent().prev().prev().val(li[0].value);
         });
         tree_input.addClass('rended');
       })
@@ -82,6 +89,15 @@ $(".admin-m2m-tree.dropdown-menu").click(function (e) {
     e.preventDefault();
     e.stopPropagation();
     return false;
+});
+
+$('#jstree-search').click(function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+});
+$('#jstree-search').keyup(function (e) {
+    $(".admin-fk-tree,.admin-m2m-tree").jstree("search",$(this).val());
 });
 
 })(jQuery)

@@ -40,24 +40,31 @@ class TreeSelect(object):
 
     def render(self, name, value, attrs=None, choices=()):
         if value is None: value = []
-        if attrs:
-            attrs['class'] = attrs.get('class', '') + ' %s dropdown-menu open'%self.base_css
+        if self.base_css=='admin-fk-tree-leaf':
+            _base_css = "admin-fk-tree leaf"
         else:
-            attrs['class'] = '%s dropdown-menu open'%self.base_css
+            _base_css = self.base_css
+        if attrs:
+            attrs['class'] = attrs.get('class', '') + ' %s open'%_base_css
+        else:
+            attrs['class'] = '%s open'%_base_css
 
         final_attrs = self.build_attrs(attrs, name=name)
         label_list = []
-        output = [u'<div%s role="combobox">' % dutils.flatatt(final_attrs)]
+        output = [u'<div class="dropdown-menu jstree-container"><input type="search" placeholder="Search" id="jstree-search"></input><div%s role="combobox">' % dutils.flatatt(final_attrs)]
         # Normalize to strings
         if self.base_css=='admin-m2m-tree':
             str_values = set([force_unicode(v) for v in value])
         else:
-            str_values = [force_unicode(value)]
+            if value:
+                str_values = [force_unicode(value)]
+            else:
+                str_values = []
         self.fill_output(output, self.choices, str_values, label_list)
         raw_str = ''
         if self.base_css=='admin-fk-tree':
             raw_str = '<input type="hidden" id="id_%s" name="%s" value="%s"></input>'%(name, name,str_values and str_values.pop() or '')
-        output.append(u'</div>')
+        output.append(u'</div></div>')
 
         wapper = '''
 <div class="dropdown">%s
@@ -74,6 +81,10 @@ class TreeCheckboxSelect(TreeSelect, forms.CheckboxSelectMultiple):
 
 class TreeRadioSelect(TreeSelect, forms.RadioSelect):
     base_css = 'admin-fk-tree'
+    pass
+
+class TreeRadioSelectLeaf(TreeSelect, forms.RadioSelect):
+    base_css = 'admin-fk-tree-leaf'
     pass
 
 class ModelTreeIterator(object):
@@ -122,12 +133,15 @@ class ModelTreeChoiceFieldFK(forms.ModelChoiceField):
         return ModelTreeIterator(self)
     choices = property(_get_choices, forms.ChoiceField._set_choices)
 
+class ModelTreeChoiceFieldFKLeaf(ModelTreeChoiceFieldFK):
+    widget = TreeRadioSelectLeaf
+
 class M2MTreePlugin(BasePlugin):
 
     def init_request(self, *args, **kwargs):
         self.include_m2m_tree = False
         return hasattr(self.admin_view, 'style_fields') and \
-            ('m2m_tree' in self.admin_view.style_fields.values() or 'fk_tree' in self.admin_view.style_fields.values())
+            ('m2m_tree' in self.admin_view.style_fields.values() or 'fk_tree' in self.admin_view.style_fields.values() or 'fk_tree_leaf' in self.admin_view.style_fields.values())
 
     def get_field_style(self, attrs, db_field, style, **kwargs):
         if style == 'm2m_tree' and isinstance(db_field, ManyToManyField):
@@ -136,6 +150,9 @@ class M2MTreePlugin(BasePlugin):
         if style == 'fk_tree' and isinstance(db_field, ForeignKey):
             self.include_m2m_tree = True
             return {'form_class': ModelTreeChoiceFieldFK, 'help_text': None}
+        if style == 'fk_tree_leaf' and isinstance(db_field, ForeignKey):
+            self.include_m2m_tree = True
+            return {'form_class': ModelTreeChoiceFieldFKLeaf, 'help_text': None}
         return attrs
 
     def get_media(self, media):
