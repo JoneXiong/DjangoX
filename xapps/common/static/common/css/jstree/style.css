@@ -96,3 +96,7 @@
 .jstree-classic a.jstree-search {
     color: #3c8dbc;
 }
+
+#jstree-search {
+    width: 100%;
+}
