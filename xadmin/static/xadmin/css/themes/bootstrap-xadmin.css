@@ -1,20 +1,4 @@
 
-/* results table */
-.table th {
-  background-color: #FAFAFA;
-  background-image: -moz-linear-gradient(top, white, #F2F2F2);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(white), to(#F2F2F2));
-  background-image: -webkit-linear-gradient(top, white, #F2F2F2);
-  background-image: -o-linear-gradient(top, white, #F2F2F2);
-  background-image: linear-gradient(to bottom, white, #F2F2F2);
-  background-repeat: repeat-x;
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#fff2f2f2', GradientType=0);
-  -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
-  -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
-  border-bottom-width: 1px !important;
-}
-
 /** panel **/
 .panel-default {
   border-radius: 2px;
