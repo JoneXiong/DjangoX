@@ -3,6 +3,7 @@
 from django.core.exceptions import PermissionDenied
 
 import xadmin
+from xadmin import defs
 from base import SiteView, filter_hook
 
 
@@ -12,7 +13,7 @@ class PageView(SiteView):
     
     app_label = 'xadmin'
     menu_group = '_default_group'
-    icon = 'fa fa-cog'
+    icon = defs.DEFAULT_MODEL_ICON
     order = 0
     
     hide_menu = False

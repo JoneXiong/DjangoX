@@ -22,7 +22,7 @@
     <div id="nav-panel-{{forloop.counter}}" class="list-group panel-collapse collapse in">
       {% for sitem in item.menus %}
       <a href="{{ sitem.url|default_if_none:'#' }}" class="list-group-item{% if sitem.selected %} active{% endif %}">
-        {% if sitem.icon %}<i class="fa-fw {{sitem.icon}}"></i>{%else%}<i class="fa-fw fa fa-circle-o"></i>{% endif %}
+        <i class="fa-fw {{sitem.icon}}"></i>
         {{ sitem.title }}
       </a>
       {% endfor %}

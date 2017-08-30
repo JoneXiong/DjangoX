@@ -27,8 +27,7 @@ class RpcPaginator(Paginator):
 
 class GridPage(BaseGrid,PageView):
     template = 'xadmin/views/grid.html'
-    icon = 'fa fa-circle-o'
-    
+
     list_filter = ()
     search_fields = ()
     

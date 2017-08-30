@@ -9,7 +9,7 @@ FILTER_PREFIX = '_p_'
 
 SEARCH_VAR = '_q_'
 
-DEFAULT_MODEL_ICON = 'fa fa-circle-o'
+DEFAULT_MODEL_ICON = ''
 
 DEFAULT_SITE_TITLE = u'DjangoX'
 
