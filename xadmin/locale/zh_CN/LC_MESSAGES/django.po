@@ -169,10 +169,10 @@ msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "选中了 %(total_count)s 个"
 
-#: plugins/actions.py:151
+#: plugins/actions.py:84
 #, python-format
 msgid "0 of %(cnt)s selected"
-msgstr "%(cnt)s 个中 0 个被选"
+msgstr "已选择 0 项，共%(cnt)s 项"
 
 #: plugins/actions.py:168 plugins/actions.py:178
 msgid "Items must be selected in order to perform actions on them. No items have been changed."
