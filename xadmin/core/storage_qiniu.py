@@ -21,7 +21,7 @@ try:
     import qiniu    # for v6.1.6
     from qiniu import resumable_io as rio
     from qiniu import rs as qiniu_rs
-    
+
     qiniu.conf.ACCESS_KEY = settings.QINIU_CONF['access_key']
     qiniu.conf.SECRET_KEY = settings.QINIU_CONF['secret_key']
     qiniu_bucket = settings.QINIU_CONF['bucket']
@@ -31,7 +31,7 @@ except:
 log = logging.getLogger('django.request')
 
 def upload_by_rawdata(rawdata, length):
-    
+
     policy = qiniu_rs.PutPolicy(qiniu_bucket)
     uptoken = policy.token()
     extra = rio.PutExtra(qiniu_bucket)
@@ -46,13 +46,16 @@ def upload_by_rawdata(rawdata, length):
 
 
 def save_imgs(imgs, ret_size=False):
-    import Image
+    try:
+        import Image
+    except:
+        from PIL import Image
     result = []
     for img in imgs:
         qiniu_key = upload_by_rawdata(img, len(img))
         log.info('upload stream img to qiniu, return: %s' % (qiniu_key,))
         img_width = 0
-        img_height = 0 
+        img_height = 0
         if ret_size:
             s = ''
             for c in img.chunks():
@@ -115,12 +118,22 @@ class QiniuFile(File):
             self.file.seek(0)
             self._storage._save(self._name, self.file)
         self.file.close()
-        
+
+try:
+    from django.utils.deconstruct import deconstructible
+except:
+    def deconstructible(aClass, *args):
+	return aClass(*args)
+
+@deconstructible
 class QiniuStorage(Storage):
     """
     Qiniu Storage Service
     """
     location = ""
+
+    def __eq__(self, other):
+        return True
 
     def __init__(self):
         pass
@@ -231,7 +244,7 @@ class QiniuStorage(Storage):
         full_url = urlparse.urljoin(settings.REMOTE_MEDIA_URL, name)
         log.info('>>> QiniuStorage full_url: %s'%name)
         return full_url
-    
+
     def url(self, name):
         name = self._normalize_name(self._clean_name(name))
         name = filepath_to_uri(name)
