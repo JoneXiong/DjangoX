@@ -38,6 +38,7 @@ class ResetPasswordSendView(BaseView):
                 'use_https': request.is_secure(),
                 'token_generator': self.password_reset_token_generator,
                 'email_template_name': self.password_reset_email_template,
+                'html_email_template_name': self.password_reset_email_template,
                 'request': request,
                 'domain_override': request.get_host()
             }
