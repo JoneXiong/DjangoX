@@ -16,7 +16,7 @@ from xadmin.defs import ACTION_CHECKBOX_NAME
 class DeleteSelectedAction(Action):
 
     action_name = "delete_selected"
-    verbose_name = _(u'Delete selected %(verbose_name_plural)s')
+    verbose_name = u'删除'#_(u'Delete selected %(verbose_name_plural)s')
 
     delete_confirmation_template = None
     delete_selected_confirmation_template = None
