@@ -26,6 +26,7 @@ class RelateMenuPlugin(BasePlugin):
     related_list = []
     use_related_menu = True
     use_op_menu = True
+    op_menu_btn = False
 
     @staticmethod
     def get_r_list(model):
@@ -141,11 +142,11 @@ class RelateMenuPlugin(BasePlugin):
         _model = self.admin_view.model
         links = []
         if self.has_view_perm:
-            links.append('''<a data-res-uri="%s" data-edit-uri="%s" rel="tooltip" title="%s" class="btn btn-info btn-xs details-handler" ><i class="fa fa-search-plus"></i> 查看</a>'''%(self.admin_view.get_url('detail',instance.pk),self.admin_view.get_url('change',instance.pk),escape(escape(str(instance)))))
+            links.append('''<a %s="%s" data-edit-uri="%s" rel="tooltip" title="%s" %s >%s 查看</a>'''%(self.op_menu_btn and 'data-res-uri' or 'href',self.admin_view.get_url('detail',instance.pk),self.admin_view.get_url('change',instance.pk),escape(escape(str(instance))), self.op_menu_btn and 'class="btn btn-info btn-xs details-handler"' or '', self.op_menu_btn and '<i class="fa fa-search-plus"></i>' or ''))
         if not self.admin_view.pop and self.has_change_perm:
-            links.append('''<a href="%s" class="btn btn-success btn-xs" ><i class="fa fa-edit"></i> 修改</a>'''%self.admin_view.get_url('change',instance.pk))
+            links.append('''<a href="%s" %s >%s 修改</a>'''%(self.admin_view.get_url('change',instance.pk), self.op_menu_btn and 'class="btn btn-success btn-xs"' or '', self.op_menu_btn and '<i class="fa fa-edit"></i>' or ''))
         if not self.admin_view.pop and self.has_delete_perm:
-            links.append('''<a href="%s" class="btn btn-danger btn-xs" ><i class="fa fa-trash"></i> 删除</a>'''%self.admin_view.get_url('delete',instance.pk))
+            links.append('''<a href="%s" %s >%s 删除</a>'''%(self.admin_view.get_url('delete',instance.pk), self.op_menu_btn and 'class="btn btn-danger btn-xs"' or '', self.op_menu_btn and '<i class="fa fa-trash"></i>' or ''))
         return ' '.join(links)
     op_link.short_description = '&nbsp;'
     op_link.allow_tags = True
