@@ -1,75 +1,62 @@
-{% load xadmin_tags %}{% load i18n %}<!DOCTYPE html>
-<html lang="zh_CN">
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
-  {% block extrameta %}
-  <meta name="description" content="" />
-  <meta name="author" content="" />
-  {% endblock %}
-  {% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
-  <title>{% block title %}{% endblock %}</title>
-  {% vendor 'bootstrap.css' %}
+{% extends 'xadmin/base.html' %}
+{% load i18n xadmin_tags %}
 
-  {% if ext_ui %}
-  <link rel="stylesheet" type="text/css" href="{% static "adminlte/dist/css/AdminLTE.css" %}" />
-  <link rel="stylesheet" type="text/css" href="{% static "adminlte/dist/css/skins/_all-skins.min.css" %}" />
-  {% endif %}
 
-  <link rel="stylesheet" type="text/css" href="{% static "xadmin/css/themes/bootstrap-xadmin.css" %}" />
+{% block title %}{{ title }} | {{ site_title }}{% endblock %}
 
-  {% vendor 'font-awesome.css' 'xadmin.main.css' 'xadmin.plugins.css' 'xadmin.responsive.css' %}
-  {{ media.css }}
-  {% block extrastyle %}{% endblock %}
-  {% vendor 'jquery.js' %}
-  {% url 'xadmin:index' as indexurl %}
-  <script type="text/javascript">
-    window.__admin_media_prefix__ = "{% filter escapejs %}{% static "xadmin/" %}{% endfilter %}";
-    window.__admin_path_prefix__ = "{% filter escapejs %}{{ indexurl }}{% endfilter %}";
-  </script>
-  <script type="text/javascript" src="{% url 'xadmin:jsi18n' %}"></script>
-  {% block extrahead %}{% endblock %}
-  {% view_block 'extrahead' %}
-</head>
-<body class="{% if ext_ui %}skin-blue sidebar-mini {% endif %}{% block bodyclass %}{% endblock %}">
+{% block body %}
+<div class="wrapper">
 
+      <!-- content nav -->
       {% block content-nav %}
       <div class="navbar content-navbar navbar-default navbar-xs" data-toggle="breakpoint"
         data-class-xs="navbar content-navbar navbar-inverse navbar-xs"
         data-class-sm="navbar content-navbar navbar-default navbar-xs">
+
         <div class="navbar-header">
           {% view_block 'nav_toggles' %}
           {% block nav_toggles %}
           {% include "xadmin/includes/toggle_back.html" %}
           {% endblock %}
 
-          <a class="navbar-brand" data-toggle="collapse" data-target="#top-nav .navbar-collapse">
-            {% block nav_title %}{% endblock %}
-          </a>
         </div>
+
         <div class="navbar-collapse collapse">
-          <ul class="nav navbar-nav">
-            {% view_block 'nav_menu' %}
-          </ul>
-          {% view_block 'nav_form' %}
-          {% block nav_form %}{% endblock %}
-          <div class="navbar-btn navbar-right hide-xs">
+          <div class="navbar-btn navbar-left hide-xs">
             {% view_block 'nav_btns' %}
             {% block nav_btns %}{% endblock %}
+          </div>
+
+          {% block nav_form %}{% endblock %}
+          <!-- 搜索框 -->
+          {% view_block 'nav_form' %}
+
+          <!-- 过滤器 -->
+          <div class="navbar-right">
+            {% view_block 'nav_menu' %}
           </div>
         </div>
       </div>
       {% endblock %}
-	
-  {% block content %}{% endblock %}
 
-  {% vendor 'jquery-ui-sortable.js' 'bootstrap.js' 'xadmin.main.js' 'xadmin.responsive.js' %}
+      <!-- messages -->
+      {% block messages %}
+      {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-dismissable{% if message.tags %} {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}{% endif %}">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          {{ message }}
+        </div>
+        {% endfor %}
+      {% endif %}
+      {% endblock messages %}
 
-  {% if ext_ui %}
-  <script src="{% static "adminlte/dist/js/app.min.js" %}"></script>
-  {% endif %}
+      <!-- content -->
+      {% block content %}
+      {{ content }}
+      {% endblock %}
 
-  {{ media.js }}
-  {% block extrabody %}{% endblock %}
-  {% view_block 'extrabody' %}
-</body>
-</html>
+
+</div>
+{% endblock body %}
+
