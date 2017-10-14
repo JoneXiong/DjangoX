@@ -1,5 +1,6 @@
-<div class="box {% block box_class %}{% endblock box_class %}" {% block box_attrs %}{% endblock box_attrs %}>
+<div class="box {% if not legend %}box-solid{% endif %} {% block box_class %}{% endblock box_class %}" {% block box_attrs %}{% endblock box_attrs %}>
 {% block box_header %}
+{% if legend %}
   <div class="box-header">
       <h3 class="panel-title">{% block box_title %}{% endblock box_title %}</h3>
     <div class="box-tools pull-right">
@@ -7,6 +8,7 @@
       <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-chevron-up chevron"></i></button>
     </div>
   </div>
+{% endif %}
 {% endblock box_header %}
   <div class="box-body {% block box_content_class %}{% endblock box_content_class %}" {% block box_content_attrs %}{% endblock box_content_attrs %}>
     {% block box_content %}{% endblock box_content %}
