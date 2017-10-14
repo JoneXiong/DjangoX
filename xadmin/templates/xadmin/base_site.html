@@ -54,27 +54,39 @@
       <div class="navbar content-navbar navbar-default navbar-xs" data-toggle="breakpoint"
         data-class-xs="navbar content-navbar navbar-inverse navbar-xs"
         data-class-sm="navbar content-navbar navbar-default navbar-xs">
+
         <div class="navbar-header">
           {% view_block 'nav_toggles' %}
           {% block nav_toggles %}
           {% include "xadmin/includes/toggle_back.html" %}
           {% endblock %}
 
-          <a class="navbar-brand" data-toggle="collapse" data-target="#top-nav .navbar-collapse">
-            {% block nav_title %}{% endblock %}
-          </a>
         </div>
-        <div class="navbar-collapse collapse">
-          <ul class="nav navbar-nav">
-            {% view_block 'nav_menu' %}
-          </ul>
-          {% view_block 'nav_form' %}
-          {% block nav_form %}{% endblock %}
-          <div class="navbar-btn navbar-right hide-xs">
+
+      <div class="row navbar-btn">
+
+          <div class="col-sm-4">
             {% view_block 'nav_btns' %}
             {% block nav_btns %}{% endblock %}
           </div>
-        </div>
+
+          <div class="col-sm-4">
+            {% block nav_middle %}{% endblock %}
+          </div>
+
+          <div class="col-sm-4">
+          {% block nav_form %}{% endblock %}
+          <!-- 搜索框 -->
+          {% view_block 'nav_form' %}
+
+          <!-- 过滤器 -->
+          <div class="navbar-right">
+            {% view_block 'nav_menu' %}
+          </div>
+          </div>
+
+      </div>
+
       </div>
       {% endblock %}
 
