@@ -56,7 +56,10 @@ class PageView(SiteView):
                         'title': self.verbose_name or self.__class__.__bases__ [0].__name__,
                         })
         if self.pop:
-            context['base_template'] = 'xadmin/base_pure.html'
+            if self.admin_site.ext_ui:
+                context['base_template'] = 'xadmin/base_pure_ext.html'
+            else:
+                context['base_template'] = 'xadmin/base_pure.html'
         return context
     
     @classmethod 

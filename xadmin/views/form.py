@@ -171,9 +171,12 @@ class FormView(SiteView):
             'has_file_field': self._has_file_field,
         })
         if self.pop:
-            context['base_template'] = 'xadmin/base_pure.html'
+            if self.admin_site.ext_ui:
+                context['base_template'] = 'xadmin/base_pure_ext.html'
+            else:
+                context['base_template'] = 'xadmin/base_pure.html'
         return context
-    
+
     def get_nav_btns(self):
         return []
 
