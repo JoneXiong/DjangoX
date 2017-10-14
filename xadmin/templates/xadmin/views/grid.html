@@ -39,6 +39,55 @@
 {% endif %}
 {% endblock nav_btns %}
 
+{% block nav_middle %}
+  {% view_block 'results_bottom' %}
+{% endblock %}
+
+
+{% block nav_form %}
+  <div class="btn-toolbar pull-right clearfix">
+    {% view_block 'top_toolbar' %}
+
+	{% if cl.col_ctrl %}
+    <div class="btn-group" title="设置显示列">
+      <a class="dropdown-toggle btn btn-default btn-sm" data-toggle="dropdown" href="#">
+        <i class="fa fa-cog"></i> </span>
+      </a>
+      <ul class="dropdown-menu model_fields pull-right" role="menu" aria-labelledby="dLabel">
+        <li><a href="{{clean_select_field_url}}"><i class="fa fa-refresh"></i> 恢复显示列</a></li>
+        <li class="divider"></li>
+        {% for f, selected, flink in model_fields %}
+        <li><a href="{{flink}}">
+          {% if selected %}<i class="fa fa-check"></i>{% else %}<i class="fa fa-blank"></i>{% endif %}
+          {{f.verbose_name}}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+	{% endif %}
+<!--
+    {% block toolbar_layouts %}
+    <div class="btn-group layout-btns" data-toggle="buttons">
+      <label class="btn btn-default btn-sm layout-normal active">
+        <input type="radio"> <i class="fa fa-th-large"></i>
+      </label>
+      <label class="btn btn-default btn-sm layout-condensed">
+        <input type="radio"> <i class="fa fa-th"></i>
+      </label>
+      {% view_block 'top_layout_btns' %}
+    </div>
+    {% endblock toolbar_layouts %}
+
+    {% block toolbar_fullscreen %}
+    <div class="btn-group layout-btns" data-toggle="buttons-checkbox">
+      <button type="button" class="btn btn-default btn-sm layout-full"><i class="fa fa-expand"></i></button>
+      {% view_block 'top_check_btns' %}
+    </div>
+    {% endblock toolbar_fullscreen %}
+-->
+    {% view_block 'top_btns' %}
+  </div>
+{% endblock %}
+
 {% block content %}
 
 {% if cl.filter_grid_left %}
@@ -59,60 +108,16 @@
 </ul>
 {% endif %}
 
-{% if ext_ui %}
-<div class="box">
-    <div class="box-header">
-{% endif %}
 
-  <div class="content-toolbar btn-toolbar pull-right clearfix">
-    {% view_block 'top_toolbar' %}
-	{% if cl.col_ctrl %}
-    <div class="btn-group">
-      <a class="dropdown-toggle btn btn-default btn-sm" data-toggle="dropdown" href="#">
-        <i class="fa fa-list-alt"></i> 显示列 <span class="caret"></span>
-      </a>
-      <ul class="dropdown-menu model_fields pull-right" role="menu" aria-labelledby="dLabel">
-        <li><a href="{{clean_select_field_url}}"><i class="fa fa-refresh"></i> 恢复显示列</a></li>
-        <li class="divider"></li>
-        {% for f, selected, flink in model_fields %}
-        <li><a href="{{flink}}">
-          {% if selected %}<i class="fa fa-check"></i>{% else %}<i class="fa fa-blank"></i>{% endif %}
-          {{f.verbose_name}}</a></li>
-        {% endfor %}
-      </ul>
-    </div>
-	{% endif %}
-    {% block toolbar_layouts %}
-    <div class="btn-group layout-btns" data-toggle="buttons">
-      <label class="btn btn-default btn-sm layout-normal active">
-        <input type="radio"> <i class="fa fa-th-large"></i>
-      </label>
-      <label class="btn btn-default btn-sm layout-condensed">
-        <input type="radio"> <i class="fa fa-th"></i>
-      </label>
-      {% view_block 'top_layout_btns' %}
-    </div>
-    {% endblock toolbar_layouts %}
-    {% block toolbar_fullscreen %}
-    <div class="btn-group layout-btns" data-toggle="buttons-checkbox">
-      <button type="button" class="btn btn-default btn-sm layout-full"><i class="fa fa-expand"></i></button>
-      {% view_block 'top_check_btns' %}
-    </div>
-    {% endblock toolbar_fullscreen %}
-    {% view_block 'top_btns' %}
-  </div>
 
-  <ul class="pagination pagination-sm pagination-left pagination-inline">
-    {% view_block 'pagination' 'small' %}
-  </ul>
 
-{% if ext_ui %}
- </div>
-{% endif %}
+
+
+
   
   <form id="changelist-form" action="" method="post"{% view_block 'result_list_form' %}>{% csrf_token %}
   {% view_block 'results_top' %}
-  <div class="results table-responsive{% if ext_ui %} box-body no-padding{% endif %}">
+  <div class="results table-responsive">
   {% if results %}
   {% block results_grid %}
   <table class="table table-bordered table-striped table-hover">
@@ -184,12 +189,20 @@
     <p class="well">无数据</p>
   {% endif %}
   </div>
+
+  <input type="hidden" id="action" name="action" value=""/>
+  <input type="hidden" id="select-across" name="select_across" value=""/>
+
+{% if not ext_ui %}
+<div class="form-actions well well-sm">
   {% view_block 'results_bottom' %}
+</div>
+{% endif %}
   </form>
 
 {% if ext_ui %}
  <div class="box-footer">
-  <ul class="pagination pagination-sm no-margin">
+  <ul class="pagination pagination-sm no-margin pull-right">
     {% view_block 'pagination' 'small' %}
   </ul>
  </div>
