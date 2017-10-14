@@ -83,8 +83,8 @@ class ActionPlugin(BasePlugin):
             new_context = {
                 'selection_note': _('0 of %(cnt)s selected') % {'cnt': len(av.result_list)},
                 'selection_note_all': selection_note_all % {'total_count': av.result_count},
-                'action_choices': m_action_choices[:5],
-                'action_choices_more': len(m_action_choices)>5 and m_action_choices[5:] or [],
+                'action_choices': m_action_choices[:3],
+                'action_choices_more': len(m_action_choices)>3 and m_action_choices[3:] or [],
             }
             context.update(new_context)
         return context
