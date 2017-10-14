@@ -19,7 +19,7 @@
           {% for sitem in item.menus %}
           <li{% if sitem.selected %} class="active"{% endif %}>
             {% if sitem.url %}<a href="{{ sitem.url }}">{% endif %}
-            {% if sitem.icon %}<i class="fa fa-fw {{sitem.icon}}"></i>{%else%}<i class="fa fa-fw fa-circle-o"></i>{% endif %}
+            {% if sitem.icon %}<i class="fa fa-fw {{sitem.icon}}"></i>{%else%}<i class=""></i>{% endif %}
             {{ sitem.title }}</span>{% if sitem.url %}</a>{% endif %}
           </li>
           {% endfor %}
