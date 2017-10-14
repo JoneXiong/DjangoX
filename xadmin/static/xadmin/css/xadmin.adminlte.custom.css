@@ -16,3 +16,10 @@
 .sidebar-menu > li > a i {
     margin-right: 6px;
 }
+
+.text-of {
+  text-overflow: ellipsis;
+  width: 50%;
+  white-space: nowrap;
+  overflow: hidden;
+}
