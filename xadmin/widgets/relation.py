@@ -121,7 +121,7 @@ class RawIdWidget(forms.TextInput):
             <div class="input-group %s">
                 %s
                 <span class="input-group-btn vertical-top">
-                    <a href="%s%s" class="btn btn-primary related-lookup" id="lookup_id_%s" onclick="return showRelatedObjectLookupPopup(this);"><i class="fa fa-search"></i></a>
+                    <a href="%s%s" class="btn btn-primary related-lookup spa-expect-links" id="lookup_id_%s" onclick="return showRelatedObjectLookupPopup(this);"><i class="fa fa-search"></i></a>
                     <a href="javascript://" class="btn btn-default related-lookup" id="remove_id_%s"  onclick="return removeRelatedObject(this);" ><i class="fa fa-remove"></i></a>
                 </span>
             </div>
