@@ -179,7 +179,7 @@
           this.$btn.attr('title') +'</h3></div><div class="modal-body"></div>'+
           '<div class="modal-footer" style="display: none;"><button class="btn btn-default" data-dismiss="modal" aria-hidden="true">'+gettext('Close')+'</button>'+
           '<a class="btn btn-primary btn-submit">'+gettext('Add')+'</a></div></div></div></div>')
-        $('body').append(modal)
+        $('body').append(modal);//$(window.top.document.body).append(modal);
 
         var self = this
         modal.find('.modal-body').html('<h2 style="text-align:center;"><i class="fa-spinner fa-spin fa fa-large"></i></h2>')
@@ -194,9 +194,29 @@
 
           self.$form = form
         })
-        this.modal = modal
+        this.modal = modal;
+        this.modal.on('show.bs.modal', function () {
+            var $body = $(window.top.document.body);
+            var target = $body.find("#backdropId");
+            if (target.length==0){
+                $body.append("<div id='backdropId' class='modal-backdrop fade in' cnt='0'></div>");
+                target = $body.find("#backdropId");
+            }
+            target.show();
+            target.attr('cnt', parseInt(target.attr('cnt'))+1 );
+        });
+        this.modal.on('hide.bs.modal', function () {
+            var $body = $(window.top.document.body);
+            var target = $body.find("#backdropId");
+            if (target){
+                var cnt = parseInt(target.attr('cnt'));
+                target.attr('cnt',cnt-1);
+                if (cnt<2)target.hide();       
+            }
+        });
       }
-      this.modal.modal();
+      this.modal.modal({backdrop:false});
+      
 
       return false
     }
