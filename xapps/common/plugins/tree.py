@@ -5,7 +5,7 @@ import xadmin
 from django import forms
 from django.db.models import ManyToManyField, ForeignKey
 #from django.forms.util import flatatt
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 from xadmin.views import BasePlugin, ModelFormAdminView
@@ -17,8 +17,8 @@ class TreeSelect(object):
         if len(choices):
             output.append(u'<ul>')
             for (option_value, option_label, children) in choices:
-                option_value = force_unicode(option_value)
-                option_label = conditional_escape(force_unicode(option_label))
+                option_value = force_text(option_value)
+                option_label = conditional_escape(force_text(option_label))
 
                 children_output = []
                 self.fill_output(children_output, children, str_values, label_list)
@@ -54,10 +54,10 @@ class TreeSelect(object):
         output = [u'<div class="dropdown-menu jstree-container"><input type="search" placeholder="Search" id="jstree-search"></input><div%s role="combobox">' % dutils.flatatt(final_attrs)]
         # Normalize to strings
         if self.base_css=='admin-m2m-tree':
-            str_values = set([force_unicode(v) for v in value])
+            str_values = set([force_text(v) for v in value])
         else:
             if value:
-                str_values = [force_unicode(value)]
+                str_values = [force_text(value)]
             else:
                 str_values = []
         self.fill_output(output, self.choices, str_values, label_list)

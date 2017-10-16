@@ -6,7 +6,7 @@ from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.core.paginator import InvalidPage
 from django.http import HttpResponseRedirect
 
-from base import inclusion_tag, filter_hook, csrf_protect_m
+from .base import inclusion_tag, filter_hook, csrf_protect_m
 from xadmin.defs import ALL_VAR, DOT
 from xadmin import defs
 from xadmin.core.structs import SortedDict

@@ -23,7 +23,7 @@ from django.views.generic import View
 
 from ..util import static, json, vendor, sortkeypicker
 from .. import defs
-from structs import filter_hook
+from .structs import filter_hook
 from ..dutils import JSONEncoder
 
 

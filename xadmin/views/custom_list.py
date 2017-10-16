@@ -8,12 +8,12 @@ from django.utils.safestring import mark_safe
 from django.template import loader
 
 import xadmin
-from base import filter_hook
-from list import ResultRow, ResultHeader, COL_LIST_VAR, ResultItem
+from .base import filter_hook
+from .list import ResultRow, ResultHeader, COL_LIST_VAR, ResultItem
 from xadmin.db.query import Collection
-from grid import BaseGrid
+from .grid import BaseGrid
 
-from custom_page import PageView
+from .custom_page import PageView
 
 class RpcPaginator(Paginator):
 

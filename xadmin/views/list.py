@@ -3,7 +3,7 @@
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.paginator import Paginator
 from django.db import models
-from django.utils.encoding import force_unicode, smart_unicode
+from django.utils.encoding import force_text, smart_text
 from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
@@ -13,10 +13,10 @@ from django.utils.text import Truncator
 from xadmin.util import lookup_field, display_for_field, label_for_field, boolean_icon
 from xadmin.defs import TO_FIELD_VAR, ALL_VAR, ORDER_VAR, PAGE_VAR, COL_LIST_VAR, ERROR_FLAG, SEARCH_VAR, EMPTY_CHANGELIST_VALUE
 
-from base import filter_hook, csrf_protect_m
-from model_page import ModelPage
-from common import FakeMethodField, ResultRow, ResultItem, ResultHeader
-from grid import BaseGrid
+from .base import filter_hook, csrf_protect_m
+from .model_page import ModelPage
+from .common import FakeMethodField, ResultRow, ResultItem, ResultHeader
+from .grid import BaseGrid
 
 
 class ListAdminView(BaseGrid,ModelPage):
@@ -235,14 +235,14 @@ class ListAdminView(BaseGrid,ModelPage):
         if hasattr(self, 'verbose_name'):
             self.opts.verbose_name = self.verbose_name
             self.opts.verbose_name_plural = self.verbose_name
-        self.title = _('%s') % force_unicode(self.opts.verbose_name)
+        self.title = _('%s') % force_text(self.opts.verbose_name)
 
         # 获取所有可供显示的列的信息
         model_fields = [(f, f.name in self.list_display, self.get_check_field_url(f))
                         for f in (list(self.opts.fields) + self.get_model_method_fields()) if f.name not in self.list_exclude]
 
         new_context = {
-            'module_name': force_unicode(self.opts.verbose_name_plural),
+            'module_name': force_text(self.opts.verbose_name_plural),
             'title': self.title,
             'cl': self,
             'model_fields': self.get_model_fields(),
@@ -413,7 +413,7 @@ class ListAdminView(BaseGrid,ModelPage):
                     item.allow_tags = True
                     item.text = boolean_icon(value)
                 else:
-                    item.text = smart_unicode(value)
+                    item.text = smart_text(value)
             else:
                 # 处理关联咧
                 if isinstance(f.rel, models.ManyToOneRel):

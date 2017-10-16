@@ -13,8 +13,8 @@ from django.contrib.auth.models import Permission
 from django.db.models.base import ModelBase
 from django.utils import six
 
-from dutils import JSONEncoder
-from manager import ModelManager
+from .dutils import JSONEncoder
+from .manager import ModelManager
 
 
 AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')

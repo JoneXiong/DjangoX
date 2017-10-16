@@ -2,13 +2,13 @@
 
 from django.core.exceptions import PermissionDenied
 from django.db import router
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.template.response import TemplateResponse
 from django.utils.translation import ugettext as _
 from django.utils.encoding import force_text
 from django.contrib.contenttypes.models import ContentType
 
-from base import filter_hook
+from .base import filter_hook
 from xadmin.views.action import Action
 from xadmin.util import get_deleted_objects, model_ngettext
 from xadmin.defs import ACTION_CHECKBOX_NAME
@@ -61,9 +61,9 @@ class DeleteSelectedAction(Action):
             return None
         # GET请求 删除确认页面
         if len(queryset) == 1:
-            objects_name = force_unicode(self.opts.verbose_name)
+            objects_name = force_text(self.opts.verbose_name)
         else:
-            objects_name = force_unicode(self.opts.verbose_name_plural)
+            objects_name = force_text(self.opts.verbose_name_plural)
 
         if perms_needed or protected:
             title = _("Cannot delete %(name)s") % {"name": objects_name}

@@ -1,11 +1,11 @@
 # coding=utf-8
 
 from django.core.paginator import Paginator
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 
-from base import SiteView, filter_hook
+from .base import SiteView, filter_hook
 
 class ModelPage(SiteView):
     """
@@ -37,7 +37,7 @@ class ModelPage(SiteView):
             "opts": self.opts,
             "app_label": self.app_label,
             "module_name": self.module_name,
-            "verbose_name": force_unicode(self.opts.verbose_name),
+            "verbose_name": force_text(self.opts.verbose_name),
             'model_icon': self.get_model_icon(self.model),
         }
         context = super(ModelAdminView, self).get_context()

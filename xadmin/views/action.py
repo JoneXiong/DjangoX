@@ -6,8 +6,8 @@ from django.template.response import TemplateResponse
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse
 
-from base import filter_hook
-from model_page import ModelAdminView
+from .base import filter_hook
+from .model_page import ModelAdminView
 from xadmin.layout import FormHelper, Layout, Fieldset, TabHolder, Container, Column, Col, Field
 from xadmin.defs import ACTION_CHECKBOX_NAME
 

@@ -8,7 +8,7 @@ from django.db import models, transaction
 from django.forms.models import modelform_factory
 from django.http import Http404, HttpResponseRedirect
 from django.template.response import TemplateResponse
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.utils.html import escape
 from django.template import loader
 from django.utils.translation import ugettext as _
@@ -23,8 +23,8 @@ from xadmin.util import unquote
 from xadmin.views.detail import DetailAdminUtil
 from xadmin import dutils
 
-from base import filter_hook, csrf_protect_m
-from model_page import ModelAdminView
+from .base import filter_hook, csrf_protect_m
+from .model_page import ModelAdminView
 
 #在显示 Form 时，系统默认的 DBField 对应的 FormField的属性。
 FORMFIELD_FOR_DBFIELD_DEFAULTS = {
@@ -420,7 +420,7 @@ class ModelFormAdminView(ModelAdminView):
             self.save_forms()
             
             ret = self.save_models()
-            if isinstance(ret, basestring):
+            if isinstance(ret, str):
                 self.message_user(ret,'error')
                 return self.get_response()
             if isinstance(ret, HttpResponse):
@@ -429,7 +429,7 @@ class ModelFormAdminView(ModelAdminView):
             self.save_related()
             self.after_save()
             response = self.post_response()
-            if isinstance(response, basestring):
+            if isinstance(response, str):
                 return HttpResponseRedirect(response)
             else:
                 return response
@@ -559,7 +559,7 @@ class CreateAdminView(ModelFormAdminView):
             ``title`` : 表单标题
         """
         new_context = {
-            'title': _('Add %s') % force_unicode(self.opts.verbose_name),
+            'title': _('Add %s') % force_text(self.opts.verbose_name),
         }
         context = super(CreateAdminView, self).get_context()
         context.update(new_context)
@@ -568,7 +568,7 @@ class CreateAdminView(ModelFormAdminView):
     @filter_hook
     def get_breadcrumb(self):
         bcs = super(ModelFormAdminView, self).get_breadcrumb()
-        item = {'title': _('Add %s') % force_unicode(self.opts.verbose_name)}
+        item = {'title': _('Add %s') % force_text(self.opts.verbose_name)}
         if self.has_add_permission():
             item['url'] = self.model_admin_url('add')
         bcs.append(item)
@@ -595,8 +595,8 @@ class CreateAdminView(ModelFormAdminView):
         request = self.request
 
         msg = _(
-            'The %(name)s "%(obj)s" was added successfully.') % {'name': force_unicode(self.opts.verbose_name),
-                                                                 'obj': "<a class='alert-link' href='%s'>%s</a>" % (self.model_admin_url('change', self.new_obj._get_pk_val()), force_unicode(self.new_obj))}
+            'The %(name)s "%(obj)s" was added successfully.') % {'name': force_text(self.opts.verbose_name),
+                                                                 'obj': "<a class='alert-link' href='%s'>%s</a>" % (self.model_admin_url('change', self.new_obj._get_pk_val()), force_text(self.new_obj))}
         
         param_list = self.param_list()
         if "_continue" in param_list:
@@ -606,7 +606,7 @@ class CreateAdminView(ModelFormAdminView):
             return self.model_admin_url('change', self.new_obj._get_pk_val())
 
         if "_addanother" in param_list:
-            self.message_user(msg + ' ' + (_("You may add another %s below.") % force_unicode(self.opts.verbose_name)), 'success')
+            self.message_user(msg + ' ' + (_("You may add another %s below.") % force_text(self.opts.verbose_name)), 'success')
             # 返回添加页面添加另外一个
             return request.path
         else:
@@ -666,7 +666,7 @@ class UpdateAdminView(ModelFormAdminView):
 
         if self.org_obj is None:
             raise Http404(_('%(name)s object with primary key %(key)r does not exist.') %
-                          {'name': force_unicode(self.opts.verbose_name), 'key': escape(object_id)})
+                          {'name': force_text(self.opts.verbose_name), 'key': escape(object_id)})
 
         # comm method for both get and post
         self.prepare_form()
@@ -692,7 +692,7 @@ class UpdateAdminView(ModelFormAdminView):
             ``object_id`` : 修改的数据对象的 id
         """
         new_context = {
-            'title': _('Change %s') % force_unicode(self.org_obj),
+            'title': _('Change %s') % force_text(self.org_obj),
             'object_id': str(self.org_obj.pk),
             'cl': self
         }
@@ -704,7 +704,7 @@ class UpdateAdminView(ModelFormAdminView):
     def get_breadcrumb(self):
         bcs = super(ModelFormAdminView, self).get_breadcrumb()
 
-        item = {'title': force_unicode(self.org_obj)}
+        item = {'title': force_text(self.org_obj)}
         if self.has_change_permission():
             item['url'] = self.model_admin_url('change', self.org_obj.pk)
         bcs.append(item)
@@ -739,7 +739,7 @@ class UpdateAdminView(ModelFormAdminView):
         pk_value = obj._get_pk_val()
 
         msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name':
-                                                                       force_unicode(verbose_name), 'obj': force_unicode(obj)}
+                                                                       force_text(verbose_name), 'obj': force_text(obj)}
         param_list = self.param_list()
         if "_continue" in param_list:
             self.message_user(
@@ -748,7 +748,7 @@ class UpdateAdminView(ModelFormAdminView):
             return request.path
         elif "_addanother" in param_list:
             self.message_user(msg + ' ' + (_("You may add another %s below.")
-                              % force_unicode(verbose_name)), 'success')
+                              % force_text(verbose_name)), 'success')
             return self.model_admin_url('add')
         else:
             self.message_user(msg, 'success')

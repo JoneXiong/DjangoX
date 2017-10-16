@@ -3,10 +3,10 @@
 import json
 
 import xadmin
-from base import filter_hook
-from form import FormView
+from .base import filter_hook
+from .form import FormView
 
-from custom_page import PageView
+from .custom_page import PageView
 from xadmin import options
 from xadmin.dutils import JSONEncoder
 

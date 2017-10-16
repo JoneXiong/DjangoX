@@ -12,8 +12,8 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate
 
-from base import BaseView, filter_hook, SiteView
-from dashboard import Dashboard
+from .base import BaseView, filter_hook, SiteView
+from .dashboard import Dashboard
 from xadmin.models import UserSettings
 from xadmin.layout import FormHelper
 from xadmin import defs

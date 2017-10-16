@@ -5,7 +5,7 @@ import decimal
 
 import django
 from django.core.serializers.json import DjangoJSONEncoder
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 from django.db.models.base import ModelBase
 from django.template import loader
 from django.template.context import RequestContext
@@ -25,7 +25,7 @@ class JSONEncoder(DjangoJSONEncoder):
             try:
                 return super(JSONEncoder, self).default(o)
             except Exception:
-                return smart_unicode(o)
+                return smart_text(o)
             
 if django.VERSION[1] >= 8:
     from django.db.models.fields.related import ForeignObjectRel

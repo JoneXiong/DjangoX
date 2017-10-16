@@ -9,7 +9,7 @@ from django.forms.models import modelform_factory
 from django.http import Http404
 from django.template import loader
 from django.template.response import TemplateResponse
-from django.utils.encoding import force_unicode, smart_unicode
+from django.utils.encoding import force_text, smart_text
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
@@ -20,8 +20,8 @@ from xadmin.layout import FormHelper, Layout, Fieldset, Container, Column, Field
 from xadmin.util import unquote, lookup_field, display_for_field, boolean_icon, label_for_field
 from xadmin.defs import EMPTY_CHANGELIST_VALUE
 
-from base import filter_hook, csrf_protect_m
-from model_page import ModelAdminView
+from .base import filter_hook, csrf_protect_m
+from .model_page import ModelAdminView
 
 
 class ShowField(Field):
@@ -94,7 +94,7 @@ class ResultField(object):
                     self.allow_tags = True
                     self.text = boolean_icon(value)
                 else:
-                    self.text = smart_unicode(value)
+                    self.text = smart_text(value)
             else:
                 if isinstance(f.rel, models.ManyToOneRel):
                     self.text = getattr(self.obj, f.name)
@@ -108,7 +108,7 @@ class ResultField(object):
     def val(self):
         text = mark_safe(
             self.text) if self.allow_tags else conditional_escape(self.text)
-        if force_unicode(text) == '' or text == 'None' or text == EMPTY_CHANGELIST_VALUE:
+        if force_text(text) == '' or text == 'None' or text == EMPTY_CHANGELIST_VALUE:
             text = mark_safe(
                 '<span class="text-muted">%s</span>' % EMPTY_CHANGELIST_VALUE)
         for wrap in self.wraps:
@@ -121,7 +121,7 @@ def replace_field_to_value(layout, cb):
         if isinstance(lo, Field) or issubclass(lo.__class__, Field):
             layout.fields[i] = ShowField(
                 cb, *lo.fields, attrs=lo.attrs, wrapper_class=lo.wrapper_class)
-        elif isinstance(lo, basestring):
+        elif isinstance(lo, str):
             layout.fields[i] = ShowField(cb, lo)
         elif hasattr(lo, 'get_field_names'):
             replace_field_to_value(lo, cb)
@@ -171,7 +171,7 @@ class DetailAdminView(ModelAdminView):
         if self.obj is None:
             raise Http404(
                 _('%(name)s object with primary key %(key)r does not exist.') %
-                {'name': force_unicode(self.opts.verbose_name), 'key': escape(object_id)})
+                {'name': force_text(self.opts.verbose_name), 'key': escape(object_id)})
         self.org_obj = self.obj
 
     @filter_hook
@@ -254,7 +254,7 @@ class DetailAdminView(ModelAdminView):
         replace_field_to_value(layout, self.get_field_result)
         helper.add_layout(layout)
         helper.filter(
-            basestring, max_level=20).wrap(ShowField, admin_view=self)
+            str, max_level=20).wrap(ShowField, admin_view=self)
 
         # 处理只读字段
         readonly_fields = self.get_readonly_fields()
@@ -296,7 +296,7 @@ class DetailAdminView(ModelAdminView):
             ``object`` : 要显示的 Model 对象
         """
         new_context = {
-            'title': _('%s 详细') % force_unicode(self.opts.verbose_name),
+            'title': _('%s 详细') % force_text(self.opts.verbose_name),
             'form': self.form_obj,
 
             'object': self.obj,
@@ -314,7 +314,7 @@ class DetailAdminView(ModelAdminView):
     @filter_hook
     def get_breadcrumb(self):
         bcs = super(DetailAdminView, self).get_breadcrumb()
-        item = {'title': force_unicode(self.obj)}
+        item = {'title': force_text(self.obj)}
         if self.has_view_permission():
             item['url'] = self.model_admin_url('detail', self.obj.pk)
         bcs.append(item)

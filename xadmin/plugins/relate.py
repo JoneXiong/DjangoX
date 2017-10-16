@@ -3,7 +3,7 @@
 模型关联相关
 '''
 from django.core.urlresolvers import reverse
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.utils.encoding import smart_str
 from django.utils.safestring import mark_safe
 from django.db.models.sql.query import LOOKUP_SEP
@@ -82,7 +82,7 @@ class RelateMenuPlugin(BasePlugin):
         f = r.field
         rel_name = f.rel.get_related_field().name
         lookup_name = '%s__%s__exact' % (f.name, rel_name)
-        verbose_name = force_unicode(opts.verbose_name)
+        verbose_name = force_text(opts.verbose_name)
         return {
             'label': label,
             'model_name': model_name,
@@ -216,12 +216,12 @@ class RelateObject(object):
         if len(self.to_objs) == 1:
             to_model_name = str(self.to_objs[0])
         else:
-            to_model_name = force_unicode(self.to_model._meta.verbose_name)
+            to_model_name = force_text(self.to_model._meta.verbose_name)
         return to_model_name
 
     def get_brand_name(self):
         to_model_name = self.get_title()
-        return mark_safe(u"<span class='rel-brand'>%s <i class='fa fa-caret-right'></i></span> %s" % (to_model_name, force_unicode(self.opts.verbose_name_plural)))
+        return mark_safe(u"<span class='rel-brand'>%s <i class='fa fa-caret-right'></i></span> %s" % (to_model_name, force_text(self.opts.verbose_name_plural)))
 
     def get_list_tabs(self):
         _r_list = RelateMenuPlugin.get_r_list(self.to_model)
@@ -345,7 +345,7 @@ class ListRelateDisplayPlugin(BaseRelateDisplayPlugin):
         if len(to_objs) == 1:
             to_model_name = str(to_objs[0])
         else:
-            to_model_name = force_unicode(to_model._meta.verbose_name)
+            to_model_name = force_text(to_model._meta.verbose_name)
         base.append({'title': to_model_name,'url':''})
 
         return base

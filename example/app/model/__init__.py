@@ -1,5 +1,5 @@
-from a import *
-from b import *
-import a_ext
+from .a import *
+from .b import *
+from .a_ext import *
 # from img_models import *
-from cms_models import *
+from .cms_models import *

@@ -9,13 +9,14 @@ from django.views.decorators.cache import never_cache
 from django.utils.text import capfirst
 from django.core.urlresolvers import reverse
 
-from util import sortkeypicker
-from core.structs import SortedDict
-import defs
+from .util import sortkeypicker
+from .core.structs import SortedDict
+from .defs import *
 
 #设置系统的编码为utf-8
-reload(sys)
-sys.setdefaultencoding("utf-8")
+if sys.version_info[0] == 2:
+    reload(sys)
+    sys.setdefaultencoding("utf-8")
 
 
 class AlreadyRegistered(Exception):

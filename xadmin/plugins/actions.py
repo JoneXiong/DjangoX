@@ -4,7 +4,7 @@
 """
 from django import forms
 from django.http import HttpResponse, HttpResponseRedirect
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _, ungettext
 from django.utils.text import capfirst
@@ -29,7 +29,7 @@ def action_checkbox(obj):
         _pk = obj['_pk']
     else:
         _pk = obj.pk
-    return checkbox_form_field.render(ACTION_CHECKBOX_NAME, force_unicode(_pk))
+    return checkbox_form_field.render(ACTION_CHECKBOX_NAME, force_text(_pk))
 action_checkbox.short_description = mark_safe(
     '<input type="checkbox" id="action-toggle" />')
 action_checkbox.allow_tags = True
