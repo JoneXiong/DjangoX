@@ -42,13 +42,14 @@ class MainView(SiteView):
         nav_menu = self.get_nav_menu()
         m_site = self.admin_site
         context.update({
-            'menu_template': defs.BUILDIN_STYLES['inspinia'], 
+            'menu_template': defs.BUILDIN_STYLES['ext'],
             'nav_menu': nav_menu,
             #'site_menu': hasattr(self, 'app_label') and m_site.get_site_menu(self.app_label) or [],
             'site_title': m_site.site_title or defs.DEFAULT_SITE_TITLE,
             'site_footer': m_site.site_footer or defs.DEFAULT_SITE_FOOTER,
             #'breadcrumbs': self.get_breadcrumb(),
             #'head_fix': m_site.head_fix
+            'ext_ui': m_site.ext_ui,
         })
         return context
 
