@@ -198,6 +198,10 @@
         this.modal.on('show.bs.modal', function () {
             var $body = $(window.top.document.body);
             var target = $body.find("#backdropId");
+
+            var spa_container = $body.find("#sap-container");
+            if (spa_container.length>0)spa_container.css('z-index','1041');
+
             if (target.length==0){
                 $body.append("<div id='backdropId' class='modal-backdrop fade in' cnt='0'></div>");
                 target = $body.find("#backdropId");
@@ -208,10 +212,16 @@
         this.modal.on('hide.bs.modal', function () {
             var $body = $(window.top.document.body);
             var target = $body.find("#backdropId");
+
             if (target){
                 var cnt = parseInt(target.attr('cnt'));
                 target.attr('cnt',cnt-1);
-                if (cnt<2)target.hide();       
+                if (cnt<2){
+                    target.hide();
+
+                    var spa_container = $body.find("#sap-container");
+                    if (spa_container.length>0)spa_container.css('z-index','auto');
+                }
             }
         });
       }
