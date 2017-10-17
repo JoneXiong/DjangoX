@@ -63,12 +63,30 @@ class ActionPlugin(BasePlugin):
     def _get_action_choices(self):
         choices = []
         if type(self.actions)==SortedDict:
+            show_action = []
+            if hasattr(self.admin_view,'action_show_by_status'):
+                for each_act in self.admin_view.action_always_show:
+                    show_action.append("act_{}".format(each_act))
+
+            if hasattr(self.admin_view,'action_show_by_status'):
+                for status, value_action in self.admin_view.action_show_by_status.iteritems():
+                    if value_action.get(self.request.GET.get(status, None)):
+                        for act in value_action.get(self.request.GET.get(status, None)):
+                            show_action.append("act_{}".format(act))
+
             for ac, name, verbose_name, icon in self.actions.itervalues():
                 if self.opts:
                     choice = (name, verbose_name % model_format_dict(self.opts), icon)
                 else:
                     choice = (name, verbose_name, icon)
-                choices.append(choice)
+
+                if hasattr(self.admin_view, 'action_show_by_status'):
+                    if not name.startswith('act_'):
+                        choices.append(choice)
+                    elif name in show_action:
+                        choices.append(choice)
+                else:
+                    choices.append(choice)
         else:
             for ac in self.actions:
                 ac_url = ac.get_page_url()
