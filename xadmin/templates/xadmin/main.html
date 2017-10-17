@@ -5,10 +5,12 @@
 {% block title %}{{ title }} | {{ site_title }}{% endblock %}
 
 {% block extrastyle %}
+
     <style style="text/css">
       #sap-container{position: relative;width: 100%;height: 100%;}
       #sap-container iframe{display: block;width: 100%;height: 100%;border: none;}
     </style>
+
 {% endblock %}
 
 {% block body %}
@@ -53,7 +55,6 @@
 
     <script>
 
-
         $(document).ready(function() {
             $(".sidebar-menu a").on("click", function (){
                 var to = $(this).attr("href");
@@ -63,18 +64,16 @@
                 }
             });
 
-    function fix_height() {
-        var h = $(window).height() - 52 + "px"
-        $('#content-block').css("height",h);
-        $('#sap-container').css("height",h);
-        //$('#sap-container iframe').contents().find("#content-block").css("min-height",h);
-    }
+            function fix_height() {
+                var h = $(window).height() - 52 + "px"
+                //$('#content-block').css("height",h);
+                $('#sap-container').css("height",h);
+                //$('#sap-container iframe').contents().find("#content-block").css("min-height",h);
+            }
 
-    fix_height();
-
-    $(window).bind("load resize scroll", function () {
-        fix_height();
-    });
+            $(window).bind("load resize scroll", function () {
+                fix_height();
+            });
 
         });
 
