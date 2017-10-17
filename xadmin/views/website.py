@@ -34,11 +34,11 @@ class MainView(SiteView):
     @filter_hook
     def get_context(self):
         context = {
-                'admin_view': self, 
-                'media': self.media, 
+                'cl': self,
+                'media': self.media,
                 'base_template': self.base_template
                 }
-        
+
         nav_menu = self.get_nav_menu()
         m_site = self.admin_site
         context.update({
