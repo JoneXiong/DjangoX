@@ -21,6 +21,8 @@ xadmin.site.register(SystemSettings, SystemSettingsAdmin)
 class LogEntryAdmin(object):
     list_display = ['id', '__str__', 'object_id', 'content_type', 'user', 'action_time']
     list_filter = ['content_type']
+    filter_default_list = ['content_type']
+    filter_list_position = 'top'
     app_label = 'xadmin'
 xadmin.site.register(LogEntry, LogEntryAdmin)
 
