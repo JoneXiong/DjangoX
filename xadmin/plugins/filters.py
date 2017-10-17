@@ -36,8 +36,8 @@ class FilterPlugin(BasePlugin):
     search_fields = ()
     free_query_filter = True
 
-    filter_grid_left = False
     filter_default_list = []
+    filter_list_position = None #'left' 'top'
 
     def lookup_allowed(self, lookup, value):
         model = self.model
@@ -152,7 +152,8 @@ class FilterPlugin(BasePlugin):
 
                     self.filter_specs.append(spec)
                     if list_filter in self.filter_default_list:
-                        spec.template = spec.template.replace('.html', '_box.html')
+                        postfix = 'top' if self.filter_list_position=='top' else 'box'
+                        spec.template = spec.template.replace('.html', '_%s.html'%postfix)
                         self.filter_default.append(spec)
 
 
@@ -231,8 +232,12 @@ class FilterPlugin(BasePlugin):
 
     # Block Views
     def block_grid_left(self, context, nodes):
-        if self.has_filters and self.filter_grid_left:
+        if self.has_filters and self.filter_list_position:
             nodes.append(render_to_string('xadmin/blocks/model_list.grid_left.filters.html', context_instance=context))
+
+    def block_grid_top(self, context, nodes):
+        if self.has_filters and self.filter_list_position:
+            nodes.append(render_to_string('xadmin/blocks/model_list.grid_top.filters.html', context_instance=context))
 
     def block_nav_form(self, context, nodes):
         if self.search_fields:

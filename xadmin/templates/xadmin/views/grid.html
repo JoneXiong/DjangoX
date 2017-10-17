@@ -91,14 +91,13 @@
 
 {% block content %}
 
-{% if cl.filter_grid_left %}
+{% ifequal cl.filter_list_position 'left' %}
 <div class="row">
 <div class="col-md-2">
     {% view_block 'grid_left' %}
 </div>
 <div class="col-md-10">
-{% endif %}
-
+{% endifequal %}
 
 {% if cl.list_tabs %}
 <div class="nav-tabs-custom">
@@ -119,6 +118,13 @@
   <form id="changelist-form" action="" method="post"{% view_block 'result_list_form' %}>{% csrf_token %}
   {% view_block 'results_top' %}
   <div class="results table-responsive">
+
+    {% ifequal cl.filter_list_position 'top' %}
+    <div class=" btn-group">
+        {% view_block 'grid_top' %}
+    </div>
+    {% endifequal %}
+
   {% if results %}
   {% block results_grid %}
   <table class="table table-bordered table-striped table-hover">
@@ -220,9 +226,9 @@
 {% endif %}
 
 
-{% if cl.filter_grid_left %}
+{% ifequal cl.filter_list_position 'left' %}
 </div>
 </div>
-{% endif %}
+{% endifequal %}
 
 {% endblock %}
