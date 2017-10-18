@@ -2,10 +2,10 @@
 
 
 {% block navbar_md %}
-  <ul class="sidebar-menu">
+  <ul class="sidebar-menu tree" data-widget="tree">
     <li class="header">功能导航</li>
     <li class="treeview">
-      <a class="section" href="{% url 'xadmin:index' %}"><i class="icon fa-fw fa fa-home"></i> <span>我的面板</span></a>
+      <a class="section" href="#!{% url 'xadmin:index' %}"><i class="icon fa-fw fa fa-home"></i> <span>我的面板</span></a>
     </li>
     {% for item in nav_menu %}
       <li class="treeview {% if item.selected %} active{% endif %}">
@@ -18,7 +18,7 @@
         <ul class="treeview-menu">
           {% for sitem in item.menus %}
           <li{% if sitem.selected %} class="active"{% endif %}>
-            {% if sitem.url %}<a href="{{ sitem.url }}">{% endif %}
+            {% if sitem.url %}<a class="jumpto" href="#!{{ sitem.url }}">{% endif %}
             {% if sitem.icon %}<i class="fa fa-fw {{sitem.icon}}"></i>{%else%}<i class=""></i>{% endif %}
             {{ sitem.title }}</span>{% if sitem.url %}</a>{% endif %}
           </li>

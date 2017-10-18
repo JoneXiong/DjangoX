@@ -56,13 +56,18 @@
     <script>
 
         $(document).ready(function() {
-            $(".sidebar-menu a").on("click", function (){
-                var to = $(this).attr("href");
-                if (to.length>1){
-                    iframer.jumpTo(to);
-                    return false;
+            
+            $(".sidebar-menu a.jumpto").on("click", function (){
+                //var to = $(this).attr("href");
+                //if (to.length>1){
+                if ($(this).hasClass('jumpto')){
+                    $(".sidebar-menu a.jumpto").parent().removeClass('active');
+                    $(this).parent().addClass('active');
+                    //iframer.jumpTo(to);
+                    //return false;
                 }
             });
+            
 
             function fix_height() {
                 var h = $(window).height() - 52 + "px"
