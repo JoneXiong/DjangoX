@@ -496,10 +496,11 @@ class SiteView(BaseView):
             icon = getattr(self.admin_site._registry[model],
                            'model_icon', defs.DEFAULT_MODEL_ICON)
         return icon
-    
+
     def block_top_account_menu(self, context, nodes):
-        a_class = self.admin_site.head_fix and 'class="J_menuItem"' or '' 
-        return '<li><a %s href="%s"><i class="fa fa-key"></i> %s</a></li>' % (a_class, self.get_admin_url('account_password'), _('Change Password'))
+        a_class = self.admin_site.head_fix and 'class="J_menuItem"' or ''
+        url_pre = self.admin_site.head_fix and '#!' or ''
+        return '<li><a %s href="%s"><i class="fa fa-key"></i> %s</a></li>' % (a_class, url_pre+self.get_admin_url('account_password'), _('Change Password'))
 
     @filter_hook
     def get_breadcrumb(self):

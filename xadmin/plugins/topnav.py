@@ -48,6 +48,7 @@ class TopNavPlugin(BasePlugin):
         add_models = []
 
         site_name = self.admin_site.name
+        url_pre = self.admin_site.head_fix and '#!' or ''
 
         if self.global_add_models == None:
             models = self.admin_site._registry.keys()
@@ -61,7 +62,7 @@ class TopNavPlugin(BasePlugin):
                 try:
                     add_models.append({
                         'title': _('Add %s') % capfirst(model._meta.verbose_name),
-                        'url': reverse('xadmin:%s_%s_add' % info, current_app=site_name),
+                        'url': url_pre+reverse('xadmin:%s_%s_add' % info, current_app=site_name),
                         'model': model
                     })
                 except NoReverseMatch:
