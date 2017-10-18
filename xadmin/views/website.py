@@ -50,6 +50,7 @@ class MainView(SiteView):
             #'breadcrumbs': self.get_breadcrumb(),
             #'head_fix': m_site.head_fix
             'ext_ui': m_site.ext_ui,
+            'head_fix': True,
         })
         return context
 
