@@ -14,6 +14,9 @@
   <link rel="stylesheet" type="text/css" href="{% static "adminlte/dist/css/AdminLTE.css" %}" />
   <link rel="stylesheet" type="text/css" href="{% static "adminlte/dist/css/skins/_all-skins.min.css" %}" />
   <link rel="stylesheet" type="text/css" href="{% static "xadmin/css/xadmin.adminlte.custom.css" %}" />
+  {% if not head_fix %}
+  <link rel="stylesheet" type="text/css" href="{% static "adminlte/plugins/pace/pace.min.css" %}" />
+  {% endif %}
   {% endif %}
 
   {% if site_theme %}
@@ -48,9 +51,10 @@
   {% vendor 'jquery-ui-sortable.js' 'bootstrap.js' 'xadmin.main.js' 'xadmin.responsive.js' %}
 
   {% if ext_ui %}
+  <script src="{% static "adminlte/plugins/pace/pace.js" %}"></script>
   <script src="{% static "adminlte/dist/js/app.min.js" %}"></script>
   <script src="{% static "adminlte/dist/js/setup.js" %}"></script>
-  <script src="/static/inspinia/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+  <script src="{% static "adminlte/plugins/slimScroll/jquery.slimscroll.min.js" %}"></script>
   {% endif %}
 
   {{ media.js }}
