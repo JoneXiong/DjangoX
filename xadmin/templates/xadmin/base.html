@@ -46,14 +46,16 @@
   {% block extrahead %}{% endblock %}
   {% view_block 'extrahead' %}
 </head>
-<body class="{% if ext_ui %}skin-blue sidebar-mini {% endif %}{% block bodyclass %}{% endblock %}">
+<body class="{% if ext_ui %}skin-blue fixed sidebar-mini {% endif %}{% block bodyclass %}{% endblock %}">
   {% block body %}{% endblock body %}
   {% vendor 'jquery-ui-sortable.js' 'bootstrap.js' 'xadmin.main.js' 'xadmin.responsive.js' %}
 
   {% if ext_ui %}
   <script src="{% static "adminlte/plugins/pace/pace.js" %}"></script>
   <script src="{% static "adminlte/dist/js/app.min.js" %}"></script>
+  {% if not head_fix %}
   <script src="{% static "adminlte/dist/js/setup.js" %}"></script>
+  {% endif %}
   <script src="{% static "adminlte/plugins/slimScroll/jquery.slimscroll.min.js" %}"></script>
   {% endif %}
 
