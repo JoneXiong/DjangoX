@@ -2,6 +2,9 @@
 
     function previewImage(file)
     {
+	if (!file.files[0]){
+		return;
+	}
         // Create a new instance of the FileReader
         var reader = new FileReader();
         // Read the local file as a DataURL
