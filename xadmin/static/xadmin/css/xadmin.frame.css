@@ -126,7 +126,7 @@ nav.page-tabs .page-tabs-content {
     cursor: default;
     position: absolute;    z-index: 100019;
     width: auto;
-    border: 1px solid rgb(187, 187, 187);
+    //border: 1px solid rgb(187, 187, 187);
     height: 80px;
     line-height: 80px;
     padding-left: 80px;
