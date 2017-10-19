@@ -60,11 +60,11 @@ def autodiscover():
         
         # app级菜单初始化
         default_title = hasattr(mod,'verbose_name') and '%s 其他'%mod.verbose_name or '其他'
-        site.sys_menu[app_label] = {'_default_group':{'title': default_title, 'icon': 'fa-th-large', 'menus': []}  }
+        site.sys_menu[app_label] = {'_default_group':{'key': '_default_group','title': default_title, 'icon': 'fa-th-large', 'menus': []}  }
         if hasattr(mod,'menus'):
             m_menus = mod.menus
             for e in m_menus:
-                site.sys_menu[app_label][e[0]] = {'title': e[1], 'icon': e[2], 'menus': []}
+                site.sys_menu[app_label][e[0]] = {'key': e[0],'title': e[1], 'icon': e[2], 'menus': []}
         
         # 导入 adminx 模块
         try:

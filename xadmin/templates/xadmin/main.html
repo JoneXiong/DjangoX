@@ -37,7 +37,7 @@ paceOptions = {
     <!-- left side menu -->
     {% block left_menu %}
     <aside class="main-sidebar">
-    <section style="height: auto;" class="sidebar">
+    <div class="sidebar">
         {% block navbar %}
         {% if nav_menu %}
           {% include menu_template %}
@@ -46,7 +46,7 @@ paceOptions = {
         {% endif %}
       {% endblock %}
       {% view_block 'left_navbar' %}
-    </section>
+    </div>
     </aside>
     {% endblock %}
 
