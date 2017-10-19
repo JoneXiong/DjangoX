@@ -139,10 +139,4 @@
 
 </div>
 {% endblock body %}
-{% block extrabody %}
-    {{ block.super }}
-    <script>
-        // To make Pace works on Ajax calls
-        $(document).ajaxStart(function() { top.Pace.restart(); });
-    </script>
-{% endblock %}
+

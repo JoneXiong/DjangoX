@@ -246,6 +246,7 @@
         this.status = 'loading';
         this.url = url;
         
+		$('.loading-content').show();
 		iframe.src= url;
 		iframe.frameBorder = 0;
         if(private_active_page) {
@@ -273,6 +274,7 @@
 				//子window对象
 				var iWindow = iframe.contentWindow,
 					iDoc = iframe.contentWindow.document;
+				$('.loading-content').show();
 				//主动触发iframe加载回调
 				private_iframeOnload && private_iframeOnload.call(iDoc,iWindow,iDoc);
 
