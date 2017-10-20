@@ -36,6 +36,7 @@
      **/
 	function changeHash(url,win,isSilence) {
         private_needRefresh = isSilence ? false : true;
+        if (isSilence){private_last_page.url=url};
         
 		url = hrefToAbsolute(url,(win || window).location.pathname);
 		if(url.length < 1) {
