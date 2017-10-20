@@ -44,7 +44,7 @@
   {% block extrahead %}{% endblock %}
   {% view_block 'extrahead' %}
 </head>
-<body class="{% if ext_ui %}skin-blue fixed sidebar-mini {% endif %}{% block bodyclass %}{% endblock %}">
+<body class="{% if ext_ui %}{% block ext_class %}skin-blue fixed sidebar-mini{% endblock %}{% endif %} {% block bodyclass %}{% endblock %}">
   {% block body %}{% endblock body %}
   {% vendor 'jquery-ui-sortable.js' 'bootstrap.js' 'xadmin.main.js' 'xadmin.responsive.js' %}
 
