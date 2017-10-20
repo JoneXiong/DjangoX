@@ -508,12 +508,12 @@ class SiteView(BaseView):
         导航链接基础部分
         '''
         import xadmin
-        if self.admin_site.head_fix:
-            return []
         base = [{
             'url': self.get_admin_url('index'),
             'title': _('Home')
             }]
+        if self.admin_site.head_fix:
+            return base
         if hasattr(self, 'app_label') and self.app_label:
             app_mod = self.admin_site.app_dict[self.app_label]
             pref_url = xadmin.ROOT_PATH_NAME and '/'+xadmin.ROOT_PATH_NAME or ''
