@@ -86,7 +86,7 @@ class ModelFormAdminView(ModelAdminView):
         .. autoattribute:: form_layout
     """
     form = forms.ModelForm     #由 Model 生成 Form 的基类，默认为 django.forms.ModelForm
-    
+
     formfield_overrides = {}    # 可以指定某种类型的 DB Field，使用指定的FormField的属性
     style_fields = {}
     """
@@ -99,7 +99,7 @@ class ModelFormAdminView(ModelAdminView):
     ``rich-textarea`` 可能是某插件提供的 Style，这样显示 ``content`` 字段时就会使用该插件的效果了
     """
     relfield_style = None      #: 当 Model 是其他 Model 的 ref model 时，其他 Model 在显示本 Model 的字段时使用的 Field Style
-    
+
     exclude = None
     readonly_fields = ()       #: 只读的字段，这些字段不能被编辑
 
@@ -113,11 +113,11 @@ class ModelFormAdminView(ModelAdminView):
     hide_other_field = False
     add_redirect_url = None
     edit_redirect_url = None
-    
+
     fields = None    #: (list,tuple) 默认显示的字段
-    
+
     grid = False
-    
+
     """
     页面 Form 的 Layout 对象，是一个标准的 Crispy Form Layout 对象。使用 Layout 可以方便的定义整个 Form 页面的结构。
     有关 Crispy Form 可以参考其文档 `Crispy Form 文档 <http://django-crispy-forms.readthedocs.org/en/latest/layouts.html>`_
@@ -144,7 +144,7 @@ class ModelFormAdminView(ModelAdminView):
                     ),
                 )
             )
-    
+
     有关 Layout 中元素的信息，可以参看文档 :ref:`form_layout`
     """
 
@@ -190,7 +190,7 @@ class ModelFormAdminView(ModelAdminView):
 #         m_key = 'get_%s_attrs'%db_field.name
 #         if hasattr(self, m_key):
 #             return getattr(self, m_key)()
-        
+
         if db_field.name in self.style_fields:
             # 如果设置了 Field Style，则返回 Style 的属性
             attrs = self.get_field_style(db_field, self.style_fields[db_field.name], **kwargs)
@@ -319,7 +319,7 @@ class ModelFormAdminView(ModelAdminView):
     @filter_hook
     def get_form_helper(self):
         """
-        取得 Crispy Form 需要的 FormHelper。具体信息可以参看 `Crispy Form 文档 <http://django-crispy-forms.readthedocs.org/en/latest/tags.html#crispy-tag>`_ 
+        取得 Crispy Form 需要的 FormHelper。具体信息可以参看 `Crispy Form 文档 <http://django-crispy-forms.readthedocs.org/en/latest/tags.html#crispy-tag>`_
         """
         helper = FormHelper()
         helper.form_tag = False # 默认不需要 crispy 生成 form_tag
@@ -418,14 +418,14 @@ class ModelFormAdminView(ModelAdminView):
 
         if self.valid_forms():
             self.save_forms()
-            
+
             ret = self.save_models()
             if isinstance(ret, basestring):
                 self.message_user(ret,'error')
                 return self.get_response()
             if isinstance(ret, HttpResponse):
                 return ret
-            
+
             self.save_related()
             self.after_save()
             response = self.post_response()
@@ -520,9 +520,9 @@ class CreateAdminView(ModelFormAdminView):
     """
     创建数据的 ModeAdminView 继承自 :class:`ModelFormAdminView` ，用于创建数据。
     """
-    
+
     log = False
-    
+
     def init_request(self, *args, **kwargs):
         self.org_obj = None
 
@@ -596,8 +596,8 @@ class CreateAdminView(ModelFormAdminView):
 
         msg = _(
             'The %(name)s "%(obj)s" was added successfully.') % {'name': force_unicode(self.opts.verbose_name),
-                                                                 'obj': "<a class='alert-link' href='%s'>%s</a>" % (self.model_admin_url('change', self.new_obj._get_pk_val()), force_unicode(self.new_obj))}
-        
+                                                                 'obj': force_unicode(self.new_obj)}
+
         param_list = self.param_list()
         if "_continue" in param_list:
             self.message_user(
@@ -622,7 +622,7 @@ class CreateAdminView(ModelFormAdminView):
                     return self.model_admin_url('changelist')
             else:
                 return self.get_admin_url('index')
-            
+
     def log_addition(self, request, object):
         """
         添加对象日志
@@ -635,7 +635,7 @@ class CreateAdminView(ModelFormAdminView):
             object_repr     = force_text(object),
             action_flag     = ADDITION
         )
-        
+
     def do_add(self):
         self.new_obj.save()
         if self.log:
@@ -653,11 +653,11 @@ class UpdateAdminView(ModelFormAdminView):
     """
     修改数据的 ModeAdminView 继承自 :class:`ModelFormAdminView` ，用于修改数据。
     """
-    
+
     log = False
     result_count = 1
     result_list = []
-    
+
     def init_request(self, object_id, *args, **kwargs):
         self.org_obj = self.get_object(unquote(object_id))
 
@@ -780,7 +780,7 @@ class UpdateAdminView(ModelFormAdminView):
         保存数据到数据库中
         """
         return self.do_update()
-    
+
     def log_change(self, request, object, message):
         """
         更新对象日志
@@ -794,14 +794,14 @@ class UpdateAdminView(ModelFormAdminView):
             action_flag     = CHANGE,
             change_message  = message
         )
-    
+
     def construct_change_message(self, request, form, formsets):
         """
         Construct a change message from a changed object.
         """
         from django.utils.encoding import force_text
         from django.utils.text import get_text_list
-        
+
         change_message = []
         if form.changed_data:
             change_message.append(_('Changed %s.') % get_text_list(form.changed_data, _('and')))
