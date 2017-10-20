@@ -28,4 +28,5 @@
 .mactive {
 	border-bottom: 3px solid #ff2832;
 	color: #ff2832;
+    margin-bottom: -2px;
 }
