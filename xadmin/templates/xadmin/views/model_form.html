@@ -16,11 +16,15 @@
     <input name="_selected_action" type="hidden" value="{{ original.pk }}" />
     <input type="hidden" id="action" name="action" value=""/>
     {% view_block 'results_bottom' %}
+    {% if show_delete_link %}
+      <a href="{{ delete_url }}" class="btn btn-sm btn-default">{% trans "Delete" %}</a>
+    {% endif %}
 </form>
 {% endif %}
 {% endblock %}
 
 {% block nav_btns %}
+{% include "xadmin/includes/form_btn.html" %}
 {% if change and cl.log %}
 <a href="{% url 'xadmin:index' %}admin/logentry/?_p_content_type={{ content_type_id }}&_p_object_id={{ original.pk }}" class="btn"><i class="fa fa-eye"></i> 历史</a>
 {% endif %}

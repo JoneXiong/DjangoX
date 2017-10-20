@@ -1,0 +1,19 @@
+{% load i18n %}
+{% load xadmin_tags %}
+
+{% if show_save %}
+<!--
+  <div class="btn-group clearfix show-xs save-group {% if show_delete_link %}col-xs-10{%else%}col-xs-12{% endif %}">
+  <button type="submit" class="default btn btn-primary col-xs-10" name="_save" data-loading-text="{% trans "Saving.." %}" {{ onclick_attrib }}/><i class="fa fa-save"></i> {% trans 'Save' %}</button>
+  <button type="button" class="more btn btn-primary col-xs-2" data-toggle="collapse" data-target=".nav-collapse.more-btns"><i class="fa fa-ellipsis-vertical"></i></button>
+  </div>
+-->
+  <button class="default btn btn-primary" onclick="$.do_form('_save')" data-loading-text="{% trans "Saving.." %}" {{ onclick_attrib }}/><i class="fa fa-save"></i> {% trans 'Save' %}</button>
+{% endif %}
+
+<!--
+    {% if show_save_as_new %}<input type="submit" class="btn btn-default" name="_saveasnew" {{ onclick_attrib }} >{% trans 'Save as new' %}</button>{%endif%}
+{% if show_save_and_add_another %}<button type="submit" class="btn btn-default" name="_addanother" {{ onclick_attrib }} >{% trans 'Save and add another' %}</button>{% endif %}
+{% if show_save_and_continue %}<button type="submit" class="btn btn-default" name="_continue" {{ onclick_attrib }}>{% trans 'Save and continue editing' %}</button>{% endif %}
+-->
+
