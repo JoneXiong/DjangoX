@@ -424,10 +424,10 @@ def display_for_field(value, field):
 
     if field.flatchoices:
         if hasattr(value,'__iter__'):
-            rets = [ dict(field.flatchoices).get(e, EMPTY_CHANGELIST_VALUE) for e in  value]
+            rets = [ dict(field.flatchoices).get(e, EMPTY_CHANGELIST_VALUE!=None and EMPTY_CHANGELIST_VALUE or e ) for e in  value]
             return ','.join(rets)
         else:
-            return dict(field.flatchoices).get(value, EMPTY_CHANGELIST_VALUE)
+            return dict(field.flatchoices).get(value, EMPTY_CHANGELIST_VALUE!=None and EMPTY_CHANGELIST_VALUE or value)
     # NullBooleanField needs special-case null-handling, so it comes
     # before the general null test.
     elif isinstance(field, models.BooleanField) or isinstance(field, models.NullBooleanField):
