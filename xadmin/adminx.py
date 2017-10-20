@@ -9,12 +9,14 @@ from models import UserSettings, SystemSettings
 class UserSettingsAdmin(object):
     model_icon = 'fa fa-cog'
     hide_menu = False
+    menu_group = 'other_group'
 xadmin.site.register(UserSettings, UserSettingsAdmin)
 
 
 class SystemSettingsAdmin(object):
     model_icon = 'fa fa-cog'
     hide_menu = False
+    menu_group = 'other_group'
 xadmin.site.register(SystemSettings, SystemSettingsAdmin)
 
 
@@ -24,8 +26,10 @@ class LogEntryAdmin(object):
     filter_default_list = ['content_type']
     filter_list_position = 'top'
     app_label = 'xadmin'
+    menu_group = 'other_group'
 xadmin.site.register(LogEntry, LogEntryAdmin)
 
 class ContentTypeAdmin(object):
     app_label = 'xadmin'
+    menu_group = 'other_group'
 xadmin.site.register(ContentType, ContentTypeAdmin)

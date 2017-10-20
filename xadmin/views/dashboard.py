@@ -71,6 +71,7 @@ class UserWidgetAdmin(object):
     list_display_links = ('widget_type',)
     user_fields = ['user']
     #hide_menu = True
+    menu_group = 'other_group'
 
     wizard_form_list = (
         (_(u"Widget Type"), ('page_id', 'widget_type')),

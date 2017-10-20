@@ -13,6 +13,7 @@ verbose_name = u'系统'
 
 menus = (
          ('auth_group', u'权限',  'fa-user-plus'),
+         ('other_group', u'其他',  'fa-reorder'),
          )
 
 # django patch
