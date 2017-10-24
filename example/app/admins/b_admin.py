@@ -49,6 +49,6 @@ class MyAction2(FormAction):
 class BAdmin(object):
     actions = [MyAction1,MyAction3,MyAction4,MyAction5,MyAction6, MyAction2]
     list_display = ['id', 'name']
-    list_gallery = True
+    #list_gallery = True
 
 xadmin.site.register(models.B, BAdmin)
