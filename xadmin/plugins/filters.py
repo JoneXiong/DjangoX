@@ -18,7 +18,7 @@ from django.db.models.sql.query import LOOKUP_SEP, QUERY_TERMS
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
 
-from xadmin.filters import manager as filter_manager, DateFieldListFilter, RelatedFieldSearchFilter, MultiSelectFieldListFilter
+from xadmin.filters import manager as filter_manager, DateFieldListFilter, RelatedFieldSearchFilter, MultiSelectFieldListFilter,DateBaseFilter
 from xadmin.sites import site
 from xadmin.views import BasePlugin, ListAdminView
 from xadmin.views.page import GridPage
@@ -217,7 +217,7 @@ class FilterPlugin(BasePlugin):
 
     # Media
     def get_media(self, media):
-        if bool(filter(lambda s: isinstance(s, DateFieldListFilter), self.filter_specs)):
+        if bool(filter(lambda s: isinstance(s, DateFieldListFilter) or isinstance(s, DateBaseFilter), self.filter_specs)):
             media = media + self.vendor('datepicker.css', 'datepicker.js',
                                         'xadmin.widget.datetime.js')
         if bool(filter(lambda s: isinstance(s, RelatedFieldSearchFilter), self.filter_specs)):
