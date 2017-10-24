@@ -193,7 +193,7 @@
   </table>
   {% endblock results_grid %}
   {% else %}
-    <p class="well">无数据</p>
+    <p class="well">{% firstof cl.no_data_tips '无数据' %}</p>
   {% endif %}
   </div>
 
