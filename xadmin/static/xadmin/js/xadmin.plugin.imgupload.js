@@ -21,4 +21,10 @@
         });
     });
 
+  $.fn.exform.renders.push(function(f){
+    f.find('input.img-file-ext').change(function(){
+            previewImage(this);	
+    });
+  })
+
 })(jQuery);

@@ -13,11 +13,12 @@
                 if (elem.attr('id')) elem.attr('id', elem.attr('id').replace(idRegex, replacement));
                 if (elem.attr('name')) elem.attr('name', elem.attr('name').replace(idRegex, replacement));
                 if (elem.attr('href')) elem.attr('href', elem.attr('href').replace(idRegex, replacement));
+                if (elem.attr('onclick')) elem.attr('onclick', elem.attr('onclick').replace(idRegex, replacement));
                 elem.find('.formset-num').html(ndx + 1);
             },
 
             hasChildElements = function(row) {
-                return row.find('input,select,textarea,label,div,a').length > 0;
+                return row.find('input,select,textarea,label,div,a,img').length > 0;
             },
 
             updateRowIndex = function(row, i){
