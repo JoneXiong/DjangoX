@@ -26,7 +26,7 @@
                     updateElementIndex(elem, options.prefix, i);
                 }));
                 updateElementIndex(row, options.prefix, i);
-                row.find('input,select,textarea,label,div,a').each(function() {
+                row.find('input,select,textarea,label,div,a,img').each(function() {
                     updateElementIndex($(this), options.prefix, i);
                 });
                 row.data('row-index', i);
