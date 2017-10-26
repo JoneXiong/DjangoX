@@ -1,6 +1,6 @@
 <div class="box {% if not legend %}box-solid{% endif %} {% block box_class %}{% endblock box_class %}" {% block box_attrs %}{% endblock box_attrs %}>
 {% block box_header %}
-{% if legend or widget_title %}
+{% if legend or widget_title or inline_style %}
   <div class="box-header">
       <h3 class="panel-title">{% block box_title %}{% endblock box_title %}</h3>
     <div class="box-tools pull-right">
