@@ -80,6 +80,11 @@
             $('#' + options.prefix + '-add-row').click(function() {
                 var formCount = parseInt($('#id_' + options.prefix + '-TOTAL_FORMS').val()),
                     row = options.formTemplate.clone(true).removeClass('empty-form');
+                var formMaxNum = parseInt($('#id_' + options.prefix + '-MAX_NUM_FORMS').val());
+                if (formCount>=formMaxNum){
+                    alert('超过了允许的数量！');
+                    return;
+                }
                 updateRowIndex(row, formCount);
                 row.appendTo($$);
                 insertDeleteLink(row);
