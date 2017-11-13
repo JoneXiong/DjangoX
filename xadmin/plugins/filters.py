@@ -227,7 +227,7 @@ class FilterPlugin(BasePlugin):
 
     # Block Views
     def block_nav_menu(self, context, nodes):
-        if self.has_filters:
+        if self.has_filters and len(self.admin_view.filter_specs)>len(self.admin_view.filter_default):
             nodes.append(render_to_string('xadmin/blocks/model_list.nav_menu.filters.html', context_instance=context))
 
     # Block Views
