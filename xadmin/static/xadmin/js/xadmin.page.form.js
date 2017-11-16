@@ -50,5 +50,8 @@
     $.do_form = function(name){
       $("button#"+name).eq(0).click();
     }
+    $.do_submit = function(name){
+      $("button[data-loading-text]").button('loading');
+    }
 })(jQuery)
 
