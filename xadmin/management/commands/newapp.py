@@ -9,10 +9,11 @@ from xadmin.dutils import import_module
 
 
 class Command(BaseCommand):
+
     help = (u"Creates a new Django app.")
 
     def add_arguments(self, parser):
-                parser.add_argument('name', nargs='+', type=int)
+        parser.add_argument('name', nargs='+', type=int)
 
     def handle(self, *args, **options):
         app_name = options.get('name',None)
