@@ -53,7 +53,9 @@ def auto_create_or_update_perm():
     all_perm = get_page_perm() + get_action_perm()
     for perm_code, perm_name in all_perm:
         try:
-            print get_or_create_perm(perm_name, perm_code, common_content_type)
+            _perm,_is_create =  get_or_create_perm(perm_name, perm_code, common_content_type)
+            if _is_create:
+                print 'Created perm:',_perm
         except:
             import traceback;traceback.print_exc()
             print 'Error to create: %s %s'%(perm_code, perm_name)
@@ -66,4 +68,5 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         auto_create_or_update_perm()
+        print 'Done.'
 
