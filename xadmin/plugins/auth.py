@@ -296,7 +296,11 @@ class ChangeAccountPasswordView(ChangePasswordView):
         else:
             return self.get_response()
 
-site.register_view(r'^auth/user/(.+)/update/password/$',
+def get_user_url():
+    model = User
+    return '%s/%s'%(model._meta.app_label, model._meta.module_name)
+
+site.register_view(r'^%s/(.+)/password/$'%get_user_url(),
                    ChangePasswordView, name='user_change_password')
 site.register_view(r'^account/password/$', ChangeAccountPasswordView,
                    name='account_password')
