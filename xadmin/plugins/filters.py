@@ -39,6 +39,12 @@ class FilterPlugin(BasePlugin):
     filter_default_list = []
     filter_list_position = None #'left' 'top'
 
+
+    def init_request(self, *args, **kwargs):
+        if hasattr(self.admin_view, 'get_list_filter'):
+            self.list_filter = self.admin_view.get_list_filter()
+        return super(FilterPlugin, self).init_request(*args, **kwargs)
+
     def lookup_allowed(self, lookup, value):
         model = self.model
         # Check FKey lookups that are allowed, so that popups produced by
