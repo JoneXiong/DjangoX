@@ -17,6 +17,7 @@ from xadmin.util import unquote, User
 from xadmin.views import BasePlugin, ModelFormAdminView, ModelAdminView, csrf_protect_m
 from xadmin.views.action import FormAction
 from xadmin import widgets
+from xadmin.views import filter_hook
 
 
 ACTION_NAME = {
@@ -136,6 +137,20 @@ class UserAdmin(object):
                 )
             )
         return super(UserAdmin, self).get_form_layout()
+
+    @filter_hook
+    def get_model_form(self, **kwargs):
+        if not self.request.user.is_superuser:
+            self.exclude = self.exclude and self.exclude + ['is_superuser'] or ['is_superuser']
+        return super(UserAdmin, self).get_model_form(**kwargs)
+
+    @filter_hook
+    def queryset(self):
+        qs = super(UserAdmin, self).queryset()
+        if self.user.is_superuser:
+            return qs
+        else:
+            return qs.filter(is_superuser = False)
 
 
 class PermissionAdmin(object):
