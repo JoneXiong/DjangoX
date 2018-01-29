@@ -92,3 +92,5 @@ def get_context_dict(context):
     else:
         ctx = context
     return ctx
+
+GTE10 = django.VERSION[1]>=10

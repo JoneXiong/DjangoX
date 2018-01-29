@@ -369,9 +369,12 @@ class SelectMultipleDropdown(forms.SelectMultiple):
         if attrs is None:
             attrs = {}
         attrs['class'] = 'selectmultiple selectdropdown'
-        return super(SelectMultipleDropdown, self).render(name, value, attrs, choices)
-    
-    
+        if dutils.GTE10:
+            return super(SelectMultipleDropdown, self).render(name, value, attrs)
+        else:
+            return super(SelectMultipleDropdown, self).render(name, value, attrs, choices)
+
+
 class SelectMultipleDropselect(forms.SelectMultiple):
     """
     select2下拉选择控件 同步加载所有数据 (多选)
@@ -385,7 +388,10 @@ class SelectMultipleDropselect(forms.SelectMultiple):
             attrs = {}
         attrs['class'] = 'select2dropdown'
         attrs['multiple'] = 'multiple'
-        return super(SelectMultipleDropselect, self).render(name, value, attrs, choices)
+        if dutils.GTE10:
+            return super(SelectMultipleDropselect, self).render(name, value, attrs)
+        else:
+            return super(SelectMultipleDropselect, self).render(name, value, attrs, choices)
     
     
 class SelectMultipleAjax(forms.SelectMultiple):
