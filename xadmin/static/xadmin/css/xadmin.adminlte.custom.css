@@ -30,3 +30,27 @@
 	color: #ff2832;
     margin-bottom: -2px;
 }
+
+.skin-black .main-header>.logo {
+    background-color: #1a2226;
+    border-right: 1px solid #1a2226;
+    color: #DFE4ED;
+}
+
+.sidebar-collapse .main-header .logo {
+    width: 0px;
+    display:none;
+}
+
+.sidebar-collapse .main-header .logo > .logo-lg {
+    display:none;
+}
+
+.sidebar-collapse .main-header .navbar {
+    margin-left: 0px;
+}
+
+.skin-black .main-header>.logo:hover {
+    background-color: unset;
+}
+
