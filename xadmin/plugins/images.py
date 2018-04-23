@@ -1,4 +1,7 @@
-import urlparse
+try:
+    import urlparse
+except:
+    from urllib.parse import urlparse
 
 from django.db import models
 from django import forms

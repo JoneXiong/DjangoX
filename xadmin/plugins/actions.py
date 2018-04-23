@@ -4,7 +4,6 @@
 """
 from django import forms
 from django.http import HttpResponse, HttpResponseRedirect
-from django.utils.encoding import force_unicode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _, ungettext
 from django.utils.text import capfirst
@@ -19,9 +18,11 @@ from xadmin.views.action_delete import DeleteSelectedAction
 from xadmin.views.grid import BaseGrid
 from xadmin.views import UpdateAdminView
 from xadmin.core.structs import SortedDict
-from xadmin.dutils import render_to_string
+from xadmin.dutils import render_to_string, force_unicode
+from xadmin import dutils
 
 checkbox_form_field = forms.CheckboxInput({'class': 'action-select'}, lambda value: False)
+
 
 #  定义一个显示列 用于展示选择框
 def action_checkbox(obj):
@@ -74,7 +75,7 @@ class ActionPlugin(BasePlugin):
                         for act in value_action.get(self.request.GET.get(status, None)):
                             show_action.append("act_{}".format(act))
 
-            for ac, name, verbose_name, icon in self.actions.itervalues():
+            for ac, name, verbose_name, icon in self.actions.values():
                 if self.opts:
                     choice = (name, verbose_name % model_format_dict(self.opts), icon)
                 else:
@@ -133,7 +134,7 @@ class ActionPlugin(BasePlugin):
                         queryset = av.list_queryset.filter(pk__in=selected)
                     
                     ret = self._response_action(ac, queryset)
-                    if isinstance(ret, basestring):
+                    if isinstance(ret, dutils.basestring):
                         self.message_user(ret,'error')
                     if isinstance(ret, HttpResponse):
                         return ret
@@ -170,7 +171,7 @@ class ActionPlugin(BasePlugin):
             actions.extend(
                 [self._get_action(action) for action in class_actions])
 
-        actions = filter(None, actions)
+        actions = list(filter(None, actions))
         actions = SortedDict([
             (name, (ac, name, desc, icon))
             for ac, name, desc, icon in actions

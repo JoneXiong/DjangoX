@@ -3,6 +3,8 @@ from django.template import Library
 from xadmin.util import static, vendor as util_vendor
 from django.utils.safestring import mark_safe
 
+from xadmin.dutils import unicode
+
 register = Library()
 
 

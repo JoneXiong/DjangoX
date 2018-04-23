@@ -3,7 +3,6 @@
 模型关联相关
 '''
 from django.core.urlresolvers import reverse
-from django.utils.encoding import force_unicode
 from django.utils.encoding import smart_str
 from django.utils.safestring import mark_safe
 from django.db.models.sql.query import LOOKUP_SEP
@@ -13,7 +12,8 @@ from django.utils.html import escape
 
 from xadmin.sites import site
 from xadmin.views import BasePlugin, ListAdminView, CreateAdminView, UpdateAdminView, DeleteAdminView
-from xadmin.dutils import RelatedObject
+from xadmin.dutils import RelatedObject, force_unicode
+from xadmin import dutils
 
 RELATE_PREFIX = '_rel_'
 
@@ -360,7 +360,7 @@ class EditRelateDisplayPlugin(BaseRelateDisplayPlugin):
         return datas
 
     def post_response(self, response):
-        if isinstance(response, basestring) and response != self.get_admin_url('index'):
+        if isinstance(response, dutils.basestring) and response != self.get_admin_url('index'):
             return self._get_url(response)
         return response
 
@@ -376,7 +376,7 @@ class EditRelateDisplayPlugin(BaseRelateDisplayPlugin):
 class DeleteRelateDisplayPlugin(BaseRelateDisplayPlugin):
 
     def post_response(self, response):
-        if isinstance(response, basestring) and response != self.get_admin_url('index'):
+        if isinstance(response, dutils.basestring) and response != self.get_admin_url('index'):
             return self._get_url(response)
         return response
 

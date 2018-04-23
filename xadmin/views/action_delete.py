@@ -2,16 +2,16 @@
 
 from django.core.exceptions import PermissionDenied
 from django.db import router
-from django.utils.encoding import force_unicode
 from django.template.response import TemplateResponse
 from django.utils.translation import ugettext as _
 from django.utils.encoding import force_text
 from django.contrib.contenttypes.models import ContentType
 
-from base import filter_hook
+from .base import filter_hook
 from xadmin.views.action import Action
 from xadmin.util import get_deleted_objects, model_ngettext
 from xadmin.defs import ACTION_CHECKBOX_NAME
+from xadmin.dutils import force_unicode
 
 class DeleteSelectedAction(Action):
 

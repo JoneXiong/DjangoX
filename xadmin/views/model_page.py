@@ -1,11 +1,12 @@
 # coding=utf-8
 
 from django.core.paginator import Paginator
-from django.utils.encoding import force_unicode
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 
-from base import SiteView, filter_hook
+from xadmin.dutils import force_unicode
+
+from .base import SiteView, filter_hook
 
 class ModelPage(SiteView):
     """

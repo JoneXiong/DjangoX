@@ -3,18 +3,18 @@ from django.core.exceptions import PermissionDenied
 from django.db import transaction, router
 from django.http import Http404, HttpResponseRedirect
 from django.template.response import TemplateResponse
-from django.utils.encoding import force_unicode
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 from django.utils.encoding import force_text
 from django.contrib.contenttypes.models import ContentType
-        
+
 from xadmin.util import unquote, get_deleted_objects
 from xadmin.views.edit import UpdateAdminView
 from xadmin.views.detail import DetailAdminView
 from xadmin.views.base import filter_hook, csrf_protect_m
 from xadmin.views.model_page import ModelAdminView
 from xadmin import dutils
+from xadmin.dutils import force_unicode
 
 class DeleteAdminView(ModelAdminView):
     """
@@ -60,7 +60,7 @@ class DeleteAdminView(ModelAdminView):
 
         response = self.post_response()
 
-        if isinstance(response, basestring):
+        if isinstance(response, dutils.basestring):
             # 如果返回字符串，说明是一个url，跳转到该页面
             return HttpResponseRedirect(response)
         else:

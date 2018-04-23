@@ -3,7 +3,6 @@ import datetime
 
 from django.db import models
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.template.loader import get_template
@@ -14,9 +13,9 @@ from django.utils.text import Truncator
 
 from xadmin.defs import EMPTY_CHANGELIST_VALUE
 from xadmin.defs import FILTER_PREFIX, SEARCH_VAR
-from xadmin.dutils import RelatedObject, get_cache
+from xadmin.dutils import RelatedObject, get_cache, smart_unicode
 
-from util import get_model_from_relation, reverse_field_path, get_limit_choices_to_from_path, prepare_lookup_value
+from .util import get_model_from_relation, reverse_field_path, get_limit_choices_to_from_path, prepare_lookup_value
 
 
 class FieldFilterManager(object):
@@ -134,7 +133,8 @@ class InputFilter(BaseFilter):
             else:
                 self.context_params["%s_val" % name] = ''
 
-        map(lambda kv: setattr(self, 'lookup_' + kv[0], kv[1]), self.context_params.items())
+        for k,v in self.context_params.items():
+            setattr(self, 'lookup_' + k, v)
         
     def has_output(self):
         return True
@@ -580,7 +580,6 @@ class CommonFieldListFilter(FieldFilter):
         if ne_key in params:
             queryset = queryset.exclude(
                 **{self.field_path: params.pop(ne_key)})
-        print 'do filter: ',params
         return queryset.filter(**params)
 
 

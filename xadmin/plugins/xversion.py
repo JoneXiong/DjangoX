@@ -7,7 +7,6 @@ from django.forms.models import model_to_dict
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
-from django.utils.encoding import force_unicode
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
@@ -23,7 +22,8 @@ from xadmin.views.detail import DetailAdminUtil
 from reversion.models import Revision, Version
 from reversion.revisions import default_revision_manager, RegistrationError
 from functools import partial
-from xadmin.dutils import RelatedObject
+from xadmin.dutils import RelatedObject, force_unicode, unicode
+from xadmin import dutils
 
 
 def _autoregister(admin, model, follow=None):
@@ -579,7 +579,7 @@ class InlineRevisionPlugin(BasePlugin):
 
         if self.request.method == 'GET' and formset.helper and formset.helper.layout:
             helper = formset.helper
-            helper.filter(basestring).wrap(InlineDiffField)
+            helper.filter(dutils.basestring).wrap(InlineDiffField)
             fake_admin_class = type(str('%s%sFakeAdmin' % (self.opts.app_label, self.opts.module_name)), (object, ), {'model': self.model})
             for form in formset.forms:
                 instance = form.instance

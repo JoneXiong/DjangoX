@@ -9,7 +9,6 @@ from django.db import models, transaction
 from django.forms.models import modelform_factory
 from django.http import Http404, HttpResponseRedirect
 from django.template.response import TemplateResponse
-from django.utils.encoding import force_unicode
 from django.utils.html import escape
 from django.template import loader
 from django.utils.translation import ugettext as _
@@ -23,7 +22,7 @@ from xadmin.views.detail import DetailAdminUtil
 from .common import JsonErrorDict
 from xadmin import dutils
 
-from base import SiteView, filter_hook, csrf_protect_m
+from .base import SiteView, filter_hook, csrf_protect_m
 
 class FormView(SiteView):
     form = forms.Form
@@ -134,13 +133,13 @@ class FormView(SiteView):
 
         if self.valid_forms():
             ret = self.save_forms()
-            if isinstance(ret, basestring):
+            if isinstance(ret, dutils.basestring):
                 self.message_user(ret,'error')
                 return self.get_response()
             if isinstance(ret, HttpResponse):
                 return ret
             response = self.post_response()
-            if isinstance(response, basestring):
+            if isinstance(response, dutils.basestring):
                 return HttpResponseRedirect(response)
             else:
                 return response

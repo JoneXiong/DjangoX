@@ -8,7 +8,6 @@ from django.db import models, transaction
 from django.forms.models import modelform_factory
 from django.http import Http404, HttpResponseRedirect
 from django.template.response import TemplateResponse
-from django.utils.encoding import force_unicode
 from django.utils.html import escape
 from django.template import loader
 from django.utils.translation import ugettext as _
@@ -22,9 +21,10 @@ from xadmin.layout import FormHelper, Layout, Fieldset, TabHolder, Container, Co
 from xadmin.util import unquote
 from xadmin.views.detail import DetailAdminUtil
 from xadmin import dutils
+from xadmin.dutils import force_unicode
 
-from base import filter_hook, csrf_protect_m
-from model_page import ModelAdminView
+from .base import filter_hook, csrf_protect_m
+from .model_page import ModelAdminView
 
 #在显示 Form 时，系统默认的 DBField 对应的 FormField的属性。
 FORMFIELD_FOR_DBFIELD_DEFAULTS = {
@@ -285,7 +285,7 @@ class ModelFormAdminView(ModelAdminView):
         设置 Form Layout 可以非常灵活的显示表单页面的各个元素
         """
         layout = copy.deepcopy(self.form_layout)
-        fields = self.form_obj.fields.keys() + list(self.get_readonly_fields())
+        fields = list(self.form_obj.fields.keys()) + list(self.get_readonly_fields())
 
         if layout is None:
             layout = Layout(Container(Col('full',
@@ -420,7 +420,7 @@ class ModelFormAdminView(ModelAdminView):
             self.save_forms()
 
             ret = self.save_models()
-            if isinstance(ret, basestring):
+            if isinstance(ret, dutils.basestring):
                 self.message_user(ret,'error')
                 return self.get_response()
             if isinstance(ret, HttpResponse):
@@ -429,7 +429,7 @@ class ModelFormAdminView(ModelAdminView):
             self.save_related()
             self.after_save()
             response = self.post_response()
-            if isinstance(response, basestring):
+            if isinstance(response, dutils.basestring):
                 return HttpResponseRedirect(response)
             else:
                 return response

@@ -5,12 +5,14 @@
 可以通过设置 list_export 属性来指定使用哪些导出格式 (四种各使用分别用 ``xls``, ``csv``, ``xml``, ``json`` 表示)
 将 list_export 设置为 None 来禁用数据导出功能. 
 """
-import StringIO
+try:
+    import StringIO
+except:
+    import io as StringIO
 import datetime
 import sys
 
 from django.http import HttpResponse
-from django.utils.encoding import force_unicode, smart_unicode
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 from django.utils.xmlutils import SimplerXMLGenerator
@@ -22,7 +24,8 @@ from xadmin.views import BasePlugin, ListAdminView
 from xadmin.util import json
 from xadmin.views.list import ALL_VAR
 from xadmin.views.page import GridPage
-from xadmin.dutils import render_to_string
+from xadmin.dutils import render_to_string, force_unicode, smart_unicode
+from xadmin import dutils
 
 try:
     import xlwt
@@ -180,7 +183,7 @@ class ExportPlugin(BasePlugin):
         if isinstance(t, bool):
             return '"是"' if t else '"否"'
         t = t.replace('"', '""').replace(',', '\,')
-        if isinstance(t, basestring):
+        if isinstance(t, dutils.basestring):
             t = '"%s"' % t
         return t
 

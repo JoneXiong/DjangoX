@@ -52,7 +52,6 @@ import calendar
 from django.http import HttpResponseNotFound
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse
-from django.utils.encoding import smart_unicode
 from django.db import models
 from django.utils.http import urlencode
 from django.utils.translation import ugettext_lazy as _, ugettext
@@ -60,7 +59,8 @@ from django.utils.translation import ugettext_lazy as _, ugettext
 from xadmin.sites import site
 from xadmin.views import BasePlugin, ListAdminView
 from xadmin.views.dashwidget import ModelBaseWidget, widget_manager
-from xadmin.util import lookup_field, label_for_field, force_unicode, json
+from xadmin.util import lookup_field, label_for_field, json
+from xadmin.dutils import force_unicode
 from xadmin import dutils
 
 @widget_manager.register
@@ -121,7 +121,7 @@ class JSONEncoder(DjangoJSONEncoder):
             try:
                 return super(JSONEncoder, self).default(o)
             except Exception:
-                return smart_unicode(o)
+                return dutils.smart_unicode(o)
 
 
 class ChartsPlugin(BasePlugin):

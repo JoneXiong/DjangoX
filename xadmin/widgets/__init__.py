@@ -2,4 +2,4 @@
 
 from .base import *
 from .relation import *
-from linkage import *
+from .linkage import *

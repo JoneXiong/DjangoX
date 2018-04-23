@@ -3,23 +3,23 @@
 import json
 
 import xadmin
-from base import filter_hook
-from form import FormView
+from .base import filter_hook
+from .form import FormView
+from .custom_page import PageView
 
-from custom_page import PageView
 from xadmin import options
 from xadmin.dutils import JSONEncoder
 
-    
+
 class FormPage(FormView,PageView):
-    
+
     @filter_hook
     def get_redirect_url(self):
         if self._has_file_field:
             return self.request.get_full_path()
         return self.get_response()
 
-    @classmethod  
+    @classmethod
     def render_btn(cls, _redirect=None):
         m_root = xadmin.ROOT_PATH_NAME and '/'+xadmin.ROOT_PATH_NAME or ''
         if _redirect:

@@ -5,7 +5,6 @@ from django import forms
 from django.core.exceptions import PermissionDenied
 from django.forms.forms import DeclarativeFieldsMetaclass
 from django.http import Http404
-from django.utils.encoding import force_unicode, smart_unicode
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
@@ -18,7 +17,8 @@ from xadmin.views.base import SiteView, filter_hook, csrf_protect_m
 from xadmin.views.model_page import ModelAdminView
 from xadmin.util import unquote
 from xadmin import dutils
-from dashwidget import widget_manager, WidgetDataError
+from .dashwidget import widget_manager, WidgetDataError
+from xadmin.dutils import force_unicode, smart_unicode
 
 
 class WidgetTypeSelect(forms.Widget):
@@ -232,7 +232,7 @@ class Dashboard(SiteView):
                                 widget = user_widgets.get(int(wid))
                                 if widget:
                                     ws.append(self.get_widget(widget))
-                            except Exception, e:
+                            except Exception as e:
                                 import logging
                                 logging.error(e, exc_info=True)
                         widgets.append(ws)

@@ -9,14 +9,15 @@ from django.views.decorators.cache import never_cache
 from django.utils.text import capfirst
 from django.core.urlresolvers import reverse
 
-from util import sortkeypicker
-from core.structs import SortedDict
-import defs
+from .util import sortkeypicker
+from .core.structs import SortedDict
+from . import defs
+from .dutils import unicode
 
-#设置系统的编码为utf-8
-reload(sys)
-sys.setdefaultencoding("utf-8")
-
+if sys.version<'3':
+    #设置系统的编码为utf-8
+    reload(sys)
+    sys.setdefaultencoding("utf-8")
 
 class AlreadyRegistered(Exception):
     """
@@ -465,7 +466,7 @@ class AdminSite(object):
                                   name=name) for path, clz_or_func, name in self._registry_views]
 
         # 循环所有已注册的 Model, 逐一添加其ModelAdminViewClass
-        for model, admin_class in self._registry.iteritems():
+        for model, admin_class in self._registry.items():
             view_urls = []
             app_label = model._meta.app_label
             module_name = model._meta.module_name
@@ -629,7 +630,7 @@ class AdminSite(object):
                     }]
         else:
             ret = []
-        for app_label,mod in self.app_dict.iteritems():
+        for app_label,mod in self.app_dict.items():
             if hasattr(mod,'verbose_name'):
                 m_first_url = None
                 if hasattr(mod,'index_url_name'):

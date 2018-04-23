@@ -3,7 +3,6 @@
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.paginator import Paginator
 from django.db import models
-from django.utils.encoding import force_unicode, smart_unicode
 from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
@@ -12,11 +11,12 @@ from django.utils.text import Truncator
 
 from xadmin.util import lookup_field, display_for_field, label_for_field, boolean_icon
 from xadmin.defs import TO_FIELD_VAR, ALL_VAR, ORDER_VAR, PAGE_VAR, COL_LIST_VAR, ERROR_FLAG, SEARCH_VAR, EMPTY_CHANGELIST_VALUE
+from xadmin.dutils import force_unicode, smart_unicode
 
-from base import filter_hook, csrf_protect_m
-from model_page import ModelPage
-from common import FakeMethodField, ResultRow, ResultItem, ResultHeader
-from grid import BaseGrid
+from .base import filter_hook, csrf_protect_m
+from .model_page import ModelPage
+from .common import FakeMethodField, ResultRow, ResultItem, ResultHeader
+from .grid import BaseGrid
 
 
 class ListAdminView(BaseGrid,ModelPage):
@@ -318,7 +318,7 @@ class ListAdminView(BaseGrid,ModelPage):
         if field_name in ordering_field_columns:
             sorted = True
             order_type = ordering_field_columns.get(field_name).lower()
-            sort_priority = ordering_field_columns.keys().index(field_name) + 1
+            sort_priority = list(ordering_field_columns.keys()).index(field_name) + 1
             th_classes.append('sorted %sending' % order_type)
             new_order_type = {'asc': 'desc', 'desc': 'asc'}[order_type]
 

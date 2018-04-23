@@ -30,7 +30,7 @@ def sync_groups(group_dict):
         perm_need_add = []
         _group,_is_create = Group.objects.get_or_create(name=group_name)
         if _is_create:
-            print 'Created group:',_group
+            print('Created group: %s'%_group)
 
         # 获取model的权限配置
         _group_model_perm = group_perm.get("model", [])
@@ -60,7 +60,7 @@ def sync_groups(group_dict):
 def get_or_create_perm(name, codename, content_type):
     _perm,_is_create =  Permission.objects.get_or_create(name=name, codename=codename, content_type=content_type)
     if _is_create:
-        print 'Created perm:',_perm
+        print('Created perm: %s'%_perm)
 
 def sync_perms(perms):
     common_content_type = ContentType.objects.filter(app_label='auth', model='permission')[0]
@@ -81,5 +81,5 @@ class Command(BaseCommand):
                     sync_groups(perm_mod.groups)
             except ImportError:
                 pass
-        print 'Done.'
+        print('Done.')
 

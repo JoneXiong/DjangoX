@@ -23,8 +23,9 @@ from django.views.generic import View
 
 from ..util import static, json, vendor, sortkeypicker
 from .. import defs
-from structs import filter_hook
+from .structs import filter_hook
 from ..dutils import JSONEncoder
+from .. import dutils
 
 
 csrf_protect_m = method_decorator(csrf_protect)
@@ -41,7 +42,7 @@ def inclusion_tag(file_name, context_class=Context, takes_context=False):
             from django.template.loader import get_template, select_template
             if isinstance(file_name, Template):
                 t = file_name
-            elif not isinstance(file_name, basestring) and is_iterable(file_name):
+            elif not isinstance(file_name, dutils.basestring) and is_iterable(file_name):
                 t = select_template(file_name)
             else:
                 t = get_template(file_name)
@@ -122,10 +123,10 @@ class Common(object):
             remove = []
         p = dict(self.request.GET.items()).copy()
         for r in remove:
-            for k in p.keys():
+            for k in list(p.keys()):
                 if k.startswith(r):
                     del p[k]
-        for k, v in new_params.items():
+        for k, v in list(new_params.items()):
             if v is None:
                 if k in p:
                     del p[k]
@@ -168,7 +169,7 @@ class Common(object):
             return self.request.POST.get(k, None)
         
     def param_list(self):
-        return self.request.GET.keys() + self.request.POST.keys()
+        return list(self.request.GET.keys()) + list(self.request.POST.keys())
 
     ########################################## 页面Page 相关的函数 ##########################################
     def render_response(self, content, response_type='json'):
@@ -420,7 +421,7 @@ class SiteView(BaseView):
                 return item
 
             nav_menu = [filter_item(item) for item in menus if self._check_menu_permission(item)]
-            nav_menu = filter(lambda x:x, nav_menu)
+            nav_menu = list(filter(lambda x:x, nav_menu))
 
             if not settings.DEBUG:
                 self.request.session[menu_session_key] = json.dumps(nav_menu)

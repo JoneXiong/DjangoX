@@ -6,7 +6,6 @@ from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db.models.base import ModelBase
 from django.template.context import RequestContext
 from django.test.client import RequestFactory
-from django.utils.encoding import force_unicode, smart_unicode
 from django.utils.translation import ugettext as _
 from django.utils.http import urlencode, urlquote
 
@@ -68,7 +67,7 @@ class ModelChoiceField(forms.ChoiceField):
     def valid_value(self, value):
         value = self.prepare_value(value)
         for k, v in self.choices:
-            if value == smart_unicode(k):
+            if value == dutils.smart_unicode(k):
                 return True
         return False
 

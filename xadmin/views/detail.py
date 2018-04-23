@@ -9,7 +9,6 @@ from django.forms.models import modelform_factory
 from django.http import Http404
 from django.template import loader
 from django.template.response import TemplateResponse
-from django.utils.encoding import force_unicode, smart_unicode
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
@@ -19,9 +18,11 @@ from crispy_forms.utils import TEMPLATE_PACK
 from xadmin.layout import FormHelper, Layout, Fieldset, Container, Column, Field, Col, TabHolder
 from xadmin.util import unquote, lookup_field, display_for_field, boolean_icon, label_for_field
 from xadmin.defs import EMPTY_CHANGELIST_VALUE
+from xadmin.dutils import force_unicode, smart_unicode
+from xadmin import dutils
 
-from base import filter_hook, csrf_protect_m
-from model_page import ModelAdminView
+from .base import filter_hook, csrf_protect_m
+from .model_page import ModelAdminView
 
 
 class ShowField(Field):
@@ -121,7 +122,7 @@ def replace_field_to_value(layout, cb):
         if isinstance(lo, Field) or issubclass(lo.__class__, Field):
             layout.fields[i] = ShowField(
                 cb, *lo.fields, attrs=lo.attrs, wrapper_class=lo.wrapper_class)
-        elif isinstance(lo, basestring):
+        elif isinstance(lo, dutils.basestring):
             layout.fields[i] = ShowField(cb, lo)
         elif hasattr(lo, 'get_field_names'):
             replace_field_to_value(lo, cb)
@@ -185,7 +186,7 @@ class DetailAdminView(ModelAdminView):
         layout = copy.deepcopy(self.detail_layout or self.form_layout)
 
         if layout is None:
-            fields = self.form_obj.fields.keys() + list(self.get_readonly_fields())
+            fields = list(self.form_obj.fields.keys()) + list(self.get_readonly_fields())
             layout = Layout(Container(Col('full',
                                           Fieldset(
                                               "", *fields,
@@ -254,7 +255,7 @@ class DetailAdminView(ModelAdminView):
         replace_field_to_value(layout, self.get_field_result)
         helper.add_layout(layout)
         helper.filter(
-            basestring, max_level=20).wrap(ShowField, admin_view=self)
+            dutils.basestring, max_level=20).wrap(ShowField, admin_view=self)
 
         # 处理只读字段
         readonly_fields = self.get_readonly_fields()

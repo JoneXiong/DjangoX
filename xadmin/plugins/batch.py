@@ -5,7 +5,6 @@ from django.db import models
 from django.core.exceptions import PermissionDenied
 from django.forms.models import modelform_factory
 from django.template.response import TemplateResponse
-from django.utils.encoding import force_unicode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _, ugettext_lazy
 from xadmin.layout import FormHelper, Layout, Fieldset, Container, Col
@@ -14,6 +13,7 @@ from xadmin.util import model_ngettext, vendor
 from xadmin.views.base import filter_hook
 from xadmin.views.edit import ModelFormAdminView
 from xadmin.defs import ACTION_CHECKBOX_NAME
+from xadmin.dutils import force_unicode
 
 BATCH_CHECKBOX_NAME = '_batch_change_fields'
 

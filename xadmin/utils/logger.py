@@ -14,6 +14,8 @@ import sys
 import os
 
 #monkey.patch_thread() # thread must be patched after import
+if sys.version>='3':
+    unicode = str
 
 LOG_DEBUG = logging.DEBUG
 LOG_ERROR = logging.ERROR

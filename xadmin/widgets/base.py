@@ -6,7 +6,6 @@ from itertools import chain
 
 from django import forms
 from django.forms.widgets import RadioFieldRenderer
-from django.utils.encoding import force_unicode
 from django.utils.safestring import mark_safe
 from django.utils.html import conditional_escape
 from django.utils.translation import ugettext as _
@@ -16,6 +15,7 @@ except:
     from django.forms.widgets import RadioChoiceInput as RadioInput
 
 from ..util import vendor
+from ..dutils import force_unicode
 
 class ReadonlyWidget(forms.TextInput):
     

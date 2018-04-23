@@ -55,10 +55,10 @@ def auto_create_or_update_perm():
         try:
             _perm,_is_create =  get_or_create_perm(perm_name, perm_code, common_content_type)
             if _is_create:
-                print 'Created perm:',_perm
+                print('Created perm: %s'%_perm)
         except:
             import traceback;traceback.print_exc()
-            print 'Error to create: %s %s'%(perm_code, perm_name)
+            print('Error to create: %s %s'%(perm_code, perm_name))
 
 	add_view_permissions(1)
 
@@ -68,5 +68,5 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         auto_create_or_update_perm()
-        print 'Done.'
+        print('Done.')
 

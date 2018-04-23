@@ -23,7 +23,7 @@ def register_builtin_views(site):
     
 def register_builtin_plugins(site):
     from xadmin.plugins import PLUGINS
-    from dutils import import_module
+    from .dutils import import_module
 
     exclude_plugins = getattr(settings, 'XADMIN_EXCLUDE_PLUGINS', [])
     [import_module('xadmin.plugins.%s' % plugin) for plugin in PLUGINS if plugin not in exclude_plugins]
@@ -31,7 +31,7 @@ def register_builtin_plugins(site):
 def autodiscover():
     import xadmin
     from xadmin.sites import site
-    from dutils import import_module
+    from .dutils import import_module
     
     xadmin.site = site
     
@@ -59,7 +59,7 @@ def autodiscover():
         site.app_dict[app_label] = mod
         
         # app级菜单初始化
-        default_title = hasattr(mod,'verbose_name') and '%s 其他'%mod.verbose_name or '其他'
+        default_title = hasattr(mod,'verbose_name') and u'%s 其他'%mod.verbose_name or u'其他'
         site.sys_menu[app_label] = {'_default_group':{'key': '_default_group','title': default_title, 'icon': 'fa-th-large', 'menus': []}  }
         if hasattr(mod,'menus'):
             m_menus = mod.menus

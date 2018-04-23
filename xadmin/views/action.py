@@ -6,10 +6,11 @@ from django.template.response import TemplateResponse
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse
 
-from base import filter_hook
-from model_page import ModelAdminView
+from .base import filter_hook
+from .model_page import ModelAdminView
 from xadmin.layout import FormHelper, Layout, Fieldset, TabHolder, Container, Column, Col, Field
 from xadmin.defs import ACTION_CHECKBOX_NAME
+from xadmin import dutils
 
 class BaseActionView(ModelAdminView):
     action_name = None  # key名，默认为类名
@@ -138,7 +139,7 @@ class FormAction(Action):
             if self.form_obj.is_valid():
                 ret = self.action(queryset)
                 if ret:
-                    if isinstance(ret, basestring):
+                    if isinstance(ret, dutils.basestring):
                         self.message_user(ret,'error')
                     elif isinstance(ret, HttpResponse):
                         return ret

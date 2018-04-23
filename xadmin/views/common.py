@@ -2,7 +2,6 @@
 
 from django.utils.safestring import mark_safe
 from django.utils.html import conditional_escape
-from django.utils.encoding import force_unicode
 
 from xadmin import dutils
 
@@ -68,7 +67,7 @@ class ResultItem(object):
     def label(self):
         text = mark_safe(
             self.text) if self.allow_tags else conditional_escape(self.text)
-        if force_unicode(text) == '':
+        if dutils.force_unicode(text) == '':
             text = mark_safe('&nbsp;')
         for wrap in self.wraps:
             text = mark_safe(wrap % text)

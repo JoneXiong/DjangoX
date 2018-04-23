@@ -1,11 +1,16 @@
 # coding=utf-8
-
+import sys
 import datetime
 import decimal
 
 import django
 from django.core.serializers.json import DjangoJSONEncoder
-from django.utils.encoding import smart_unicode
+try:
+    from django.utils.encoding import smart_unicode, force_unicode
+    force_text = force_unicode
+except:
+    from django.utils.encoding import smart_text as smart_unicode, force_text as force_unicode
+    from django.utils.encoding import smart_text, force_text
 from django.db.models.base import ModelBase
 from django.template import loader
 from django.template.context import RequestContext
@@ -88,9 +93,16 @@ def get_context_dict(context):
     """
     if isinstance(context, RequestContext):
         ctx = {}
-        map(ctx.update, context.dicts)
+        list(map(ctx.update, context.dicts))
     else:
         ctx = context
     return ctx
 
 GTE10 = django.VERSION[1]>=10
+
+if sys.version<'3':
+    unicode = unicode
+    basestring = basestring
+else:
+    unicode = str
+    basestring = str

@@ -1,5 +1,5 @@
 # coding=utf-8
-
+import sys
 import logging
 import time
 import hashlib
@@ -13,6 +13,7 @@ from django.db.models import SlugField
 
 from .form_fields import MultiSelectFormField
 from .subclassing import SubfieldBase
+from xadmin import dutils
 
 
 class AutoMD5SlugField(SlugField):
@@ -104,7 +105,7 @@ class MultiSelectField(models.Field):
         return value
  
     def get_db_prep_value(self, value, connection=None, prepared=False):
-        if isinstance(value, basestring):
+        if isinstance(value, dutils.basestring):
             return value
         elif isinstance(value, list):
             return ",".join(value)

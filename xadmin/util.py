@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import sys
 
 import datetime
 import decimal
@@ -11,14 +12,18 @@ from django.utils import formats
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
-from django.utils.encoding import force_unicode, smart_unicode, smart_str
+from django.utils.encoding import smart_str
 from django.utils.translation import ungettext
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.forms import Media
 from django.utils.translation import get_language
 
-from xadmin.dutils import RelatedObject
+from xadmin.dutils import RelatedObject, force_unicode, smart_unicode
+from xadmin import dutils
+
+if sys.version>='3':
+    unicode = str
 
 
 if 'django.contrib.staticfiles' in settings.INSTALLED_APPS:
@@ -49,7 +54,7 @@ def xstatic(*tags):
     u'''
     根据vendors映射表得到资源的static路径
     '''
-    from vendors import vendors
+    from .vendors import vendors
     node = vendors
 
     fs = []
@@ -59,7 +64,7 @@ def xstatic(*tags):
         try:
             for p in tag.split('.'):
                 node = node[p]
-        except Exception, e:
+        except Exception as e:
             if tag.startswith('xadmin'):
                 file_type = tag.split('.')[-1]
                 if file_type in ('css', 'js'):
@@ -142,7 +147,7 @@ def quote(s):
     quoting is slightly different so that it doesn't get automatically
     unquoted by the Web browser.
     """
-    if not isinstance(s, basestring):
+    if not isinstance(s, dutils.basestring):
         return s
     res = list(s)
     for i in range(len(res)):
@@ -156,7 +161,7 @@ def unquote(s):
     """
     Undo the effects of quote(). Based heavily on urllib.unquote().
     """
-    if not isinstance(s, basestring):
+    if not isinstance(s, dutils.basestring):
         return s
     mychr = chr
     myatoi = int
@@ -250,7 +255,7 @@ class NestedObjects(Collector):
                 self.add_edge(None, obj)
         try:
             return super(NestedObjects, self).collect(objs, source_attr=source_attr, **kwargs)
-        except models.ProtectedError, e:
+        except models.ProtectedError as e:
             self.protected.update(e.protected_objects)
 
     def related_objects(self, related, objs):

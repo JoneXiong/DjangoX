@@ -18,6 +18,7 @@ from xadmin.views import BasePlugin, ModelFormAdminView, ModelAdminView, csrf_pr
 from xadmin.views.action import FormAction
 from xadmin import widgets
 from xadmin.views import filter_hook
+from xadmin import dutils
 
 
 ACTION_NAME = {
@@ -246,7 +247,7 @@ class ChangePasswordView(ModelAdminView):
         helper.include_media = False
         self.form.helper = helper
         context.update({
-            'title': _('Change password: %s') % escape(unicode(self.obj)),
+            'title': _('Change password: %s') % escape(dutils.unicode(self.obj)),
             'form': self.form,
             'has_delete_permission': False,
             'has_change_permission': True,
