@@ -1,9 +1,9 @@
-import a_admin
-import b_admin
-import idc_admin
-import host_group_admin
-import host_admin
-import maintainlog_admin
-import access_record_admin
+from . import a_admin
+from . import b_admin
+from . import idc_admin
+from . import host_group_admin
+from . import host_admin
+from . import maintainlog_admin
+from . import access_record_admin
 # import img_admin
-import cms_admin
+from . import cms_admin

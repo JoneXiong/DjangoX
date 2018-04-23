@@ -11,7 +11,7 @@ from app import models
 class MyAction1(Action):
     
     def action(self, qs):
-        print 'do MyAction1'
+        print('do MyAction1')
         self.msg('执行成功', 'success')
         return '5555555'
     
@@ -43,7 +43,7 @@ class MyAction2(FormAction):
     form = VerifyFailForm
     
     def action(self, qs):
-        print 'do MyAction2'
+        print('do MyAction2')
         #self.msg('执行成功', 'success')
 
 class BAdmin(object):

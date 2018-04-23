@@ -126,4 +126,4 @@ class AccessRecord(models.Model):
     def __unicode__(self):
         return "%s Access Record" % self.date.strftime('%Y-%m-%d')
 
-from model import *
+from .model import *

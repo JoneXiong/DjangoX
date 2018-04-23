@@ -16,7 +16,7 @@ class MyAction(views.Action):
     def do_action(self, queryset):
         # queryset 是包含了已经选择的数据的 queryset
         for obj in queryset:
-            print 'do action for ',obj,type(obj)
+            print('do action for ',obj,type(obj))
 
         self.msg('操作成功', 'success')
         # 返回 HttpResponse
@@ -47,11 +47,11 @@ class HostGroupAdmin(object):
     actions = [MyAction, ]
 
     def do_patch(self):
-        print 'do patch begin.'
-        print dir(self.patch_form)
-        print self.patch_form.fields
-        print self.patch_form.cleaned_data
+        print('do patch begin.')
+        print(dir(self.patch_form))
+        print(self.patch_form.fields)
+        print(self.patch_form.cleaned_data)
         super(HostGroupAdmin,self).do_patch()
-        print 'do patch end.'
+        print('do patch end.')
 
 xadmin.site.register(models.HostGroup, HostGroupAdmin)

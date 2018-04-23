@@ -1,1 +1,1 @@
-import upload_view
+from . import upload_view

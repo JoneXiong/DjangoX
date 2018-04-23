@@ -3,8 +3,6 @@
 import sys
 import os.path
 
-reload(sys)
-sys.setdefaultencoding('utf-8')
 gettext = lambda s: s
 
 PROJECT_ROOT = os.path.join(

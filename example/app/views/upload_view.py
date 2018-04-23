@@ -22,7 +22,7 @@ class UploadView(BaseView):
             for chunk in f.chunks():
                 des_origin_f.write(chunk)
             des_origin_f.close()
-        except Exception, e:
+        except Exception as e:
             import traceback;traceback.print_exc()
         res = "<script>window.parent.CKEDITOR.tools.callFunction("+callback+",'/"+file_name+"', '');</script>"
         return HttpResponse(res)

@@ -1,1 +1,1 @@
-from user_profile import EmailVerifyRecord
+from .user_profile import EmailVerifyRecord

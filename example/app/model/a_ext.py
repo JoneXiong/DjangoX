@@ -3,7 +3,7 @@
 from django.db import models
 from xadmin.util import User
 
-from a import A
+from .a import A
 
 class AExt(object):
     

@@ -28,5 +28,5 @@ site.register(views.SiteView, GlobalSetting)
 
 
 from . import dashboard
-import admins
-import pages
+from . import admins
+from . import pages

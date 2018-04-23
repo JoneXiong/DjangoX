@@ -8,7 +8,7 @@ from xadmin.views.list import ResultRow
 from xadmin.views.base import filter_hook
 from xadmin.filters import ChoicesBaseFilter
 
-from form_actions import FormAction1
+from .form_actions import FormAction1
 
 
 class GridListFilter1(ChoicesBaseFilter):

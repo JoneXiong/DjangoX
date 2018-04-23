@@ -3,7 +3,7 @@
 import xadmin
 from xadmin.views.form import FormView
 
-from forms import TestForm
+from .forms import TestForm
 
 class TestFormView(FormView):
     '''
@@ -15,7 +15,7 @@ class TestFormView(FormView):
 
     def save_forms(self):
         data = self.form_obj.cleaned_data
-        print '>>>',data
+        print('>>>',data)
 
     def post_response(self):
 

@@ -27,7 +27,7 @@ class FormPage1(FormPage):
         ]
 
     def save_forms(self):
-        print self.form_obj.cleaned_data
+        print(self.form_obj.cleaned_data)
 
 xadmin.site.register_page(FormPage1)
 

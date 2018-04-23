@@ -23,5 +23,5 @@ class FormAction1(FormAction):
 
     def save_forms(self):
         for e in self.get_id_list():
-            print 'doing...',e
+            print('doing...',e)
 xadmin.site.register_page(FormAction1)
