@@ -19,7 +19,7 @@ class ModelPage(SiteView):
     app_label = None
     module_name = None
     model_info = None
-    
+
     remove_permissions = []
     exclude = None #用在编辑页或详情页
     fields = None #用在编辑页或详情页
@@ -46,7 +46,7 @@ class ModelPage(SiteView):
         return context
 
     @filter_hook
-    def get_breadcrumb(self): 
+    def get_breadcrumb(self):
         u'''
         导航链接基础部分
         '''
@@ -81,7 +81,7 @@ class ModelPage(SiteView):
             return self.model_admin_url("detail", getattr(obj, self.opts.pk.attname))
         else:
             return None
-        
+
     def get_url(self, name, *args, **kwargs):
         u'''
         模型相关url
@@ -153,7 +153,7 @@ class ModelPage(SiteView):
         if perm_code in ('view', 'add', 'change', 'delete'):
             perm_code = '%s.%s_%s' %(opts.app_label, perm_code ,opts.module_name)
         return (raw_code not in self.remove_permissions) and self.user.has_perm(perm_code)
-    
+
     def get_model_perms(self):
         return {
             'view': self.has_view_permission(),
@@ -161,26 +161,26 @@ class ModelPage(SiteView):
             'change': self.has_change_permission(),
             'delete': self.has_delete_permission(),
         }
-        
+
     @property
     def pk_name(self):
         return self.opts.pk.attname
-        
+
 ModelAdminView = ModelPage
 ModelView = ModelAdminView
 
 class ModelAdmin(object):
-    
+
     # 【列表页】相关配置项
-    
+
     list_display = ('__str__',)    #: 列表字段
     list_exclude = ()              #: 排除显示的列
-    
+
     list_display_links = ()        #: 链接字段
     list_display_links_details = False  #: 链接到详情页面而非编辑页
-    
+
     list_select_related = None     #: 是否提前加载关联数据, 使用 ``select_related``
-    
+
     list_per_page = 50             #: 每页数
     list_max_show_all = 200        #: 当点“显示全部”每页显示的最大条数
     paginator_class = Paginator    #: 默认的分页类
@@ -191,10 +191,10 @@ class ModelAdmin(object):
     list_template = None    #: 显示数据的模板 默认为 views/grid.html
     pop = False # 是否为弹窗页
     search_sphinx_ins = None # 使用的搜索引擎
-    
-    
+
+
     relfield_style = 'fk-ajax'
-    
+
     # 【列表页】相关可获取项
     page_num = 0    # 当前第几页
     paginator = None    #分页类实例

@@ -17,8 +17,9 @@ from xadmin.views.base import SiteView, filter_hook, csrf_protect_m
 from xadmin.views.model_page import ModelAdminView
 from xadmin.util import unquote
 from xadmin import dutils
-from .dashwidget import widget_manager, WidgetDataError
 from xadmin.dutils import force_unicode, smart_unicode
+
+from .dashwidget import widget_manager, WidgetDataError
 
 
 class WidgetTypeSelect(forms.Widget):
@@ -352,11 +353,11 @@ class AppDashboard(Dashboard):
 
     def get_page_id(self):
         return 'app:%s' % self.app_label
-    
+
     def get_title(self):
         mod = self.admin_site.app_dict[self.app_label]
         return self.title % force_unicode(getattr(mod, 'verbose_name', self.app_label))
-    
+
     def set_widgets(self, context):
         # 设置 self.widgets 
         nav_menu = context['nav_menu']
@@ -372,7 +373,7 @@ class AppDashboard(Dashboard):
             widgets[int(flag)].append(widget)
             flag = not flag
         self.widgets = widgets
-    
+
     @filter_hook
     def get_context(self):
         context = super(Dashboard, self).get_context()

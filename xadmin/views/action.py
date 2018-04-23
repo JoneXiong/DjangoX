@@ -6,11 +6,12 @@ from django.template.response import TemplateResponse
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse
 
-from .base import filter_hook
-from .model_page import ModelAdminView
 from xadmin.layout import FormHelper, Layout, Fieldset, TabHolder, Container, Column, Col, Field
 from xadmin.defs import ACTION_CHECKBOX_NAME
 from xadmin import dutils
+
+from .base import filter_hook
+from .model_page import ModelAdminView
 
 class BaseActionView(ModelAdminView):
     action_name = None  # key名，默认为类名
@@ -33,7 +34,7 @@ class BaseActionView(ModelAdminView):
     def init_action(self, list_view):
         self.list_view = list_view
         self.admin_site = list_view.admin_site
-        
+
     def get_redirect_url(self):
         action_return_url = self.request.META['HTTP_REFERER']
         return action_return_url
@@ -44,7 +45,7 @@ class BaseActionView(ModelAdminView):
     @filter_hook
     def do_action(self, queryset):
         return self.action(queryset)
-    
+
 Action = BaseActionView
 
 class FormAction(Action):
@@ -52,19 +53,19 @@ class FormAction(Action):
     form_layout = None
     form_template = 'xadmin/views/model_form_action.html'
     action_url = ''
-    
+
     def get_form_datas(self):
         data = {'initial': self.get_initial_data()}
         if self.request_method == 'post' and '_save' in self.request.POST:
             data.update({'data': self.request.POST, 'files': self.request.FILES})
-            
+
         else:
             data['initial'].update(self.request.GET)
         return data
-    
+
     def get_initial_data(self):
         return {}
-    
+
     @filter_hook
     def get_form_layout(self):
         layout = copy.deepcopy(self.form_layout)
@@ -95,7 +96,7 @@ class FormAction(Action):
                     container.append(other_fieldset)
 
         return layout
-    
+
     @filter_hook
     def get_form_helper(self):
         helper = FormHelper()
@@ -104,25 +105,25 @@ class FormAction(Action):
         helper.add_layout(self.get_form_layout())
 
         return helper
-    
+
     def setup_forms(self):
         helper = self.get_form_helper()
         if helper:
             self.form_obj.helper = helper
-            
+
     @filter_hook
     def get_media(self):
         return super(FormAction, self).get_media() + self.form_obj.media + \
             self.vendor('xadmin.page.form.js', 'xadmin.form.css')
-            
+
     @filter_hook
     def prepare_form(self):
         self.view_form = self.form
-            
+
     @filter_hook
     def instance_forms(self):
         self.form_obj = self.view_form(**self.get_form_datas())
-        
+
     def get_redirect_url(self):
         action_return_url = self.request.POST.get('_action_return_url')
         return action_return_url
@@ -134,7 +135,7 @@ class FormAction(Action):
         self.prepare_form()
         self.instance_forms()
         self.setup_forms()
-        
+
         if self.request.POST.get('post') and '_save' in self.request.POST:
             if self.form_obj.is_valid():
                 ret = self.action(queryset)
@@ -146,7 +147,7 @@ class FormAction(Action):
                 else:
                     self.message_user(u'操作成功', 'success')
                     return None
-            
+
         context = self.get_context()
         context.update({
             'title': self.verbose_name or self.__class__.__bases__ [1].__name__,
@@ -160,5 +161,5 @@ class FormAction(Action):
             'return_url': self.request.POST.get('_action_return_url') if '_action_return_url' in self.request.POST else self.request.META['HTTP_REFERER'],
             'action_url': self.action_url
         })
-        
+
         return TemplateResponse(self.request, self.form_template, context)

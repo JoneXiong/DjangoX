@@ -3,6 +3,7 @@ import re
 
 from django import forms
 from django.forms import Media
+
 from ..util import vendor
 
 
@@ -17,20 +18,20 @@ class SelectRelation(forms.TextInput):
                             )
 
     '''
-    
+
     def __init__(self, admin_view, link, map_dict, attrs=None, using=None,inline_ref=''):
         self.admin_view = admin_view
         self.link = link
         self.map_dict = map_dict
         self.inline_ref = inline_ref
         super(SelectRelation, self).__init__(attrs)
-    
+
     def value_from_datadict(self, data, files, name):
         return data.get(name)
         link_val = data.get(self.link)
         cur_obj = self.map_dict[link_val]
         return cur_obj.value_from_datadict(data, files, name)
-    
+
     def render(self, name, value, attrs=None,form=None):
         link_val = self.get_value(self.link, form)
         link_val = str(link_val)
@@ -57,7 +58,7 @@ class SelectRelation(forms.TextInput):
                       <ul class="select-relation" name="%s" link="%s" style="display:none">%s</ul>
         '''%(_name,self.link,''.join(opt_list)))
         return ''.join(output)
-        
+
     def get_value(self, key, form=None):
         '''
         得到关联字段的值
@@ -70,7 +71,7 @@ class SelectRelation(forms.TextInput):
             return self.form.initial.get(key,None)
         else:
             return self.form.data.get(key,None)
-    
+
     @property
     def media(self):
         media = Media()

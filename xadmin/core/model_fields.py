@@ -11,9 +11,10 @@ from django.utils.text import capfirst
 from django.core import exceptions
 from django.db.models import SlugField
 
+from xadmin import dutils
+
 from .form_fields import MultiSelectFormField
 from .subclassing import SubfieldBase
-from xadmin import dutils
 
 
 class AutoMD5SlugField(SlugField):

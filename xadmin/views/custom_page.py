@@ -4,22 +4,23 @@ from django.core.exceptions import PermissionDenied
 
 import xadmin
 from xadmin import defs
+
 from .base import SiteView, filter_hook
 
 
 class PageView(SiteView):
     verbose_name = None
     template = 'xadmin/views/page.html'
-    
+
     app_label = 'xadmin'
     menu_group = '_default_group'
     icon = defs.DEFAULT_MODEL_ICON
     order = 0
-    
+
     hide_menu = False
     perm = None#'comm_page_code'
     pop = False
-    
+
     def init_request(self, *args, **kwargs):
         u'''
         类实例化时执行
@@ -32,19 +33,19 @@ class PageView(SiteView):
         if '_pop' in self.request.GET or 'pop' in self.request.GET:
             self.pop = True
             # self.base_template = 'xadmin/base_pure.html'
-    
+
     def get(self, request, *args, **kwargs):
         u'''
         Django http GET请求的返回
         '''
         return self.render_tpl(self.template, self.get_context())
-    
+
     def get_content(self):
         u'''
         页面主体内容
         '''
         pass
-    
+
     @filter_hook
     def get_context(self):
         u'''
@@ -61,12 +62,12 @@ class PageView(SiteView):
             else:
                 context['base_template'] = 'xadmin/base_pure.html'
         return context
-    
-    @classmethod 
+
+    @classmethod
     def get_page_url(cls):
         m_root = xadmin.ROOT_PATH_NAME and '/'+xadmin.ROOT_PATH_NAME or ''
         return '%s/page/%s/'%(m_root, cls.__name__.lower())
-    
+
     @filter_hook
     def get_breadcrumb(self):
         bcs = super(PageView, self).get_breadcrumb()

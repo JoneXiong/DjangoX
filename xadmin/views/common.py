@@ -36,7 +36,7 @@ class ResultRow(dict):
     """
     def __init__(self):
         self.cells = []
-        
+
     def add_cell(self,name, text):
         item = ResultItem(name, self)
         item.text = text

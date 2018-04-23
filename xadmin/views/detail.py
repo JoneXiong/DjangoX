@@ -245,7 +245,7 @@ class DetailAdminView(ModelAdminView):
     @filter_hook
     def get_form_helper(self):
         """
-        取得 Crispy Form 需要的 FormHelper。具体信息可以参看 `Crispy Form 文档 <http://django-crispy-forms.readthedocs.org/en/latest/tags.html#crispy-tag>`_ 
+        取得 Crispy Form 需要的 FormHelper。具体信息可以参看 `Crispy Form 文档 <http://django-crispy-forms.readthedocs.org/en/latest/tags.html#crispy-tag>`_
         """
         helper = FormHelper()
         helper.form_tag = False

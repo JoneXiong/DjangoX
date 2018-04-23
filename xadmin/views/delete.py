@@ -72,7 +72,7 @@ class DeleteAdminView(ModelAdminView):
         删除 ``self.obj``
         """
         self.do_delete()
-        
+
     def do_delete(self):
         if self.log:
             self.log_deletion(self.request, self.obj)

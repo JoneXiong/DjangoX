@@ -31,7 +31,7 @@ class JSONEncoder(DjangoJSONEncoder):
                 return super(JSONEncoder, self).default(o)
             except Exception:
                 return smart_unicode(o)
-            
+
 if django.VERSION[1] >= 8:
     from django.db.models.fields.related import ForeignObjectRel
     RelatedObject = ForeignObjectRel
@@ -52,7 +52,7 @@ try:
 except:
     from django.db import transaction
     commit_on_success = transaction.atomic
-    
+
 try:
     from django.core.cache import get_cache
 except:

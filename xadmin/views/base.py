@@ -2,7 +2,6 @@
 import sys
 import copy
 import functools
-
 from functools import update_wrapper
 
 
@@ -114,7 +113,7 @@ class Common(object):
         URL 参数控制
         在当前的query_string基础上生成新的query_string
 
-        :param new_params: 要新加的参数，该参数为 dict 
+        :param new_params: 要新加的参数，该参数为 dict
         :param remove: 要删除的参数，该参数为 list, tuple
         """
         if new_params is None:
@@ -139,7 +138,7 @@ class Common(object):
         Form 参数控制
         将当前 request 的参数，新加或是删除后，生成 hidden input。用于放入 HTML 的 Form 中。
 
-        :param new_params: 要新加的参数，该参数为 dict 
+        :param new_params: 要新加的参数，该参数为 dict
         :param remove: 要删除的参数，该参数为 list, tuple
         """
         if new_params is None:
@@ -159,15 +158,15 @@ class Common(object):
                 p[k] = v
         return mark_safe(''.join(
             '<input type="hidden" name="%s" value="%s"/>' % (k, v) for k, v in p.items() if v))
-        
-        
+
+
     def get_param(self, k):
         ret = self.request.GET.get(k, None)
         if ret:
             return ret
         else:
             return self.request.POST.get(k, None)
-        
+
     def param_list(self):
         return list(self.request.GET.keys()) + list(self.request.POST.keys())
 
@@ -183,19 +182,19 @@ class Common(object):
                 json.dumps(content, cls=JSONEncoder, ensure_ascii=False))
             return response
         return HttpResponse(content)
-    
+
     def render_json(self, content):
         response = HttpResponse(content_type='application/json; charset=UTF-8')
         response.write(
             json.dumps(content, cls=JSONEncoder, ensure_ascii=False))
         return response
-    
+
     def render_text(self, content):
         return HttpResponse(content)
 
     def template_response(self, template, context):
         return self.render_tpl(template, context)
-    
+
     def render_tpl(self, tpl, context):
         context.update({'current_app': self.admin_site.name})
         return TemplateResponse(self.request, tpl, context)
@@ -207,7 +206,7 @@ class Common(object):
         """
         if hasattr(messages, level) and callable(getattr(messages, level)):
             getattr(messages, level)(self.request, message)
-    
+
     def msg(self, message, level='info'):
         '''
         level 为 info、success、error
@@ -223,8 +222,8 @@ class Common(object):
 
     def vendor(self, *tags):
         return vendor(*tags)
-    
-    
+
+
     ########################################## 日志操作相关的函数 ##########################################
     def log_change(self, obj, message):
         """
@@ -238,7 +237,7 @@ class Common(object):
         obj_des = force_text(obj)
         aciton_id = CHANGE
         self._log(type_id, obj_id, obj_des, aciton_id, message)
-        
+
     def _log(self, type_id, obj_id, obj_des, aciton_id, msg=''):
         from django.contrib.admin.models import LogEntry
         LogEntry.objects.log_action(
@@ -396,7 +395,7 @@ class SiteView(BaseView):
             return self.user.is_superuser
         else:
             return self.user.has_perm(need_perm)
-        
+
     def get_nav_menu(self, app_label=None):
         # 非DEBUG模式会首先尝试从SESSION中取得缓存的 app 菜单项
         if self.admin_site.ext_ui:
@@ -434,7 +433,7 @@ class SiteView(BaseView):
             return menus
         else:
             return []
- 
+
     def deal_selected(self, nav_menu):
         def check_selected(menu, path):
             # 判断菜单项是否被选择，使用当前url跟菜单项url对比
@@ -472,7 +471,7 @@ class SiteView(BaseView):
             _app_label = hasattr(self, 'app_label') and self.app_label or None
             nav_menu = self.get_nav_menu(_app_label)
             self.deal_selected(nav_menu)
-        
+
         m_site = self.admin_site
         if m_site.ext_ui:m_site.menu_style = 'ext'
         context.update({

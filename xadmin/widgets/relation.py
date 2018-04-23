@@ -12,7 +12,7 @@ from django.utils import six
 from django.utils import formats
 from django.template import loader
 
-from xadmin import dutils
+from .. import dutils
 from ..util import vendor
 from .. import defs
 from ..dutils import force_text,force_unicode
@@ -79,15 +79,15 @@ class ForeignKeySearchWidget(forms.TextInput):
     @property
     def media(self):
         return vendor('select.js', 'select.css', 'xadmin.widget.select.js')
-    
-    
+
+
 class RawIdWidget(forms.TextInput):
-    
+
     label_format = '<input type="text" id="id_%s_show" class="form-control" value="%s" readonly="readonly" />'
-    
+
     def render(self, name, value, attrs=None):
         to_opts = self.r_model._meta
-        
+
         if attrs is None:
             attrs = {}
         extra = []
@@ -132,10 +132,10 @@ class RawIdWidget(forms.TextInput):
         output = [super(RawIdWidget, self).render(name, value, attrs)] + extra
 
         return mark_safe(''.join(output))
-    
+
     def _render_label(self, name, value):
         return self.label_format %(name, escape(Truncator(value).words(14, truncate='...')) )
-    
+
     @property
     def media(self):
         return vendor('xadmin.widget.RelatedObjectLookups.js','xadmin.widget.select-related.css')
@@ -148,7 +148,7 @@ class ForeignKeyRawIdWidget(RawIdWidget):
     def __init__(self, rel, admin_view, attrs=None, using=None):
         self.rel = rel
         self.r_model = rel.to
-        
+
         self.admin_view = admin_view
         self.db = using
         super(ForeignKeyRawIdWidget, self).__init__(attrs)
@@ -172,8 +172,8 @@ class ForeignKeyRawIdWidget(RawIdWidget):
             return self._render_label(name, obj)
         except (ValueError, self.r_model.DoesNotExist):
             return ''
-    
-    
+
+
 class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
     """
     打开Window窗口选择对象将id, title带过来 (多选)
@@ -215,8 +215,8 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
             if force_text(pk1) != force_text(pk2):
                 return True
         return False
-    
-    
+
+
 class ForeignKeyPopupWidget(RawIdWidget):
     """
     打开div窗口 选择对象 设置id, title (单选)
@@ -225,7 +225,7 @@ class ForeignKeyPopupWidget(RawIdWidget):
         self.r_model = r_model
         self.t_name = t_name
         self.s_name = s_name
-        
+
         self.admin_view = admin_view
         self.db = using
         super(ForeignKeyPopupWidget, self).__init__(attrs)
@@ -257,7 +257,7 @@ class ForeignKeyPopupWidget(RawIdWidget):
                 return self._render_label(name, show_val)
             except (ValueError, self.r_model.DoesNotExist):
                 return self._render_label(name, '')
-        
+
 
 class ManyToManyPopupWidget(ForeignKeyPopupWidget):
     """
@@ -270,7 +270,7 @@ class ManyToManyPopupWidget(ForeignKeyPopupWidget):
         if type(value) in (list,tuple):
             value = ','.join([force_text(v) for v in value])
         return super(ManyToManyPopupWidget, self).render(name, value, attrs)
-    
+
     def label_for_value(self, value, name=None):
         m_value = value.split(',')
         m_value = [e for e in m_value if e]
@@ -293,7 +293,7 @@ class ManyToManyPopupWidget(ForeignKeyPopupWidget):
         value = data.get(name)
         return value
 
-    
+
 class SelectMultipleTransfer(forms.SelectMultiple):
     """
     左右转移选择控件 (多选)
@@ -355,8 +355,8 @@ class SelectMultipleTransfer(forms.SelectMultiple):
             'chosen_options': u'\n'.join(chosen_output),
         }
         return mark_safe(loader.render_to_string('xadmin/forms/transfer.html', context))
-    
-    
+
+
 class SelectMultipleDropdown(forms.SelectMultiple):
     """
     下拉勾选控件 (多选)
@@ -392,8 +392,8 @@ class SelectMultipleDropselect(forms.SelectMultiple):
             return super(SelectMultipleDropselect, self).render(name, value, attrs)
         else:
             return super(SelectMultipleDropselect, self).render(name, value, attrs, choices)
-    
-    
+
+
 class SelectMultipleAjax(forms.SelectMultiple):
     """
     select2下拉选择控件 异步加载 (单选/多选)
@@ -403,7 +403,7 @@ class SelectMultipleAjax(forms.SelectMultiple):
         self.admin_view = admin_view
         self.multiple = multiple
         super(SelectMultipleAjax, self).__init__(attrs)
-        
+
     def value_from_datadict(self, data, files, name):
         m_data = data.get(name, None)
         if m_data:
@@ -411,13 +411,13 @@ class SelectMultipleAjax(forms.SelectMultiple):
             return [int(k) for k in m_list if k]
         else:
             return []
-        
+
     def _format_value(self, value):
         if self.is_localized:
             return formats.localize_input(value)
         value = [str(e) for e in value]
         return ','.join(value)
-    
+
     def label_for_value(self, value):
         key = self.rel.get_related_field().name
         q_dict = {}
@@ -437,8 +437,7 @@ class SelectMultipleAjax(forms.SelectMultiple):
         return vendor('select.js', 'select.css', 'xadmin.widget.select.js')
 
     def render(self, name, value, attrs=None, choices=()):
-        
-        
+
         to_opts = self.rel.to._meta
         if attrs is None:
             attrs = {}
@@ -455,8 +454,7 @@ class SelectMultipleAjax(forms.SelectMultiple):
             attrs['data-choices'] = format_html(attrs['data-choices'])
         if value:
             attrs['data-label'] = self.label_for_value(value)
-            
-            
+
         if value is None:
             value = ''
         final_attrs = self.build_attrs(attrs, type='text', name=name)

@@ -23,22 +23,22 @@ class ListAdminView(BaseGrid,ModelPage):
 
     list_display = ('__str__',)    #: 列表字段
     list_exclude = ()              #: 排除显示的列, 在显示列的设置中不会出现这些被排除的列
-    
+
     list_display_links = ()        #: 链接字段
     list_display_links_details = True  #: 链接到详情页面而非编辑页
-    
+
     list_select_related = None     #: 是否提前加载关联数据, 使用 ``select_related``
-    
+
     list_per_page = 50             #: 每页显示数据的条数
     list_max_show_all = 200        #: 每页最大显示数据的条数
     paginator_class = Paginator    #: 分页类
 
     search_fields = ()             #: 按照这些列搜索数据
     ordering = None                #: 默认的数据排序规则
-    
+
     list_template = None    #: 显示数据的模板
     pop = False
-    search_sphinx_ins = None 
+    search_sphinx_ins = None
     col_ctrl = True
 
     list_tabs = []
@@ -112,7 +112,7 @@ class ListAdminView(BaseGrid,ModelPage):
                 query_set.order_by('-@weight', '-@id')
                 query_set._maxmatches = 500
                 query_set._limit = 500
-                
+
                 sph_results = query_set._get_sphinx_results()
                 result_ids = [r['id'] for r in sph_results['matches'][:500]]
                 if query.isdigit():
@@ -144,7 +144,7 @@ class ListAdminView(BaseGrid,ModelPage):
 
         # 进行排序
         queryset = queryset.order_by(*self.get_ordering())
-        
+
         return queryset
 
 
@@ -187,7 +187,7 @@ class ListAdminView(BaseGrid,ModelPage):
 
     def get_check_field_url(self, f):
         """
-        返回 ``显示列`` 菜单项中每一项的 url. 
+        返回 ``显示列`` 菜单项中每一项的 url.
         """
         # 使用 :attr:`base_list_display` 作为基础列, 因为 :attr:`list_display` 可能已经被插件修改
         fields = [fd for fd in self.base_list_display if fd != f.name]
@@ -212,7 +212,7 @@ class ListAdminView(BaseGrid,ModelPage):
                 pass
         return [FakeMethodField(name, getattr(method, 'short_description', capfirst(name.replace('_', ' '))))
                 for name, method in methods]
-        
+
     def get_model_fields(self):
         u'''
         获取所有可供显示的列的信息

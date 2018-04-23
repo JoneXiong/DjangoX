@@ -20,7 +20,7 @@ def register_builtin_views(site):
     site.register_modelview(r'^(.+)/dashboard/$', views.ModelDashboard, name='%s_%s_dashboard')
 
     site.set_loginview(views.LoginView)
-    
+
 def register_builtin_plugins(site):
     from xadmin.plugins import PLUGINS
     from .dutils import import_module
@@ -32,9 +32,9 @@ def autodiscover():
     import xadmin
     from xadmin.sites import site
     from .dutils import import_module
-    
+
     xadmin.site = site
-    
+
     # 为 crispy_form 动态设置的settings项
     setattr(settings, 'CRISPY_TEMPLATE_PACK', 'bootstrap3')
     setattr(settings, 'CRISPY_CLASS_CONVERTERS', {
@@ -57,7 +57,7 @@ def autodiscover():
         else:
             app_label = app.split('.')[-1]
         site.app_dict[app_label] = mod
-        
+
         # app级菜单初始化
         default_title = hasattr(mod,'verbose_name') and u'%s 其他'%mod.verbose_name or u'其他'
         site.sys_menu[app_label] = {'_default_group':{'key': '_default_group','title': default_title, 'icon': 'fa-th-large', 'menus': []}  }
@@ -65,7 +65,7 @@ def autodiscover():
             m_menus = mod.menus
             for e in m_menus:
                 site.sys_menu[app_label][e[0]] = {'key': e[0],'title': e[1], 'icon': e[2], 'menus': []}
-        
+
         # 导入 adminx 模块
         try:
             before_import_registry = site.copy_registry()

@@ -7,11 +7,12 @@ from django.utils.translation import ugettext as _
 from django.utils.encoding import force_text
 from django.contrib.contenttypes.models import ContentType
 
-from .base import filter_hook
 from xadmin.views.action import Action
 from xadmin.util import get_deleted_objects, model_ngettext
 from xadmin.defs import ACTION_CHECKBOX_NAME
 from xadmin.dutils import force_unicode
+
+from .base import filter_hook
 
 class DeleteSelectedAction(Action):
 
@@ -23,7 +24,7 @@ class DeleteSelectedAction(Action):
 
     model_perm = 'delete'
     icon = 'fa fa-times'
-    
+
     def do_deletes(self, queryset):
         if self.log:
             for obj in queryset:
@@ -85,7 +86,7 @@ class DeleteSelectedAction(Action):
 
         return TemplateResponse(self.request, self.delete_selected_confirmation_template or
                                 self.get_template_list('views/model_delete_selected_confirm.html'), context)
-        
+
     def log_deletion(self, request, object):
         """
         删除对象日志

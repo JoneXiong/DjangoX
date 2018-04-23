@@ -110,9 +110,9 @@ class BaseFilter(object):
         return mark_safe(tpl.render(Context(self.get_context())))
 
 class InputFilter(BaseFilter):
-    
+
     lookup_formats = {} # 过滤器涉及的子类型和url参数之间映射字典
-    
+
     def __init__(self, request, params, model, admin_view):
         super(InputFilter, self).__init__(request, params, model, admin_view)
         # 确保子类设置了 lookup_formats 成员
@@ -120,7 +120,7 @@ class InputFilter(BaseFilter):
             raise ImproperlyConfigured(
                 "The filter '%s' does not specify "
                 "a 'lookup_formats'." % self.__class__.__name__)
-            
+
         # 设置 self.lookup_[key] = value，和 self.context_params、self.used_params
         self.context_params = {}    #传给模板的context变量
         for name, format in self.lookup_formats.items():
@@ -135,16 +135,16 @@ class InputFilter(BaseFilter):
 
         for k,v in self.context_params.items():
             setattr(self, 'lookup_' + k, v)
-        
+
     def has_output(self):
         return True
-    
+
     def get_context(self):
         context = super(InputFilter, self).get_context()
         context.update(self.context_params)
         context['remove_url'] = self.query_string( {}, map( lambda k: FILTER_PREFIX + k, self.used_params.keys() ) )
         return context
-    
+
     def get_value(self, name):
         _param_name = self.lookup_formats[name] % self.parameter_name
         return self.used_params.get(_param_name, None)
@@ -153,13 +153,13 @@ class FieldFilter(InputFilter):
     u'''
     模型字段过滤器基类
     '''
-    
+
     def __init__(self, field, request, params, model, admin_view, field_path):
         # 多了首尾两个参数    字段类 和 字段名
         self.field = field
         self.field_path = field_path
         self.parameter_name = field_path
-        
+
         self.title = getattr(field, 'verbose_name', field_path)
         self.context_params = {}
 
@@ -193,12 +193,12 @@ class ChoicesBaseFilter(BaseFilter):
         if self.parameter_name in params:
             value = params.pop(self.parameter_name)
             self.used_params[self.parameter_name] = value
-        
-       
+
+
     def lookups(self, request, admin_view):
         u'''配置选项 eg [ ('1', '上个月'), ('2', '下个月') ]'''
         raise NotImplementedError
-        
+
     def choices(self):
         yield {
             'selected': self.value() is None,
@@ -211,39 +211,39 @@ class ChoicesBaseFilter(BaseFilter):
                 'query_string': self.query_string({'_p_'+self.parameter_name: lookup,}, []),
                 'display': title,
             }
-    
+
     def get_context(self):
         context = super(ChoicesBaseFilter, self).get_context()
         context['choices'] = list(self.choices())
         return context
-    
+
     def has_output(self):
         return len(self.lookup_choices) > 0
 
     def value(self):
         return self.used_params.get(self.parameter_name, None)
 
-    
+
 class TextBaseFilter(InputFilter):
-    
+
     template = 'xadmin/filters/char.html'
     lookup_formats = {'in': '%s__in','search': '%s__contains'}
 
     def value(self):
         u'''获取Text的值'''
         return self.get_value('search')
-    
-    
+
+
 class NumberBaseFilter(InputFilter):
-    
+
     template = 'xadmin/filters/number.html'
     lookup_formats = {'equal': '%s__exact', 'lt': '%s__lt', 'gt': '%s__gt',
                       'ne': '%s__ne', 'lte': '%s__lte', 'gte': '%s__gte',
                       }
 
-    
+
 class DateBaseFilter(ChoicesBaseFilter, InputFilter):
-    
+
     template = 'xadmin/filters/date_base.html'
     lookup_formats = {'since': '%s__gte', 'until': '%s__lt'}
 
@@ -252,7 +252,7 @@ class DateBaseFilter(ChoicesBaseFilter, InputFilter):
         self.field_generic = '%s__' % self.parameter_name
         self.date_params = dict([(FILTER_PREFIX + k, v) for k, v in params.items()
                                  if k.startswith(self.field_generic)])
-        
+
         super(DateBaseFilter, self).__init__(request, params, model, admin_view)
 
     def lookups(self, request, admin_view):
@@ -281,7 +281,7 @@ class DateBaseFilter(ChoicesBaseFilter, InputFilter):
                 param_dict, [FILTER_PREFIX + self.field_generic]),
                 'display': title,
             }
-    
+
 
 @manager.register
 class BooleanFieldListFilter(ListFieldFilter):
@@ -360,7 +360,7 @@ class NumberFieldListFilter(FieldFilter):
             queryset = queryset.exclude(
                 **{self.field_path: params.pop(ne_key)})
         return queryset.filter(**params)
-    
+
 
 @manager.register
 class DateFieldListFilter(ListFieldFilter):
@@ -516,7 +516,7 @@ class RelatedFieldListFilter(ListFieldFilter):
         else:
             self.lookup_title = other_model._meta.verbose_name
         self.title = self.lookup_title
-        
+
     def check_null(self):
         if hasattr(self.field,'field'):
             _field = self.field.field
@@ -560,8 +560,8 @@ class RelatedFieldListFilter(ListFieldFilter):
                 }, [self.lookup_exact_name]),
                 'display': EMPTY_CHANGELIST_VALUE,
             }
-            
-            
+
+
 # @manager.register
 class CommonFieldListFilter(FieldFilter):
     template = 'xadmin/filters/common.html'
@@ -586,62 +586,62 @@ class CommonFieldListFilter(FieldFilter):
 # @manager.register
 class MultiSelectFieldListFilter(ListFieldFilter):
     """ Delegates the filter to the default filter and ors the results of each
-     
+
     Lists the distinct values of each field as a checkbox
-    Uses the default spec for each 
-     
+    Uses the default spec for each
+
     """
     template = 'xadmin/filters/checklist.html'
     lookup_formats = {'in': '%s__in'}
     cache_config = {'enabled':False,'key':'quickfilter_%s','timeout':3600,'cache':'default'}
- 
+
     @classmethod
     def test(cls, field, request, params, model, admin_view, field_path):
         return True
- 
+
     def get_cached_choices(self):
         if not self.cache_config['enabled']:
             return None
         c = get_cache(self.cache_config['cache'])
         return c.get(self.cache_config['key']%self.field_path)
-    
+
     def set_cached_choices(self,choices):
         if not self.cache_config['enabled']:
             return
         c = get_cache(self.cache_config['cache'])
         return c.set(self.cache_config['key']%self.field_path,choices)
-    
+
     def __init__(self, field, request, params, model, model_admin, field_path,field_order_by=None,field_limit=None,sort_key=None,cache_config=None):
         super(MultiSelectFieldListFilter,self).__init__(field, request, params, model, model_admin, field_path)
-        
+
         # Check for it in the cachce
         if cache_config is not None and type(cache_config)==dict:
             self.cache_config.update(cache_config)
-        
+
         if self.cache_config['enabled']:
             self.field_path = field_path
             choices = self.get_cached_choices()
             if choices:
                 self.lookup_choices = choices
                 return
-            
+
         # Else rebuild it
         queryset = self.admin_view.queryset().exclude(**{"%s__isnull"%field_path:True}).values_list(field_path, flat=True).distinct() 
         #queryset = self.admin_view.queryset().distinct(field_path).exclude(**{"%s__isnull"%field_path:True})
-        
+
         if field_order_by is not None:
             # Do a subquery to order the distinct set
             queryset = self.admin_view.queryset().filter(id__in=queryset).order_by(field_order_by)
-            
+
         if field_limit is not None and type(field_limit)==int and queryset.count()>field_limit:
             queryset = queryset[:field_limit]
-        
+
         self.lookup_choices = [str(it) for it in queryset.values_list(field_path,flat=True) if str(it).strip()!=""]
         if sort_key is not None:
             self.lookup_choices = sorted(self.lookup_choices,key=sort_key)
-        
+
         if self.cache_config['enabled']:
-            self.set_cached_choices(self.lookup_choices) 
+            self.set_cached_choices(self.lookup_choices)
 
     def choices(self):
         self.lookup_in_val = (type(self.lookup_in_val) in (tuple,list)) and self.lookup_in_val or list(self.lookup_in_val)

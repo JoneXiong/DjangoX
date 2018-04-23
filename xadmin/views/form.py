@@ -19,9 +19,9 @@ from xadmin import widgets
 from xadmin.layout import FormHelper, Layout, Fieldset, TabHolder, Container, Column, Col, Field
 from xadmin.util import unquote
 from xadmin.views.detail import DetailAdminUtil
-from .common import JsonErrorDict
 from xadmin import dutils
 
+from .common import JsonErrorDict
 from .base import SiteView, filter_hook, csrf_protect_m
 
 class FormView(SiteView):
@@ -35,7 +35,7 @@ class FormView(SiteView):
     pop = False
     #弃用
     title = None
-    
+
     _has_file_field = False
     perm = None
 
@@ -62,7 +62,7 @@ class FormView(SiteView):
         if helper:
             self.form_obj.helper = helper
         self.check_fields()
-            
+
     def check_fields(self):
         for name, field in self.form_obj.fields.items():
             if isinstance(field,forms.FileField):
@@ -151,7 +151,7 @@ class FormView(SiteView):
                 return self.render_response(result)
 
         return self.get_response()
-    
+
     @filter_hook
     def get_error_list(self):
         """
@@ -211,7 +211,7 @@ class FormView(SiteView):
         msg = _('操作成功')
         self.message_user(msg, 'success')
         param_list = self.param_list()
-        
+
         if "_continue" in param_list:
             if self._has_file_field:
                 return self.request.get_full_path()

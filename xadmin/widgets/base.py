@@ -18,7 +18,7 @@ from ..util import vendor
 from ..dutils import force_unicode
 
 class ReadonlyWidget(forms.TextInput):
-    
+
     def __init__(self, attrs=None):
         if attrs:
             attrs['readonly'] = 'readonly'
@@ -68,9 +68,9 @@ class SelectWidget(forms.Select):
     def media(self):
         return vendor('select.js', 'select.css', 'xadmin.widget.select.js')
 AdminSelectWidget = SelectWidget
-    
+
 class SelectModelWidget(forms.Select):
-    
+
     def __init__(self, model, key, value, attrs=None, choices=()):
         super(SelectModelWidget, self).__init__(attrs)
         self.model = model
@@ -79,7 +79,7 @@ class SelectModelWidget(forms.Select):
     @property
     def media(self):
         return vendor('select.js', 'select.css', 'xadmin.widget.select.js')
-    
+
 class AjaxSearchWidget(forms.TextInput):
 
     def __init__(self, data_source, attrs=None, using=None):
@@ -227,14 +227,14 @@ class AdminTextInputWidget(forms.TextInput):
         if attrs is not None:
             final_attrs.update(attrs)
         super(AdminTextInputWidget, self).__init__(attrs=final_attrs)
-        
+
 class MultiTextInputWidget(forms.TextInput):
     def __init__(self, attrs=None):
         final_attrs = {'class': 'text-field'}
         if attrs is not None:
             final_attrs.update(attrs)
         super(MultiTextInputWidget, self).__init__(attrs=final_attrs)
-        
+
     def _format_value(self, value):
         if value:
             value = map(str, value)

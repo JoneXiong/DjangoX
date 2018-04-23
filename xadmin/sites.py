@@ -58,7 +58,7 @@ class AdminSite(object):
         * 注册的 ``model admin view class``
         * 注册的各种插件
     """
-    
+
     site_title = None         # 网站的标题
     site_footer = None         # 网站的下角标文字
     menu_style = 'accordion'    # 网站左侧菜单风格 可选项 default、accordion
@@ -73,7 +73,7 @@ class AdminSite(object):
     main_view = None #frame框架main页试图
     show_default_index = True
 
-    
+
     def __init__(self, name='xadmin'):
         self.name = name
         self.app_name = 'xadmin'
@@ -160,7 +160,7 @@ class AdminSite(object):
         name = page_view_class.__name__
         self._registry_pages.append(page_view_class)
         self.register_view('^page/%s/$'%name.lower(), page_view_class, name)
-        
+
     def register_appindex(self, app_index_class):
         app_label = app_index_class.app_label
         name = '%s_%s'%(app_label,app_index_class.__name__)
@@ -189,7 +189,7 @@ class AdminSite(object):
         注册需要管理的 Model， 或是为某 AdminView 添加 OptionClass
 
         :param model_or_iterable: 传入 model 或 BaseView子类
-        :param admin_class: 
+        :param admin_class:
                         model_or_iterable 为 Model 时，该参数为 ModelAdmin；
                         model_or_iterable 为 BaseView 时 ，该参数为 OptionClass
         """
@@ -347,17 +347,17 @@ class AdminSite(object):
             # 列出 AdminViewClass 所有的继承类，包括本身类
             if klass == BaseView or issubclass(klass, BaseView):
                 merge_opts = []
-                
+
                 reg_class = self._registry_avs.get(klass)
                 if reg_class:
                     merge_opts.append(reg_class)
-                    
+
 #                settings_class = self._get_settings_class(klass)
 #                if settings_class:
 #                    merge_opts.append(settings_class)
                 if issubclass(klass, GridPage):
                     merge_opts.append(admin_view_class)
-                    
+
                 merge_opts.extend(opts)
                 ps = self._registry_plugins.get(klass, [])
                 # 如果有需要merge的 OptionClass 则使用 AdminSite._create_plugin 方法创建插件类，并且放入插件列表
@@ -385,7 +385,7 @@ class AdminSite(object):
 #            if settings_class:
 #                merges.append(settings_class)
             merges.append(klass)
-            
+
         new_class_name = '__'.join([c.__name__ for c in merges])
 
         if new_class_name not in self._admin_view_cache:
@@ -414,7 +414,7 @@ class AdminSite(object):
         :param option_class: Model 的 OptionClass，保存对该 Model 的相关定制
         """
         return self.get_view_class(admin_view_class, option_class).as_view()
-    
+
     def gen_view(self, clz):
         def wrap(view, cacheable=False):
             '''
@@ -424,7 +424,7 @@ class AdminSite(object):
                 return self.site_view_decor(view, cacheable)(*args, **kwargs)
             return update_wrapper(wrapper, view)
         return wrap(self.create_admin_view(clz))
-    
+
     def gen_model_view(self, clz):
         model = getattr(clz, 'model')
         admin_class = self._registry[model]
@@ -510,7 +510,7 @@ class AdminSite(object):
         else:
             from django.views.i18n import null_javascript_catalog as javascript_catalog
         return javascript_catalog(request, packages=['django.conf', 'xadmin'])
-    
+
     def get_model_url(self, model, name, *args, **kwargs):
         """
         路径工具函数
@@ -523,10 +523,10 @@ class AdminSite(object):
 
     def url_for(self, name, *args, **kwargs):
         return reverse( '%s:%s'%(self.name, name) ,current_app=self.name)
-        
+
     def get_model_perm(self, model, name):
         return '%s.%s_%s' % (model._meta.app_label, name, model._meta.module_name)
-    
+
     def get_sys_menu(self):
         '''
         加载系统所有菜单
@@ -539,7 +539,7 @@ class AdminSite(object):
             else:
                 m_menu_group = '_default_group'
             icon = getattr(model_admin,'model_icon', defs.DEFAULT_MODEL_ICON)
-            
+
             app_label = getattr(model_admin, 'app_label', model._meta.app_label)  #model_admin.app_label
             model_dict = {
                 'title': getattr(model_admin, 'verbose_name', '') or  unicode(capfirst(model._meta.verbose_name_plural)),
@@ -553,7 +553,7 @@ class AdminSite(object):
                 m_menu[m_menu_group]['menus'].append(model_dict)
             else:
                 m_menu['_default_group']['menus'].append(model_dict)
-        
+
         for page in self._registry_pages:
             if getattr(page, 'hide_menu', False)or getattr(page, 'hidden_menu', False):
                 continue
@@ -574,12 +574,12 @@ class AdminSite(object):
                 m_menu[m_menu_group]['menus'].append(model_dict)
             else:
                 m_menu['_default_group']['menus'].append(model_dict)
-                
+
         for app_menu in self.sys_menu.values():
             for menu in app_menu.values():
                 menu['menus'].sort(key=sortkeypicker(['order']))
         self.sys_menu_loaded = True
-    
+
     def get_app_menu(self, app_label):
         '''
         获取某个APP的菜单
@@ -614,7 +614,7 @@ class AdminSite(object):
             if len(m_menu['_default_group'])>0:
                     ret.append(m_menu['_default_group'])
         return ret
-    
+
     def get_site_menu(self, select_app):
         '''
         获取APP列表菜单
@@ -660,7 +660,7 @@ class AdminSite(object):
                             })
                 mod.index_url = m_first_url
         return ret
-        
+
 
 # AdminSite 的单例, 全站统一实例
 site = AdminSite()

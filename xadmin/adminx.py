@@ -1,4 +1,5 @@
 # coding=utf-8
+
 from django.contrib.admin.models import LogEntry
 from django.contrib.contenttypes.models import ContentType
 

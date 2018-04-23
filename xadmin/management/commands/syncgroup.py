@@ -4,7 +4,6 @@ import os
 import json
 
 from django.conf import settings
-
 from django.core.management.base import CommandError, BaseCommand
 from django.contrib.auth.models import ContentType, Permission, Group
 

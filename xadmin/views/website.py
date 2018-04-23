@@ -12,11 +12,12 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate
 
-from .base import BaseView, filter_hook, SiteView
-from .dashboard import Dashboard
 from xadmin.models import UserSettings
 from xadmin.layout import FormHelper
 from xadmin import defs
+
+from .base import BaseView, filter_hook, SiteView
+from .dashboard import Dashboard
 
 
 class IndexView(Dashboard):
@@ -82,7 +83,7 @@ class AdminAuthenticationForm(AuthenticationForm):
 
     def clean(self):
         from xadmin.util import User
-        
+
         ERROR_MESSAGE = ugettext_lazy("Please enter the correct username and password "
                                       "for a staff account. Note that both fields are case-sensitive.")
         username = self.cleaned_data.get('username')
