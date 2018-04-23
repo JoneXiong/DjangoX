@@ -1,1 +1,1 @@
-import tree, wysi
+from . import tree, wysi

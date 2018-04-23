@@ -5,11 +5,11 @@ import xadmin
 from django import forms
 from django.db.models import ManyToManyField, ForeignKey
 #from django.forms.util import flatatt
-from django.utils.encoding import force_unicode
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 from xadmin.views import BasePlugin, ModelFormAdminView
 from xadmin import dutils
+from xadmin.dutils import force_unicode
 
 class TreeSelect(object):
 

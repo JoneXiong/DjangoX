@@ -1,3 +1,3 @@
 # coding=utf-8
-import plugins
-import views
+from . import plugins
+from . import views
