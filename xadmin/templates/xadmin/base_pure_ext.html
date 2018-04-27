@@ -33,23 +33,23 @@
             <div class="box-title">
             {% view_block 'nav_btns' %}
             {% block nav_btns %}{% endblock %}
+
+            {% block nav_middle %}{% endblock %}
             </div>
           </div>
 
 
           <div class="col-sm-4">
-            {% block nav_middle %}{% endblock %}
+              <!-- 过滤器 -->
+              <div>
+                {% view_block 'nav_menu' %}
+              </div>
           </div>
 
           <div class="col-sm-4">
-          {% block nav_form %}{% endblock %}
-          <!-- 搜索框 -->
-          {% view_block 'nav_form' %}
-
-          <!-- 过滤器 -->
-          <div class="navbar-right">
-            {% view_block 'nav_menu' %}
-          </div>
+              {% block nav_form %}{% endblock %}
+              <!-- 搜索框 -->
+              {% view_block 'nav_form' %}
         </div>
       </div>
       {% endblock %}
