@@ -428,7 +428,7 @@ def display_for_field(value, field):
     from xadmin.defs import EMPTY_CHANGELIST_VALUE
 
     if field.flatchoices:
-        if hasattr(value,'__iter__'):
+        if not isinstance(value, (str, unicode)) and hasattr(value,'__iter__'):
             rets = [ dict(field.flatchoices).get(e, EMPTY_CHANGELIST_VALUE) for e in  value]
             return ','.join(rets)
         else:

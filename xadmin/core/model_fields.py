@@ -41,7 +41,8 @@ class AutoMD5SlugField(SlugField):
 
         #所选字段取不到值的时候,用uuid来代替做hash
         hash_field_val = getattr(model_instance, self._populate_from) or str(uuid.uuid1())
-        slug = hashlib.md5('%s%s%s' % (hash_key, hash_field_val, extra)).hexdigest()
+        _data = '%s%s%s' % (hash_key, hash_field_val, extra)
+        slug = hashlib.md5(_data.encode('utf-8')).hexdigest()
         slug_len = slug_field.max_length
         if slug_len:
             slug = slug[:slug_len]
@@ -76,7 +77,7 @@ class AutoMD5SlugField(SlugField):
         return slug
 
     def pre_save(self, model_instance, add):
-        value = unicode(self.create_slug(model_instance, add))
+        value = dutils.unicode(self.create_slug(model_instance, add))
         setattr(model_instance, self.attname, value)
         return value
 
@@ -86,13 +87,13 @@ class AutoMD5SlugField(SlugField):
 
 class MultiSelectField(models.Field):
     __metaclass__ = SubfieldBase
- 
+
     def get_internal_type(self):
         return "CharField"
- 
+
     def get_choices_default(self):
         return self.get_choices(include_blank=False)
- 
+
     def formfield(self, **kwargs):
         # don't call super, as that overrides default widget if it has choices
         defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name),
@@ -101,34 +102,34 @@ class MultiSelectField(models.Field):
             defaults['initial'] = self.get_default()
         defaults.update(kwargs)
         return MultiSelectFormField(**defaults)
- 
+
     def get_prep_value(self, value):
         return value
- 
+
     def get_db_prep_value(self, value, connection=None, prepared=False):
         if isinstance(value, dutils.basestring):
             return value
         elif isinstance(value, list):
             return ",".join(value)
- 
+
     def to_python(self, value):
         if value is not None:
             return value if isinstance(value, list) else value.split(',')
         return ''
- 
+
     def contribute_to_class(self, cls, name):
         super(MultiSelectField, self).contribute_to_class(cls, name)
         if self.choices:
             func = lambda self, fieldname = name, choicedict = dict(self.choices): ",".join([choicedict.get(value, value) for value in getattr(self, fieldname)])
             setattr(cls, 'get_%s_display' % self.name, func)
- 
+
     def validate(self, value, model_instance):
         arr_choices = self.get_choices_selected(self.get_choices_default())
         for opt_select in value:
             if (int(opt_select) not in arr_choices):  # the int() here is for comparing with integer choices
                 raise exceptions.ValidationError(self.error_messages['invalid_choice'] % value)
         return
- 
+
     def value_to_string(self, obj):
         value = self._get_val_from_obj(obj)
         return self.get_db_prep_value(value)
@@ -145,13 +146,13 @@ class BetterCharField(models.Field):
 
 
 class CloudImageField(models.ImageField):
-    
+
     def __init__(self, verbose_name=None, name=None, width_field=None,
             height_field=None, **kwargs):
         from .storage_qiniu import QiniuStorage
         kwargs['storage'] = QiniuStorage()
         super(CloudImageField, self).__init__(verbose_name, name, width_field, height_field, **kwargs)
-   
+
 # Fix south problems     
 try:
     from south.modelsinspector import add_introspection_rules
