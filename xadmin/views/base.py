@@ -145,9 +145,10 @@ class Common(object):
             new_params = {}
         if remove is None:
             remove = []
-        p = dict(self.request.GET.items()).copy()
+        origin = self.request.GET
+        p = dict(origin.items()).copy()
         for r in remove:
-            for k in p.keys():
+            for k in origin.keys():
                 if k.startswith(r) and k!='pop':
                     del p[k]
         for k, v in new_params.items():
