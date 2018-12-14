@@ -510,6 +510,7 @@ class AdminSite(object):
         else:
             from django.views.i18n import null_javascript_catalog as javascript_catalog
         return javascript_catalog(request, packages=['django.conf', 'xadmin'])
+    i18n_javascript.need_site_permission = False
 
     def get_model_url(self, model, name, *args, **kwargs):
         """

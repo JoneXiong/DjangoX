@@ -220,7 +220,7 @@ class FormView(SiteView):
             return self.get_param('_redirect')
         elif '_pop' in param_list:
             js_str='''<!DOCTYPE html>
-<html lang="zh_CN">
+<html lang="zh-CN">
 <head>
             <script type="text/javascript">
                 window.opener.location.reload();

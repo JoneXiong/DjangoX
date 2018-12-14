@@ -114,7 +114,7 @@ class AdminAuthenticationForm(AuthenticationForm):
 
 class LoginView(BaseView):
 
-    title = _(u"登陆")
+    title = _(u"登录")
     login_form = None
     login_template = None
 
