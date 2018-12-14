@@ -115,6 +115,8 @@ class FilterPlugin(BasePlugin):
 
         self.filter_specs = []
         self.filter_default = []
+        if not self.admin_site.ext_ui:
+            self.filter_default_list = []
         if self.list_filter:
             for list_filter in self.list_filter:
                 if callable(list_filter):
@@ -166,6 +168,8 @@ class FilterPlugin(BasePlugin):
 
         self.has_filters = bool(self.filter_specs)
         self.admin_view.filter_specs = self.filter_specs
+        if not self.admin_site.ext_ui:
+            self.admin_view.filter_list_position = None
         self.admin_view.filter_default = self.filter_default
         self.admin_view.used_filter_num = len(
             list(filter(lambda f: f.is_used and f not in self.filter_default, self.filter_specs)))

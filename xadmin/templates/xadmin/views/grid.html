@@ -200,7 +200,7 @@
   <input type="hidden" id="action" name="action" value=""/>
   <input type="hidden" id="select-across" name="select_across" value=""/>
 
-{% if not ext_ui %}
+{% if not ext_ui and cl.result_count %}
 <div class="form-actions well well-sm">
   {% view_block 'results_bottom' %}
 </div>
