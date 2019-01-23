@@ -1,7 +1,7 @@
 try:
     import urlparse
 except:
-    from urllib.parse import urlparse
+    from urllib import parse as urlparse
 
 from django.db import models
 from django import forms
