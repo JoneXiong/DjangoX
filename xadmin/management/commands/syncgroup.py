@@ -32,7 +32,7 @@ def sync_groups(group_dict):
             print('Created group: %s'%_group)
 
         # 获取model的权限配置
-        _group_model_perm = group_perm.get("model", [])
+        _group_model_perm = group_perm.get("model", {})
         for model_name, model_perm in _group_model_perm.iteritems():
             perm_need_add.extend([each_perm for each_perm in
                                   Permission.objects.filter(codename__in=gen_model_perm_code(model_name, model_perm))])
