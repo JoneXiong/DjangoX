@@ -174,7 +174,8 @@ class BaseGrid(object):
         self.paginator = self.get_paginator()
 
         # 获取当前据数目
-        self.result_count = self.paginator.count
+        self.result_count = self.get_result_count()
+        self.paginator._count = self.result_count
         if self.can_show_all:
             self.can_show_all = self.result_count <= self.list_max_show_all
         self.multi_page = self.result_count > self.list_per_page
@@ -211,3 +212,7 @@ class BaseGrid(object):
 
     def get_nav_btns(self):
         return []
+
+
+    def get_result_count(self):
+        return self.paginator.count
