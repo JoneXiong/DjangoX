@@ -9,7 +9,7 @@
       {% if formset.formset.can_delete %}
         <a class="delete-row pull-right"><i class="fa fa-times"></i></a>
       {% endif %}
-      <b>{{ formset.opts.verbose_name|title }}:</b>&nbsp;{% if fs.instance.pk %}{{ fs.instance }}{% else %}#<span class="formset-num">{{ forloop.counter }}</span>{% endif %}
+      <b>{{ formset.opts.verbose_name|title }}:</b>&nbsp;{% if fs.instance.pk %}{{ fs.instance|stringformat:"s" }}{% else %}#<span class="formset-num">{{ forloop.counter }}</span>{% endif %}
     </div>
     <div class="panel-body formset-form">
       {% crispy fs formset.formset.helper %}
