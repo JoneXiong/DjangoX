@@ -12,12 +12,12 @@
 
 {% block nav_middle %}
 {% if change %}
-<form id="changelist-form" action="{% url opts|admin_urlname:'changelist' %}" method="post">{% csrf_token %}
+<form style="float: left;margin-left: 5px;" id="changelist-form" action="{% url opts|admin_urlname:'changelist' %}" method="post">{% csrf_token %}
     <input name="_selected_action" type="hidden" value="{{ original.pk }}" />
     <input type="hidden" id="action" name="action" value=""/>
     {% view_block 'results_bottom' %}
     {% if show_delete_link %}
-      <a href="{{ delete_url }}" class="btn btn-sm btn-default">{% trans "Delete" %}</a>
+      <a href="{{ delete_url }}" class="btn btn-default">{% trans "Delete" %}</a>
     {% endif %}
 </form>
 {% endif %}
