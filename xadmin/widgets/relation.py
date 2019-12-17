@@ -86,6 +86,7 @@ class RawIdWidget(forms.TextInput):
     label_format = '<input type="text" id="id_%s_show" class="form-control" value="%s" readonly="readonly" />'
 
     def render(self, name, value, attrs=None):
+        attrs = attrs.copy()
         to_opts = self.r_model._meta
 
         if attrs is None:
