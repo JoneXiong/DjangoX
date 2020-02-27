@@ -23,6 +23,7 @@ xadmin.site.register(SystemSettings, SystemSettingsAdmin)
 
 
 class LogEntryAdmin(object):
+    model_icon = 'fa fa-file-text-o'
     list_display = ['id', '__str__', 'object_id', 'content_type', 'user', 'action_time']
     list_filter = ['content_type']
     filter_default_list = ['content_type']
@@ -32,6 +33,7 @@ class LogEntryAdmin(object):
 xadmin.site.register(LogEntry, LogEntryAdmin)
 
 class ContentTypeAdmin(object):
+    model_icon = 'fa fa-navicon'
     app_label = 'xadmin'
     menu_group = 'other_group'
 xadmin.site.register(ContentType, ContentTypeAdmin)
